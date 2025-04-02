@@ -1,0 +1,114 @@
+<link rel="stylesheet" href="/css/usuarios/usuarios.css">
+
+<body>
+    <header class="header">
+        <h5 class="titulo-usuarios">Usuarios</h5>
+        <button id="btnRegistrarUsuario" class="btn btn-success" data-toggle="modal" data-target="#modalRegistrarUsuario">Registrar Usuario</button>
+    </header>
+    <div class="container-fluid mt-4">
+        <div class="table-responsive">
+            <table id="usuarios" class="table table-striped table-bordered" style="width: 99%;">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Documento</th>
+                        <th>Estado</th>
+                        <th>Correo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyusuarios">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="modalEditarUsuario" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Editar Usuario</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarUsuario" novalidate>
+                        <input type="hidden" id="idusuario">
+                        <div class="form-group">
+                            <label for="nombres">Nombres</label>
+                            <input type="text" id="nombres" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellidos">Apellidos</label>
+                            <input type="text" id="apellidos" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="documento">Documento</label>
+                            <input type="text" id="documento" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="correo">Correo</label>
+                            <input type="email" id="correo" class="form-control">
+                            <div class="invalid-feedback">Por favor, ingrese un correo válido.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="guardarCambios">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div class="modal fade" id="modalRegistrarUsuario" aria-labelledby="modalRegistrarLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalRegistrarLabel">Registrar Usuario</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formRegistrarUsuario" novalidate>
+                        <div class="form-group">
+                            <label for="nombresRegistro">Nombres</label>
+                            <input type="text" id="nombresRegistro" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellidosRegistro">Apellidos</label>
+                            <input type="text" id="apellidosRegistro" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="documentoRegistro">Documento</label>
+                            <input type="text" id="documentoRegistro" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="correoRegistro">Correo</label>
+                            <input type="email" id="correoRegistro" class="form-control">
+                            <div class="invalid-feedback">Por favor, ingrese un correo válido.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="guardarRegistro">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/controllers/usuarios/usuarios.js"></script>
+</body>

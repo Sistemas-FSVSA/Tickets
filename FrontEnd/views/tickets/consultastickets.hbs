@@ -1,0 +1,117 @@
+<link rel="stylesheet" href="/css/tickets/tickets.css">
+<link rel="stylesheet" href="/css/tickets/consultastickets.css">
+
+<body>
+    <div class="container-fluid mt-4">
+        <div class="table-responsive">
+            <h5 class="titulo-tickets">Tickets Gestionados</h5>
+            <table id="tickets" class="table table-striped table-bordered" style="width: 99%;">
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th>Nombre</th>
+                        <th>Dependencia</th>
+                        <th>Tema</th>
+                        <th>Detalle</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodytickets">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar información del ticket -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl custom-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-primary btn-sm mr-2" id="gestionesBtn">
+                        <i class="fas fa-tasks"></i> Gestiones
+                    </button>
+                    <h5 class="modal-title mx-auto" id="ticketModalLabel">Detalles del Ticket</h5>
+                    <button type="button" class="btn btn-outline-secondary" id="toggleFechas">
+                        <i class="fas fa-clock"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="ticketInfoForm" class="row g-3">
+                        <div class="col-md-2">
+                            <label for="idticket" class="form-label">ID del Ticket</label>
+                            <input type="text" class="form-control" id="idticket" readonly>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="usuario" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="usuario" readonly>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="correo" class="form-label">Correo</label>
+                            <input type="email" class="form-control" id="correo" readonly>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="nombreDependencia" class="form-label">Dependencia</label>
+                            <input type="text" class="form-control" id="nombreDependencia" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ext" class="form-label">Extensión</label>
+                            <input type="text" class="form-control" id="ext" readonly>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="idtema" class="form-label">Tema</label>
+                            <input type="text" class="form-control" id="idtema" readonly>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="detalle" class="form-label">Detalle</label>
+                            <textarea class="form-control" id="detalle" rows="3" readonly></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="estado" class="form-label">Estado</label>
+                            <input type="text" class="form-control" id="estado" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ipticket" class="form-label">IP Ticket</label>
+                            <input type="text" class="form-control" id="ipticket" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="notemail" class="form-label">Notificación por Email</label>
+                            <input type="text" class="form-control" id="notemail" readonly>
+                        </div>
+                        <!-- Botón para mostrar las gestiones -->
+                        <button type="button" class="btn btn-primary" id="gestionesBtn" style="display:none;">
+                            Gestiones
+                        </button>
+                        <div class="col-md-12 adjuntos-container">
+                            <!-- Aquí se insertarán los archivos adjuntos -->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary cerrar-modal" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal para mostrar imagen en tamaño grande -->
+    <div class="modal fade" id="imagenModal" tabindex="-1" aria-labelledby="imagenModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imagenModalLabel">Imagen Adjunta</h5>
+                    <!-- Botón de cerrar con una "X" en Bootstrap 4 -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="imagenModalContent">
+                    <!-- La imagen se cargará dinámicamente aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/controllers/tickets/consultastickets.js"></script>
+</body>

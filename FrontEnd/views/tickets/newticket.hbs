@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/tickets/newticket.css">
+    <title>Centro de Soporte FSV</title>
+    <link rel="icon" href="/image/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <div class="card">
+        <!-- Botón de Back -->
+        <div class="d-flex justify-content-start">
+            <a href="/" class="btn-back">⬅ Atrás</a>
+        </div>
+        <!-- Título -->
+        <h1 class="text-center text-dark">Nuevo Ticket</h1>
+        <form id="ticketForm" method="post" enctype="multipart/form-data" class="row g-3">
+            <!-- Correo Electrónico -->
+            <div class="col-md-6">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            <!-- Nombre de Usuario -->
+            <div class="col-md-6">
+                <label for="username" class="form-label">Nombre</label>
+                <input type="text" id="username" name="username" class="form-control" maxlength="50" required>
+            </div>
+            <!-- Dependencia -->
+            <div class="col-md-5">
+                <label for="dependencia" class="form-label">Dependencia</label>
+                <select id="dependencia" name="dependencia" class="form-select" required>
+                </select>
+            </div>
+            <!-- Tema de Ayuda -->
+            <div class="col-md-5">
+                <label for="tema" class="form-label">Tema de Ayuda</label>
+                <select id="tema" name="tema" class="form-select" required>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="extension" class="form-label">EXT</label>
+                <input type="text" id="extension" name="extension" class="form-control" maxlength="10">
+            </div>
+            <!-- Descripción del Problema -->
+            <div class="col-md-12">
+                <label for="rich-text" class="form-label">Descripción del Problema</label>
+                <div id="editor" style="height: 150px;"></div>
+                <textarea name="descripcion" id="rich-text" class="d-none" maxlength="1000"></textarea>
+            </div>
+
+            <!-- Vista previa de los archivos -->
+            <div id="preview-container" class="col-md-12 mt-3">
+                <p><strong>Archivos cargados:</strong></p>
+                <div id="preview-files" class="d-flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- Botón de Enviar -->
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-custom w-50">Enviar Ticket</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/config.js"></script>
+    <script src="/controllers/tickets/newticket.js"></script>
+</body>
+
+</html>

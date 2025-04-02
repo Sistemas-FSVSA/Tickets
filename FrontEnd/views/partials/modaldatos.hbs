@@ -1,0 +1,346 @@
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevaDependenciaModal" tabindex="-1" aria-labelledby="nuevaDependenciaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INICIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevaDependenciaModalLabel">Nueva Dependencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INICIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevaDependenciaForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="dependencianueva">Nombre de la Dependencia</label>
+                                <input type="text" class="form-control" id="dependenciaequipo"
+                                    placeholder="Nombre de la Dependencia" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre de la dependencia.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarDepBtn" data-tipo="dependencia">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="dependenciaTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">ID Dependencia</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarDepBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevaMarcaModal" tabindex="-1" aria-labelledby="nuevaMarcaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INICIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevaMarcaModalLabel">Nueva Marca</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INICIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevaMarcaForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="marcanueva">Nombre de la Marca</label>
+                                <input type="text" class="form-control" id="marcaequipo"
+                                    placeholder="Nombre de la Marca" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre de la marca.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarMarcaBtn" data-tipo="marca">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="marcaTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">ID Marca</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarMarcaBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevoFormatoModal" tabindex="-1" aria-labelledby="nuevoFormatoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INICIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoFormatoModalLabel">Nuevo Formato</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INICIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevoFormatoForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="formatonuevo">Nombre del Formato</label>
+                                <input type="text" class="form-control" id="formato"
+                                    placeholder="Nombre del Formato" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre del formato.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarFormatoBtn" data-tipo="formato">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="formatoTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">ID Formato</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarFormatoBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevoActividadModal" tabindex="-1" aria-labelledby="nuevoActividadModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INCIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoActividadModalLabel">Nueva Actividad</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INCIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevaActividadForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="actividadnueva">Nombre Actividad</label>
+                                <input type="text" class="form-control" id="actividad"
+                                    placeholder="Nombre de la Actividad" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre de la actividad.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarActBtn" data-tipo="actividad">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="actividadTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">idactividad</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarActBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevaRamModal" tabindex="-1" aria-labelledby="nuevaRamModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INCIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevaRamModalLabel">Nuevo Tipo de RAM</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INCIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevaRamForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="ramnueva">Nombre Tipo de RAM</label>
+                                <input type="text" class="form-control" id="ram"
+                                    placeholder="Nombre del Tipo de RAM" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre del tipo de RAM.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarRamBtn" data-tipo="ram">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="ramTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">idtiporam</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarRamBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevoAlmacenamientoModal" tabindex="-1" aria-labelledby="nuevoAlmacenamientoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INICIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoAlmacenamientoModalLabel">Nuevo Tipo de Almacenamiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INICIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevoAlmacenamientoForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="almacenamientoNuevo">Nombre Tipo de Almacenamiento</label>
+                                <input type="text" class="form-control" id="almacenamiento" placeholder="Nombre del Tipo de Almacenamiento" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre del tipo de almacenamiento.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarAlmacenamientoBtn" data-tipo="almacenamiento">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="almacenamientoTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">idtipoalmacenamiento</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarAlmacenamientoBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+<script src="/controllers/inventario/registro.js"></script>

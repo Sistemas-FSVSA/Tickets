@@ -1,0 +1,147 @@
+<style>
+    /* Ajusta el alto del contenedor de las cards dinámicamente */
+    .content {
+        display: flex;
+        flex-direction: column;
+
+    }
+
+    #cards-container {
+        flex-grow: 1;
+        /* Ocupa todo el espacio restante */
+        overflow-y: auto;
+        /* Scroll interno */
+        height: calc(85vh - 120px);
+        /* Ajusta el 100% del espacio restante */
+    }
+
+    .card {
+        width: 100%;
+        /* O ajusta según el diseño */
+        max-width: 400px;
+        /* Controla el tamaño máximo de la card */
+        height: 320px;
+        /* Fija una altura para uniformidad */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .card img {
+        width: 100%;
+        height: 200px;
+        /* Tamaño fijo de la imagen */
+        object-fit: cover;
+        /* Recorta la imagen para llenar el espacio */
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .card-body {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        /* Centra todo el contenido horizontalmente */
+        padding: 10px;
+    }
+
+    .card-body .button-group {
+        display: flex;
+        gap: 10px;
+        /* Espaciado entre los botones */
+        justify-content: center;
+        width: 100%;
+    }
+
+    .card-body button {
+        flex: 1;
+        max-width: 120px;
+        /* Limita el ancho de los botones */
+    }
+</style>
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2 align-items-center d-flex justify-content-between">
+            <div class="col-sm-8 d-flex align-items-center">
+                <button class="btn btn-outline-secondary mr-2" onclick="irAtras()">
+                    <i class="fas fa-angle-double-left"></i> Regresar
+                </button>
+                <h1 class="m-0" id="title">Modificación de Datos</h1>
+            </div>
+            <div class="col-sm-4 text-right">
+                <h3 id="fechaActual" class="m-0"></h3>
+                <span class="text-muted">Administración</span>
+            </div>
+        </div>
+    </div>
+    <hr>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <!-- Barra de búsqueda y botón -->
+        <div class="row mb-4 align-items-center d-flex justify-content-between">
+            <div class="col-md-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+            </div>
+            <div class="col-md-3 d-flex justify-content-end">
+                <button class="btn btn-fsvsaon" data-toggle="modal" data-target="#guardarModificaciones"
+                    id="abrirModalBtn">Guardar Modificaciones</button>
+            </div>
+        </div>
+
+        <!-- Contenedor dinámico de tarjetas con scroll interno -->
+        <div id="cards-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            <!-- Tarjetas de ejemplo -->
+
+            <!-- Puedes agregar más tarjetas aquí -->
+        </div>
+    </div>
+</div>
+
+<script src="/controllers/modificaciones/modificaciones.js"></script>
+
+<!-- MODAL -->
+<!-- MODAL -->
+<div class="modal fade" id="guardarModificaciones" tabindex="-1" aria-labelledby="guardarModificacionesLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guardarModificacionesLabel">Subir Archivos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="subirArchivosForm" class="needs-validation" novalidate>
+                    <div class="form-group">
+                        <label for="mesAnio">Seleccionar Mes y Año</label>
+                        <input type="month" class="form-control" id="mesAnio" required>
+                        <div class="invalid-feedback">Por favor, elige un mes y un año.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archivos">Adjuntar Archivos</label>
+                        <input type="file" class="form-control" id="archivos" accept="image/png, image/jpeg, image/jpg, image/gif, image/webp, application/pdf, image/tiff" multiple>
+                        <small class="form-text text-muted">Puedes seleccionar varios archivos.</small>
+
+                        <!-- Contenedor con Scroll -->
+                        <div id="contenedorArchivos" class="mt-2 border rounded p-2"
+                            style="max-height: 400px; overflow-y: auto; background: #f8f9fa;">
+                            <ul id="listaArchivos" class="list-group mb-0"></ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarBtn" data-dismiss="modal">Cerrar</button>
+                <button class="btn btn-fsvsaon" id="subirBtn">Subir</button>
+            </div>
+        </div>
+    </div>
+</div>

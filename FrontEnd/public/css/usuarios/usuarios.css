@@ -1,0 +1,21 @@
+/* HEADER */
+.header {
+    width: 100%;
+    color: black;
+    text-align: left;
+    padding: 5px 20px;
+    /* 🔹 Espaciado a los lados */
+    display: flex;
+    /* 🔹 Hace que los elementos estén en fila */
+    justify-content: space-between;
+    /* 🔹 Coloca el título a la izquierda y la barra a la derecha */
+    align-items: center;
+    /* 🔹 Asegura que ambos estén alineados verticalmente */
+    box-sizing: border-box;
+}
+
+/* Ajuste del título dentro del header */
+.header h5 {
+    margin: 5px;
+    font-size: 1.5rem;
+}

@@ -1,0 +1,175 @@
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevaDependenciaModal" tabindex="-1" aria-labelledby="nuevaDependenciaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INICIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevaDependenciaModalLabel">Nueva Dependencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INICIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevaDependenciaForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="dependencianueva">Nombre de la Dependencia</label>
+                                <input type="text" class="form-control" id="dependencia"
+                                    placeholder="Nombre de la Dependencia" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre de la dependencia.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarDepBtn" data-tipo="dependencia">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="dependenciaTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">ID Dependencia</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarDepBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevoSoporteModal" tabindex="-1" aria-labelledby="nuevoSoporteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INICIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoSoporteModalLabel">Nuevo Soporte</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INICIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevoSoporteForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="soportenuevo">Nombrel del Soporte</label>
+                                <input type="text" class="form-control" id="soporte"
+                                    placeholder="Nombre del Soporte" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre del soporte.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarSoporteBtn" data-tipo="soporte">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="soporteTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">ID Soporte</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarSoporteBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevoTemasModal" tabindex="-1" aria-labelledby="nuevoTemasModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INICIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoTemasModalLabel">Nuevo Tema</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INICIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <div>
+                    <form id="nuevoTemasForm" class="needs-validation" novalidate>
+                        <div class="form-row align-items-end">
+                            <div class="col-md-9 mb-3">
+                                <label for="temasnuevo">Nombre del Tema</label>
+                                <input type="text" class="form-control" id="temas"
+                                    placeholder="Nombre del Tema" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre del tema.
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3 text-right">
+                                <button class="btn btn-fsvsaon" type="button" id="registrarTemasBtn" data-tipo="temas">Registrar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="temasTable" class="table table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="d-none">ID Temas</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos insertados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarTemasBtn" data-dismiss="modal">Cerrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+
+<script src="/controllers/tickets/registrotickets.js"></script>

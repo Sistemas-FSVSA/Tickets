@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="/css/mantenimientos/mantenimiento.css">
+
+<header class="header">
+    <h1>Mantenimiento</h1>
+    <div class="header-right">
+        <button id="btnProgramarMantenimiento" class="btn btn-success" onclick="abrirModalMantenimiento()">Programar Mantenimiento</button>
+        <div class="progreso-container">
+            <label for="progresoBarra" class="small">Progreso:</label>
+            <div class="progress">
+                <div id="progresoBarra" class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    0%
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid mt-4">
+    <div class="table-responsive">
+        <table id="mantenimiento" class="table table-striped table-bordered" style="width: 99%;">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Ultimo Mantenimiento</th>
+                    <th>Equipo</th>
+                    <th>Dependencia</th>
+                    <th>Observacion</th>
+                    <th>Siguente Mantenimiento</th>
+                    <th>Tecnico</th>
+                    <th></th>
+                    <th>HVC</th>
+                </tr>
+            </thead>
+            <tbody id="tbodymantenimiento">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalProgramarMantenimiento" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Programar Mantenimiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- 🔹 Campo de búsqueda de Serial -->
+                <div class="mb-3">
+                    <label for="serialInput" class="form-label">Serial (S/N)</label>
+                    <div class="d-flex">
+                        <input type="text" id="serialInput" class="form-control">
+                        <button id="btnBuscarSerial" class="btn btn-primary btn-sm ms-2" onclick="buscarPorSerial()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🔹 Tabla de resultados -->
+                <table id="tablaResultados" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Equipo</th>
+                            <th>Dependencia</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodytablaResultados">
+                        <!-- Aquí se insertarán los resultados dinámicamente -->
+                    </tbody>
+                </table>
+
+                <!-- 🔹 Fecha de próximo mantenimiento -->
+                <div class="mb-3">
+                    <label for="fechaProximoMantenimiento" class="form-label">Fecha Próximo Mantenimiento</label>
+                    <input type="date" id="fechaProximoMantenimiento" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarProgramacion">Programar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="/controllers/mantenimientos/mantenimiento.js" defer></script>

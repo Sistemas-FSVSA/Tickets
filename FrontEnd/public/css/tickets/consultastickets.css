@@ -1,0 +1,25 @@
+/* Estilos para recortar texto largo en la tabla */
+table td {
+    white-space: nowrap;  /* Evita que el texto se divida en varias líneas */
+    overflow: hidden;     /* Oculta el texto que desborda el contenedor */
+    text-overflow: ellipsis; /* Muestra "..." cuando el texto es demasiado largo */
+}
+
+/* Estilos específicos para columnas con contenido largo */
+table td:nth-child(1), /* ID del ticket */
+table td:nth-child(2), /* Nombre */
+table td:nth-child(3), /* Dependencia */
+table td:nth-child(4), /* Tema */
+table td:nth-child(5) { /* Detalle */
+    max-width: 200px;  /* Ajusta el ancho máximo que deseas para las celdas */
+}
+
+#gestionesBtn {
+    margin-right: auto; /* Empuja el botón a la izquierda */
+}
+
+.titulo-tickets {
+    font-size: 25px; 
+    color: #050505;  
+    margin-bottom: 20px; 
+}

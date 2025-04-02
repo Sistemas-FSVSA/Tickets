@@ -1,0 +1,117 @@
+body {
+  background-color: #163c64;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Asegura que el contenido se alinee hacia la parte superior */
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh; /* Asegura que el body ocupe toda la altura de la pantalla */
+  overflow: auto; /* Permite el desplazamiento si el contenido es muy largo */
+}
+
+.card {
+  width: 100%; /* Ocupa todo el ancho disponible */
+  max-width: 800px; /* Máximo 800px de ancho */
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Mantiene el contenido alineado desde la parte superior */
+  min-height: 60vh; /* Asegura que la tarjeta tenga suficiente altura para contenido completo */
+}
+
+h1 {
+  font-size: 2rem;
+  margin-top: 0; /* Elimina el margen superior para el título */
+}
+
+#editor {
+  height: 500px; /* Aumenta la altura del área de descripción */
+}
+
+#editor img {
+  display: none;
+}
+
+.btn-custom {
+  background-color: #96072d;
+  color: #fff;
+}
+
+.btn-custom:hover {
+  background-color: #0056b3;
+}
+
+.btn-back {
+  color: #96072d;
+  text-decoration: none;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.btn-back:hover {
+  color: #0056b3;
+}
+
+.form-label {
+  color: #333;
+}
+
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* Aumentar el tamaño de los iconos en la toolbar */
+.ql-toolbar .ql-formats button {
+    padding: 1px;    /* Ajustar el espacio alrededor de los iconos */
+}
+
+/* Si también quieres ajustar el tamaño de los iconos dentro de la caja de texto */
+.ql-container .ql-editor {
+    font-size: 13px;  /* Ajusta el tamaño del texto dentro del editor */
+}
+
+/* Ajustes responsivos para pantallas pequeñas */
+@media (max-width: 576px) {
+  body {
+      padding: 0 10px;
+      justify-content: flex-start; /* Mantiene la tarjeta hacia la parte superior */
+      align-items: flex-start; /* Centrado vertical no es necesario */
+  }
+
+  .card {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 15px;
+      width: 100%; /* La tarjeta ocupa el 100% del ancho disponible */
+      min-height: auto; /* El contenido se ajusta al contenido de la tarjeta */
+      box-sizing: border-box;
+  }
+
+  h1 {
+      font-size: 1.5rem; /* Ajustar el tamaño del título */
+  }
+
+  .btn-custom {
+      width: 100%; /* Botón de envío a todo el ancho */
+  }
+
+  .col-md-6, .col-md-5, .col-md-2 {
+      width: 100%; /* Asegurarse de que todos los campos ocupen el 100% del ancho */
+  }
+
+  .d-flex {
+      flex-direction: column; /* Asegura que los elementos dentro del flexbox se apilen en pantallas pequeñas */
+  }
+}

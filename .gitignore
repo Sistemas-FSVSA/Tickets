@@ -1,0 +1,30 @@
+# Node.js dependencies
+/FrontEnd/node_modules
+/BackEnd/node_modules
+/BackEnd/uploads
+
+# Yarn/PNPM/Other packages folder
+/FrontEnd/packages/
+/BackEnd/packages/
+/BackEnd/uploads
+
+# Docker archivos temporales
+/BackEnd/.dockerignore
+/BackEnd/docker-compose.yml
+/BackEnd/.docker/
+
+
+# Ignorar archivos de entorno
+/FrontEnd/.env
+/BackEnd/.env
+.env
+
+/FrontEnd/app.js
+/BackEnd/uploads
+
+
+# Logs
+/logs/
+
+# Miscellaneous
+/NSSM/

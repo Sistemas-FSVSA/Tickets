@@ -1,0 +1,71 @@
+<body>
+    <div class="container-fluid mt-4">
+        <!-- Encabezado -->
+        <div class="row">
+            <div class="col-12">
+                <h2 class="text-center mb-4">Dashboard General</h2>
+            </div>
+        </div>
+
+        <!-- Tarjetas de estadísticas -->
+        <div class="row text-center">
+            <div class="col-md-3 mb-3">
+                <div class="card text-dark" style="background-color: #afeeee;">
+                    <div class="card-body">
+                        <h5 class="card-title">Tickets Activos</h5>
+                        <p class="card-text fs-2" id="ticketsActivos">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-dark" style="background-color: #b0e0e6;">
+                    <div class="card-body">
+                        <h5 class="card-title">Tickets Leídos</h5>
+                        <p class="card-text fs-2" id="ticketsPendientes">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-dark" style="background-color: #e0ffff;">
+                    <div class="card-body">
+                        <h5 class="card-title">Tickets Cerrados</h5>
+                        <p class="card-text fs-2" id="ticketsGestionados">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-dark" style="background-color: #87cefa;">
+                    <div class="card-body">
+                        <h5 class="card-title">Esperelo en la 2° Temporada</h5>
+                        <p class="card-text fs-2" id="systemErrors">3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-white" style="background-color: #007bff;">
+                        <h6>Ticket semanales por Area</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-white" style="background-color: #007bff;">
+                        <h6>Tipos de Soporte</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="usersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/controllers/dashboard/dashboard.js" defer></script>
+</body>

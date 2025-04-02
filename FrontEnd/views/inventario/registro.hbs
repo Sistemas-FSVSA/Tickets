@@ -1,0 +1,50 @@
+<link rel="stylesheet" href="/css/inventario/registro.css">
+
+<body>
+    <header class="header">
+        <h1>Registro</h1>
+    </header>
+    <div class="container-fluid mt-4">
+        <div class="card">
+            <div class="card-body">
+                <h1><i class="fas fa-desktop"></i></h1><button class="btn btn-fsvsaon" data-toggle="modal" data-target="#nuevoEquipoModal" id="abrirModalEquipo">Equipo</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h1><i class="fas fa-bookmark"></i></h1><button class="btn btn-fsvsaoff" data-toggle="modal" data-target="#nuevaDependenciaModal" id="abrirModalDependencia">Dependencia</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h1><i class="fas fa-wrench"></i></h1><button class="btn btn-fsvsaon" data-toggle="modal" data-target="#nuevoActividadModal" id="abrirModalActividad">Actividad</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h1><i class="fas fa-memory"></i></h1><button class="btn btn-fsvsaoff" data-toggle="modal" data-target="#nuevaRamModal" id="abrirModalRam">Ram</button>
+            </div>
+        </div>
+
+        <!-- Segunda fila (3 elementos) -->
+        <div class="card">
+            <div class="card-body">
+                <h1><i class="fas fa-hdd"></i></h1><button class="btn btn-fsvsaon" data-toggle="modal" data-target="#nuevoAlmacenamientoModal" id="abrirModalAlmacenamiento">Almacenamiento</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h1><i class="fas fa-swatchbook"></i></h1><button class="btn btn-fsvsaoff" data-toggle="modal" data-target="#nuevoFormatoModal" id="abrirModalFormato">Formato</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h1><i class="far fa-registered"></i></h1><button class="btn btn-fsvsaon" data-toggle="modal" data-target="#nuevaMarcaModal" id="abrirModalMarca">Marca</button>
+            </div>
+        </div>
+    </div>
+
+    {{> modaldatos }}
+    {{> modalregistroequipo }}
+
+</body>

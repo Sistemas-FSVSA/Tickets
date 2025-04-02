@@ -1,0 +1,199 @@
+<!-- INICIO MODAL -->
+<div class="modal fade" id="nuevoEquipoModal" tabindex="-1" aria-labelledby="nuevoEquipoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- INCIO CABEZA DEL MODAL -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoEquipoModalLabel">Nuevo Equipo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- FINAL CABEZA DEL MODAL -->
+            <!-- INCIO CUERPO DEL MODAL -->
+            <div class="modal-body">
+                <form id="nuevoEquipoForm" class="needs-validation" novalidate>
+                    <div class="form-row">
+                        <div class="col-md-1 mb-3">
+                            <label for="sn">SN</label>
+                            <input type="text" class="form-control" id="sn" placeholder="SN" required>
+                            <div class="invalid-feedback">
+                                Por favor, proporcione el serial.
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="ip">IP</label>
+                            <input type="text" class="form-control" id="ip" placeholder="IP" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese una IP.
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="mac">MAC</label>
+                            <input type="text" class="form-control" id="mac" placeholder="Direccion MAC" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese una direccion MAC.
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="datos">Datos</label>
+                            <input type="text" class="form-control" id="datos" placeholder="Datos">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="procesador">Procesador</label>
+                            <input type="text" class="form-control" id="procesador" placeholder="Procesador">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="tiporam">RAM</label>
+                            <select class="form-control" id="tiporam" required>
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="cantidadram">Cantidad</label>
+                            <input type="text" class="form-control" id="cantidadram" placeholder="RAM">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="tipoalmacenamiento">Storage</label>
+                            <select class="form-control" id="tipoalmacenamiento" required>
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="cantidadalmacenamiento">Cantidad</label>
+                            <input type="text" class="form-control" id="cantidadalmacenamiento"
+                                placeholder="Almacenamiento">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="formatoequipo">Formato del Equipo</label>
+                            <select class="form-control" id="formatoequipo" required>
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="marca">Marca</label>
+                            <select class="form-control" id="marca" required>
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="so">S.O</label>
+                            <input type="text" class="form-control" id="so" placeholder="Sistema Operativo">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="nombreequipo">Nombre Equipo</label>
+                            <input type="text" class="form-control" id="nombreequipo" placeholder="Nombre" required>
+                            <div class="invalid-feedback">
+                                Por favor, Ingrese el nombre del equipo.
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="sistemas">Cuenta Sistemas</label>
+                            <select class="form-control" id="sistemas" required>
+                                <option value="">Seleccionar</option>
+                                <option value="1">Sí</option>
+                                <option value="0">No</option>
+                                <option value="2">No Aplica</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="dependencia">Dependencia</label>
+                            <select class="form-control" id="dependencia" required>
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="responsable">Reponsable</label>
+                            <input type="text" class="form-control" id="responsable" placeholder="Responsable" required>
+                            <div class="invalid-feedback">
+                                Por favor, Ingrese el responsable.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="usuario">Usuario</label>
+                            <input type="text" class="form-control" id="usuario" placeholder="Usuario">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="cargousuario">Cargo Usuario</label>
+                            <input type="text" class="form-control" id="cargousuario" placeholder="Cargo del Usuario">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="mantenimiento">Mantenimiento</label>
+                            <select class="form-control" id="mantenimiento" required>
+                                <option value="">Seleccionar</option> <!-- Opción predeterminada -->
+                                <option value="1">Aplica</option>
+                                <option value="0">No Aplica</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3 d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <label for="observaciones">Observaciones</label>
+                                <textarea type="text" class="form-control" id="observaciones"
+                                    placeholder="Escáner, impresoras, periféricos conectados, etc."></textarea>
+                            </div>
+                            <div class="ml-3">
+                                <button type="button" class="btn btn-fsvsaon" id="subirImagenesBtn" data-toggle="modal"
+                                    data-target="#subirImagenesModal">
+                                    <i class="fas fa-images"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- FINAL CUERPO DEL MODAL -->
+            <!-- INICIO PIES DEL MODAL -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarBtn" data-dismiss="modal">Cerrar</button>
+                <button class="btn btn-fsvsaon" id="guardarEquipoBtn">Registrar</button>
+            </div>
+            <!-- FINAL PIES DEL MODAL -->
+        </div>
+    </div>
+</div>
+<!-- FINAL MODAL -->
+<!-- MODAL PARA SUBIR IMÁGENES -->
+<div class="modal fade" id="subirImagenesModal" tabindex="-1" aria-labelledby="subirImagenesModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="subirImagenesModalLabel">Imágenes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="subirImagenesForm">
+                    <div class="row">
+
+                        <div class="col-md-6 text-center">
+                            <div class="border p-2 mb-2"
+                                style="display: flex; align-items: center; justify-content: center;">
+                                <img id="preview1" src="" alt="Vista previa 1"
+                                    style="max-height: 100%; max-width: 100%; display: none;">
+                            </div>
+                            <input type="file" class="form-control" id="imagen1" accept="image/*">
+                        </div>
+
+                        <div class="col-md-6 text-center">
+                            <div class="border p-2 mb-2"
+                                style="display: flex; align-items: center; justify-content: center;">
+                                <img id="preview2" src="" alt="Vista previa 2"
+                                    style="max-height: 100%; max-width: 100%; display: none;">
+                            </div>
+                            <input type="file" class="form-control" id="imagen2" accept="image/*">
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-fsvsaon" id="guardarImagenesBtn">Guardar Imágenes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/controllers/inventario/guardarequipo.js"></script>

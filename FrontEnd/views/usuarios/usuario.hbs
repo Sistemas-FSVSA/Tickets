@@ -1,0 +1,84 @@
+<style>
+    .btn:focus {
+        outline: none;
+        box-shadow: none;
+    }
+</style>
+
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2 align-items-center">
+            <div class="col-sm-6">
+                <h1 class="m-0">Usuario</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card d-flex flex-row align-items-center">
+                    <div class="card-body w-75">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre del Usuario</label>
+                            <input type="text" id="nombre" class="form-control" value="" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="documento" class="form-label">Documento</label>
+                            <input type="text" id="documento" class="form-control" value="" readonly>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-fsvsaoff" data-toggle="modal"
+                                data-target="#modalCambiarPassword">
+                                Cambiar Contraseña
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-25 text-center">
+                        <i class="fas fa-user fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCambiarPassword" tabindex="-1" aria-labelledby="modalCambiarPasswordLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCambiarPasswordLabel">Cambiar Contraseña</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCambiarPassword">
+                    <div class="form-group">
+                        <label for="passwordActual">Contraseña Actual</label>
+                        <input type="password" class="form-control" id="passwordActual" required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordNueva">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="passwordNueva" required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmarPasswordNueva">Confirmar Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="confirmarPasswordNueva" required="">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-fsvsaon" id="guardarPasswordBtn">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="module" src="/controllers/usuarios/usuario.js"></script>

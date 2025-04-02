@@ -1,0 +1,119 @@
+
+.ticket-scroll {
+    height: calc(100vh - 150px); /* Altura dinámica restando otros elementos */
+    overflow-y: auto;
+}
+
+
+/* Contenedor de la bandeja de entrada */
+.inbox-scroll {
+    height: calc(100vh - 150px); /* Altura máxima con scroll */
+    overflow-y: auto; /* Scroll vertical si hay muchos tickets */
+    padding: 10px;
+}
+
+/* Contenedor principal del ticket */
+.ticket-content {
+    display: flex;
+    justify-content: space-between; /* Separa el contenido principal y el lado derecho */
+    align-items: flex-start; /* Alinea los elementos en la parte superior */
+    height: 100px; /* Altura fija para cada ticket */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.ticket-content:hover {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenedor del texto (nombre, tema, detalle) */
+.ticket-main {
+    flex: 1; /* Ocupa el espacio disponible */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden; /* Evita que el texto se desborde */
+    margin-right: 10px; /* Espacio entre el contenido principal y el lado derecho */
+}
+
+/* Estilos para truncar el texto con puntos suspensivos */
+.text-ellipsis {
+    white-space: nowrap; /* Evita el salto de línea */
+    overflow: hidden; /* Oculta el texto que se desborda */
+    text-overflow: ellipsis; /* Muestra "..." cuando el texto se desborda */
+    max-width: 100%; /* Ocupa todo el ancho disponible */
+}
+
+/* Nombre del usuario */
+.ticket-main .font-weight-bold {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* Tema y detalle del ticket */
+.ticket-main p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Contenedor del lado derecho (ID y hora) */
+.ticket-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinea los elementos a la derecha */
+    justify-content: space-between; /* Separa el ID y la hora */
+    height: 100%; /* Ocupa toda la altura del ticket */
+}
+
+/* ID del ticket */
+.ticket-id {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Hora del ticket */
+.ticket-time {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+
+/* Estilos para los tickets en la bandeja */
+.list-group-item {
+    padding: 0; /* Elimina el padding predeterminado */
+    border: none; /* Elimina el borde predeterminado */
+    margin-bottom: 10px; /* Espacio entre tickets */
+}
+
+
+
+
+
+
+.adjunto-imagen {
+    max-width: 200px; /* Ancho máximo */
+    height: auto; /* Mantiene la proporción de la imagen */
+    margin: 10px; /* Margen opcional */
+    border: 1px solid #ddd; /* Opcional: Añade un borde */
+    border-radius: 4px; /* Opcional: Bordes redondeados */
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1); /* Opcional: Añade sombra */
+}
+
+
+
+
+
+
+
+
+
+
+
+

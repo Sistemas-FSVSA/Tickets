@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Soporte FSV</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="icon" href="/image/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            margin: 0;
+            background-color: #163c64;
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            max-width: 800px;
+            width: 90%;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-header img {
+            max-height: 150px;
+        }
+
+        .btn-custom {
+            background-color: #96072d;
+            color: #fff;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-primary {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #96072d;
+        }
+
+        .btn-login {
+            margin-top: 1rem;
+        }
+
+        .footer-text {
+            text-align: center;
+            color: #ffffff;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex flex-column align-items-center flex-grow-1 justify-content-center">
+        <div class="card shadow">
+            <!-- Encabezado -->
+            <div class="card-header bg-white text-center">
+                <img src="/image/logoblanco.png" alt="Funeraria San Vicente" class="img-fluid">
+            </div>
+            <!-- Contenido -->
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Sección izquierda -->
+                    <div class="col-12 col-lg-8">
+                        <h1 class="h4 text-dark text-center text-lg-start">¡Bienvenido al Centro de Soporte!</h1>
+                        <p class="text-muted">
+                            Con el fin de agilizar las solicitudes de soporte y tener un mejor servicio, utilizamos un
+                            sistema de Tickets de soporte. Cada solicitud de soporte se le asigna a un número de Ticket
+                            único que se puede utilizar para rastrear el progreso y respuestas en línea.
+                        </p>
+                        <p class="text-muted">
+                            Para su referencia proporcionamos archivos completos y la historia de todas sus peticiones
+                            de
+                            ayuda. Es necesaria una dirección válida de correo electrónico para presentar Ticket.
+                        </p>
+                    </div>
+                    <!-- Sección derecha -->
+                    <div class="col-12 col-lg-4 d-flex flex-column align-items-center">
+                        <a href="/tickets/nuevoticket" id="btnCrearTicket" class="btn btn-custom w-100 mb-3">Crear Ticket</a>
+                        <a href="/tickets/infoticket" class="btn btn-primary w-100">Seguir Ticket</a>
+                        <a href="/login" class="btn btn-link btn-login text-decoration-none w-100">Iniciar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-text">
+        Derechos de autor © 2025, Funeraria San Vicente S.A. By - Sistemas
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/config.js"></script>
+    <script src="/controllers/index.js"></script>
+
+</body>
+
+</html>

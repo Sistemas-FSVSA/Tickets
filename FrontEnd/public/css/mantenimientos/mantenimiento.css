@@ -1,0 +1,115 @@
+    /* HEADER */
+    .header {
+        width: 100%;
+        color: black;
+        text-align: left;
+        padding: 5px 20px;
+        /* 🔹 Espaciado a los lados */
+        font-size: 1rem;
+        display: flex;
+        /* 🔹 Hace que los elementos estén en fila */
+        justify-content: space-between;
+        /* 🔹 Coloca el título a la izquierda y la barra a la derecha */
+        align-items: center;
+        /* 🔹 Asegura que ambos estén alineados verticalmente */
+        box-sizing: border-box;
+    }
+
+    /* Ajuste del título dentro del header */
+    .header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+    }
+
+    /* Contenedor derecho con barra de progreso y botón */
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        /* Espaciado entre el botón y la barra de progreso */
+    }
+
+    #btnProgramarMantenimiento {
+        margin-top: 25px;
+        /* Ajusta el valor según necesites */
+    }
+
+    /* Contenedor para la barra de progreso */
+    .progreso-container {
+        width: 500px;
+        /* 🔹 Ajusta el ancho de la barra según lo necesites */
+    }
+
+    /* Ajuste del progreso */
+    .progress {
+        height: 30px;
+        /* 🔹 Ajusta la altura de la barra */
+        border-radius: 10px;
+        /* 🔹 Hace la barra más estilizada */
+    }
+
+    #mantenimiento {
+        width: 100%;
+        table-layout: auto;
+        /* 🔹 Permite que las columnas se ajusten al contenido */
+        border-collapse: collapse;
+    }
+
+    #mantenimiento th,
+    #mantenimiento td {
+        padding: 8px;
+        white-space: nowrap;
+        /* 🔹 Evita saltos de línea en campos cortos */
+    }
+
+    #mantenimiento th:nth-child(5),
+    /* Observación */
+    #mantenimiento td:nth-child(5) {
+        white-space: normal;
+        /* 🔹 Permite saltos de línea en esta columna */
+        max-width: 300px;
+        /* 🔹 Ajusta el ancho máximo */
+        word-wrap: break-word;
+        /* 🔹 Divide el texto largo en varias líneas */
+    }
+
+    #tbodymantenimiento i {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+    }
+
+    /* Ajustar el tamaño del icono del semáforo */
+    #tbodymantenimiento i.fas.fa-circle {
+        font-size: 20px;
+    }
+
+    #tbodymantenimiento i {
+        font-size: 20px;
+        /* Cambia el tamaño según lo necesites */
+    }
+
+    #modalProgramarMantenimiento .modal-dialog {
+        max-width: 800px;
+    }
+
+    #serialInput {
+        flex-grow: 1;
+        max-width: 190px;
+    }
+
+    #fechaProximoMantenimiento {
+        max-width: 580px;
+    }
+
+    #btnBuscarSerial {
+        width: 40px;
+        height: 38px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        margin-left: 10px;
+    }

@@ -1,0 +1,75 @@
+body {
+    overflow-x: hidden;
+}
+
+/* HEADER */
+.header {
+    width: 100%;
+    color: black;
+    text-align: left;
+    padding: 5px 0;
+    font-size: 0.8rem; /* Reducimos el tamaño */
+    font-weight: normal; /* Quitamos la negrita */
+    position: relative;
+    top: 20px; /* Ajustamos la posición */
+    margin-left: 10px; /* Evitamos desplazamientos innecesarios */
+}
+
+.header {
+    max-width: calc(100% - 260px); /* Asegura que no sobrepase el ancho */
+    box-sizing: border-box;
+    padding-left: 260px; /* En lugar de margin-left */
+}
+
+.header h1 {
+    font-size: 1.5rem !important; /* Forzar el tamaño */
+    font-weight: normal !important; /* Eliminar la negrita */
+    margin: 0; /* Eliminar margen por defecto */
+}
+
+/* CONTENEDOR DE TARJETAS */
+.container-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* ESTILO DE TARJETAS */
+.card {
+    width: 23%; /* Un valor fijo más seguro */
+    min-width: 200px; /* Evita que se encojan demasiado */
+    height: 190px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+/* Ajustar el tamaño del contenido dentro de la tarjeta */
+.card h1 {
+    font-size: 3rem;
+}
+
+.card button {
+    font-size: 1rem;
+    padding: 10px 15px;
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 702px) { 
+    .card {
+        width: 100%; /* En lugar de calc(45% - 20px) */
+        height: auto;
+    }
+}
