@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function InicializarUsuario() {
         // Obtener datos del usuario desde sessionStorage
-        const nombres = sessionStorage.getItem("nombres") || "";
-        const apellidos = sessionStorage.getItem("apellidos") || "";
-        const documento = sessionStorage.getItem("identificacion") || "";
-        const idUsuario = sessionStorage.getItem("idusuario"); // Obtener el ID del usuario en sesión
+        const nombres = localStorage.getItem("nombres") || "";
+        const apellidos = localStorage.getItem("apellidos") || "";
+        const documento = localStorage.getItem("identificacion") || "";
+        const idUsuario = localStorage.getItem("idusuario"); // Obtener el ID del usuario en sesión
     
         // Insertar los valores en los campos
         document.getElementById("nombre").value = `${nombres} ${apellidos}`;

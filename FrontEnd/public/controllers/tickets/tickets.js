@@ -140,7 +140,7 @@ async function buscarTicketPorId(idticket) {
 }
 
 function asignarTicket(idticket) {
-    const idusuario = sessionStorage.getItem('idusuario');
+    const idusuario = localStorage.getItem('idusuario');
 
     if (!idusuario) {
         return;
