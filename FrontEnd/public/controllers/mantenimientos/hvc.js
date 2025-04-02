@@ -158,12 +158,12 @@ async function registrarMantenimientoModal() {
     const idinventario = document.getElementById("idInventario").value;
     const observacion = document.getElementById("observacionesMantenimiento").value.trim();
     const idactividad = document.getElementById("tipoMantenimiento").value;
-    const idusuario = parseInt(sessionStorage.getItem("idusuario") || "0");
+    const idusuario = parseInt(localStorage.getItem("idusuario") || "0");
 
     if (!idinventario || !idactividad || !observacion || !idusuario) {
         console.warn("Por favor, complete todos los campos.");
         return;
-    }
+    } 
 
     const datos = {
         idinventario: parseInt(idinventario),

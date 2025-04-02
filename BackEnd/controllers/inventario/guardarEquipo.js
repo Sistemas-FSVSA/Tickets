@@ -6,7 +6,7 @@ const guardarEquipo = async (req, res) => {
         const equipoData = req.body;
         const {
             sn, ip, mac, datos, procesador, tiporam, cantidadram, tipoalmacenamiento, cantidadalmacenamiento,
-            formatoequipo, marca, so, nombreequipo, sistemas, dependencia, responsable, usuario, cargousuario,
+            formatoequipo, marcaequipo, so, nombreequipo, sistemas, dependenciaequipo, responsable, usuario, cargousuario,
             mantenimiento, observaciones, idusuario
         } = equipoData;
 
@@ -34,8 +34,8 @@ const guardarEquipo = async (req, res) => {
 
             const inventarioResult = await transaction.request()
                 .input("sn", sql.VarChar, sn)
-                .input("dependencia", sql.Int, dependencia)
-                .input("marca", sql.Int, marca)
+                .input("dependencia", sql.Int, dependenciaequipo)
+                .input("marca", sql.Int, marcaequipo)
                 .input("formatoequipo", sql.Int, formatoequipo)
                 .input("nombreequipo", sql.VarChar, nombreequipo)
                 .input("ip", sql.VarChar, ip)
@@ -56,8 +56,8 @@ const guardarEquipo = async (req, res) => {
             await transaction.request()
                 .input("idinventario", sql.Int, idinventario)
                 .input("formatoequipo", sql.Int, formatoequipo)
-                .input("marca", sql.Int, marca)
-                .input("dependencia", sql.Int, dependencia)
+                .input("marca", sql.Int, marcaequipo)
+                .input("dependencia", sql.Int, dependenciaequipo)
                 .input("responsable", sql.VarChar, responsable)
                 .input("cargousuario", sql.VarChar, cargousuario)
                 .input("ip", sql.VarChar, ip)
@@ -86,7 +86,7 @@ const guardarEquipo = async (req, res) => {
 
             await transaction.request()
                 .input("idinventario", sql.Int, idinventario)
-                .input("iddependencia", sql.Int, dependencia)
+                .input("iddependencia", sql.Int, dependenciaequipo)
                 .input("observacion", sql.VarChar, "Registrado en la Base de Datos, programado el mantenimiento para dentro de un año")
                 .input("fechaactual", sql.Date, fechaActual)
                 .input("fechaproximo", sql.Date, fechaProxima)
