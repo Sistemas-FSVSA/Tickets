@@ -115,7 +115,7 @@ $(document).ready(function () {
 
 
 function cambiarEstadoUsuario(idusuario, nuevoEstado) {
-    const usuarioLogueado = Number(sessionStorage.getItem("idusuario")); // Convertir a número
+    const usuarioLogueado = Number(localStorage.getItem("idusuario")); // Convertir a número
 
     if (idusuario === usuarioLogueado) {
         Swal.fire({
