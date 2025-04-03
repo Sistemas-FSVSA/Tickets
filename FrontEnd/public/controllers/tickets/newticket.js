@@ -27,6 +27,16 @@ if (extension) {
     });
 }
 
+// Inicializar Quill con las opciones personalizadas
+var quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: {
+        toolbar: [['image'], ['link']] // Solo se permiten imágenes y enlaces 
+        //toolbar: false // Solo se permiten imágenes y enlaces 
+    },
+    placeholder: 'Describe tu problema aquí y adjunta captura o id de tu anydesk... ',
+});
+
 // Iniciar la validación periódica al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
     validarHorarioPeriodicamente();
@@ -335,12 +345,3 @@ quill.getModule('toolbar').addHandler('link', function () {
     });
 });
 
-// Inicializar Quill con las opciones personalizadas
-var quill = new Quill('#editor', {
-    theme: 'snow',
-    modules: {
-        toolbar: [['image'], ['link']] // Solo se permiten imágenes y enlaces 
-        //toolbar: false // Solo se permiten imágenes y enlaces 
-    },
-    placeholder: 'Describe tu problema aquí y adjunta captura o id de tu anydesk... ',
-});
