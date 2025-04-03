@@ -2,8 +2,8 @@
 const url = window.env.API_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const nombres = sessionStorage.getItem('nombres');
-    const apellidos = sessionStorage.getItem('apellidos');
+    conlocalStorage.getItem('nombres');
+    const apellidos = localStorage.getItem('apellidos');
 
     if (nombres && apellidos) {
         const nombreCompleto = `${nombres.trim()} ${apellidos.trim()}`;
@@ -96,10 +96,6 @@ function reinitializeScripts() {
         loadAndRunScript("/controllers/tickets/tickets.js", "inicializarTickets");
     }
 
-    if (path.includes("/tickets/tickets")) {
-        loadAndRunScript("/controllers/tickets/registrotickets.js");
-    }
-
     if (path.includes("/usuarios/usuarios/")) {
         loadAndRunScript("/controllers/usuarios/usuarios.js", "inicializarUsuarios");
     }
@@ -112,12 +108,20 @@ function reinitializeScripts() {
         loadAndRunScript("/controllers/tickets/consultastickets.js", "InicializarConsultaTickets");
     }
 
+    if (path.includes("/tickets/registrotickets")) {
+        loadAndRunScript("/controllers/tickets/registrotickets.js", "obtenerDatosTickets");
+    }
+
     if (path.includes("/inventario/consultainventario")) {
         loadAndRunScript("/controllers/inventario/consultainventario.js", "InicializarConsultaInventario");
     }
 
     if (path.includes("/inventario/registro")) {
-        loadAndRunScript("/controllers/inventario/registro.js");
+        loadAndRunScript("/controllers/inventario/registro.js", "obtenerDatosInventario");
+    }
+
+    if (path.includes("/inventario/registro")) {
+        loadAndRunScript("/controllers/inventario/guardarequipo.js", "obtenerDatosParaFormulario");
     }
 
     if (path.includes("/mantenimientos/mantenimiento")) {
@@ -221,6 +225,11 @@ function enviarNotificacionConSonido() {
 let ticketIds = new Set(); // Para almacenar los IDs de los tickets actuales
 let firstLoad = true; // Para verificar si es la primera carga de tickets
 let enProceso = false; // Variable para controlar ejecución
+let datosTickets = null; // Variable para almacenar los datos obtenidos
+let datosInventario = null; // Variable para almacenar los datos obtenidos
+let datosCargados = false; // Variable global para almacenar los datos obtenidos del servidor
+let datosFormularioCargados = false; // Variable para controlar si los datos ya fueron cargados
+let imagenesGuardadas = false; // Variable para controlar si las imágenes fueron guardadas
 let Inventario = [];
 let ticketsCerrados = [];
 let Usuarios = [];
@@ -228,15 +237,15 @@ let Mantenimiento = [];
 let EquiposSeleccionados = [];
 
 function setSessionStartTime() {
-    sessionStorage.setItem('sessionStartTime', Date.now());
+    localStorage.setItem('sessionStartTime', Date.now());
 }
 
 function resetSessionTimer() {
-    sessionStorage.setItem('sessionStartTime', Date.now());
+    localStorage.setItem('sessionStartTime', Date.now());
 }
 
 function checkSessionExpiration() {
-    const sessionStartTime = sessionStorage.getItem('sessionStartTime');
+    const sessionStartTime = localStorage.getItem('sessionStartTime');
     const maxInactivityTime = 12 * 60 * 60 * 1000;
 
     if (sessionStartTime) {
@@ -281,7 +290,7 @@ logoutLink.addEventListener('click', async (event) => {
 
         const data = await response.json();
         if (data.estado === 'ok') {
-            sessionStorage.clear();  // Limpiar sessionStorage
+            localStorage.clear();  // Limpiar sessionStorage
 
             Swal.fire({
                 title: 'Sesión cerrada',

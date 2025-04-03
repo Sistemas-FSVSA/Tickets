@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         showConfirmButton: false
                     }).then(() => {
                         window.location.href = '/dashboard/dashboard';
-                        sessionStorage.setItem('nombres', result.usuario.nombres);
-                        sessionStorage.setItem('apellidos', result.usuario.apellidos);
-                        sessionStorage.setItem('correo', result.usuario.correo);
-                        sessionStorage.setItem('identificacion', result.usuario.identificacion);
-                        sessionStorage.setItem('idusuario', result.usuario.idusuario);
+                        localStorage.setItem('nombres', result.usuario.nombres);
+                        localStorage.setItem('apellidos', result.usuario.apellidos);
+                        localStorage.setItem('correo', result.usuario.correo);
+                        localStorage.setItem('identificacion', result.usuario.identificacion);
+                        localStorage.setItem('idusuario', result.usuario.idusuario);
                     });
                 } else {
                     Swal.fire({
