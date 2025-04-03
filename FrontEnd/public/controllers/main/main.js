@@ -2,7 +2,11 @@
 const url = window.env.API_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
+<<<<<<< HEAD
     conlocalStorage.getItem('nombres');
+=======
+    const nombres = localStorage.getItem('nombres');
+>>>>>>> origin/pruebas
     const apellidos = localStorage.getItem('apellidos');
 
     if (nombres && apellidos) {

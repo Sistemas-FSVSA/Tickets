@@ -163,7 +163,7 @@ async function registrarMantenimientoModal() {
     if (!idinventario || !idactividad || !observacion || !idusuario) {
         console.warn("Por favor, complete todos los campos.");
         return;
-    }
+    } 
 
     const datos = {
         idinventario: parseInt(idinventario),

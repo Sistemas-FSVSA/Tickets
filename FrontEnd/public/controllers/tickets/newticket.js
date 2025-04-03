@@ -6,6 +6,7 @@ const MAX_FILES = 2;
 const MAX_CHARACTERS = 1000; // Límite de caracteres
 let uploadedFiles = [];
 let imageFiles = []; // Contendrá imágenes cargadas y pegadas
+
 const extension = document.getElementById('extension');
 // Validar que solo se permitan números en el input de ticket
 if (extension) {
@@ -36,10 +37,49 @@ var quill = new Quill('#editor', {
     placeholder: 'Describe tu problema aquí y adjunta captura o id de tu anydesk... ',
 });
 
+// Iniciar la validación periódica al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    validarHorarioPeriodicamente();
+    contadorCaracteres()
+
+    fetchOptions(`${url}/api/tickets/obtenerDependencias`, 'dependencia', 'dependencias');
+    fetchOptions(`${url}/api/tickets/obtenerTemas`, 'tema', 'temas');
+});
 
 
-// Configuración del contador de caracteres
-document.addEventListener('DOMContentLoaded', function () {
+
+
+// Validar horario periódicamente
+function validarHorarioPeriodicamente() {
+    setInterval(async () => {
+        try {
+            const response = await fetch(`${url}/api/index/horario`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fechaHora: new Date().toISOString() }),
+                credentials: "include",
+            });
+
+            const data = await response.json();
+
+            if (data.estado !== "true") {
+                // Si el horario no es válido, redirigir al inicio
+                Swal.fire({
+                    title: "Horario no disponible",
+                    text: "El horario permitido ha finalizado. Serás redirigido al inicio.",
+                    icon: "warning",
+                    confirmButtonText: "Aceptar",
+                }).then(() => {
+                    window.location.href = "/";
+                });
+            }
+        } catch (error) {
+            console.error("Error al validar horario:", error);
+        }
+    }, 60000); // Validar cada 60 segundos
+}
+
+function contadorCaracteres() {
     const editorContainer = document.querySelector('#editor');
     const textarea = document.querySelector('#rich-text');
 
@@ -70,41 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Sincronizar con el textarea oculto
         textarea.value = quill.root.innerHTML; // Guardar contenido como HTML
     });
-});
-
-// Manejador para imágenes desde el toolbar
-quill.getModule('toolbar').addHandler('image', function () {
-    if (imageFiles.length >= MAX_IMAGES) {
-        Swal.fire({
-            title: '¡Límite alcanzado!',
-            text: `Solo puedes cargar hasta ${MAX_IMAGES} imágenes.`,
-            icon: 'warning',
-            confirmButtonText: 'Aceptar'
-        });
-        return;
-    }
-    handleFileUpload('image/*', function (file) {
-        addImageFile(file);
-    });
-});
-
-// Manejador para archivos (solo permitir tipos específicos)
-quill.getModule('toolbar').addHandler('link', function () {
-    if (uploadedFiles.length >= MAX_FILES) {
-        Swal.fire({
-            title: '¡Límite alcanzado!',
-            text: `Solo puedes cargar hasta ${MAX_FILES} archivos.`,
-            icon: 'warning',
-            confirmButtonText: 'Aceptar'
-        });
-        return;
-    }
-    handleFileUpload('application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain', function (file) {
-        uploadedFiles.push(file);
-        displayPreviewFile(file);
-    });
-});
-
+}
 
 // Función para manejar la carga de archivos
 function handleFileUpload(allowedTypes, callback) {
@@ -135,31 +141,6 @@ function addImageFile(file) {
     reader.readAsDataURL(file);
 }
 
-// Escuchar el evento de pegar
-quill.root.addEventListener('paste', function (e) {
-    const clipboard = e.clipboardData || window.clipboardData;
-    const items = clipboard.items;
-
-    for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image') !== -1) {
-            e.preventDefault(); // Evitar pegar directamente en el editor
-
-            if (imageFiles.length >= MAX_IMAGES) {
-                // Mostrar alerta con SweetAlert
-                Swal.fire({
-                    title: '¡Límite alcanzado!',
-                    text: `Solo puedes cargar hasta ${MAX_FILES} imagenes.`,
-                    icon: 'warning',
-                    confirmButtonText: 'Aceptar'
-                });
-                return;
-            }
-
-            const file = items[i].getAsFile();
-            addImageFile(file);
-        }
-    }
-});
 
 
 // Mostrar imagen en la vista previa
@@ -275,11 +256,6 @@ form.onsubmit = function (e) {
         });
 };
 
-// Cargar opciones dinámicamente
-document.addEventListener('DOMContentLoaded', () => {
-    fetchOptions(`${url}/api/tickets/obtenerDependencias`, 'dependencia', 'dependencias');
-    fetchOptions(`${url}/api/tickets/obtenerTemas`, 'tema', 'temas');
-});
 
 // Utilidades de fetch y validación
 function fetchOptions(url, selectId, keyName) {
@@ -309,3 +285,63 @@ function fetchOptions(url, selectId, keyName) {
         })
         .catch(error => console.error(`Error al obtener ${keyName}:`, error));
 }
+
+// Escuchar el evento de pegar
+quill.root.addEventListener('paste', function (e) {
+    const clipboard = e.clipboardData || window.clipboardData;
+    const items = clipboard.items;
+
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            e.preventDefault(); // Evitar pegar directamente en el editor
+
+            if (imageFiles.length >= MAX_IMAGES) {
+                // Mostrar alerta con SweetAlert
+                Swal.fire({
+                    title: '¡Límite alcanzado!',
+                    text: `Solo puedes cargar hasta ${MAX_FILES} imagenes.`,
+                    icon: 'warning',
+                    confirmButtonText: 'Aceptar'
+                });
+                return;
+            }
+
+            const file = items[i].getAsFile();
+            addImageFile(file);
+        }
+    }
+});
+
+// Manejador para imágenes desde el toolbar
+quill.getModule('toolbar').addHandler('image', function () {
+    if (imageFiles.length >= MAX_IMAGES) {
+        Swal.fire({
+            title: '¡Límite alcanzado!',
+            text: `Solo puedes cargar hasta ${MAX_IMAGES} imágenes.`,
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
+    handleFileUpload('image/*', function (file) {
+        addImageFile(file);
+    });
+});
+
+// Manejador para archivos (solo permitir tipos específicos)
+quill.getModule('toolbar').addHandler('link', function () {
+    if (uploadedFiles.length >= MAX_FILES) {
+        Swal.fire({
+            title: '¡Límite alcanzado!',
+            text: `Solo puedes cargar hasta ${MAX_FILES} archivos.`,
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
+    handleFileUpload('application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain', function (file) {
+        uploadedFiles.push(file);
+        displayPreviewFile(file);
+    });
+});
+
