@@ -53,6 +53,7 @@ function limpiarModal() {
     document.getElementById("listaArchivos").innerHTML = ""; // Vaciar la lista de archivos
 }
 
+// Función para capturar la fecha, archivos y enviar a la API
 async function enviarDatos() {
     let mesAnio = document.getElementById("mesAnio").value;
     let archivosInput = document.getElementById("archivos");
@@ -60,29 +61,17 @@ async function enviarDatos() {
 
     // Validaciones antes de enviar
     if (!mesAnio) {
-        Swal.fire({
-            icon: "warning",
-            title: "Campo requerido",
-            text: "Por favor, selecciona un mes y un año."
-        });
+        alert("Por favor, selecciona un mes y un año.");
         return;
     }
 
     if (archivos.length === 0) {
-        Swal.fire({
-            icon: "warning",
-            title: "Archivos requeridos",
-            text: "Por favor, adjunta al menos un archivo."
-        });
+        alert("Por favor, adjunta al menos un archivo.");
         return;
     }
 
     if (archivos.length > 100) {
-        Swal.fire({
-            icon: "error",
-            title: "Límite de archivos excedido",
-            text: "Solo puedes subir un máximo de 100 archivos."
-        });
+        alert("Solo puedes subir un máximo de 100 archivos.");
         return;
     }
 
@@ -92,11 +81,7 @@ async function enviarDatos() {
     }
 
     if (totalSize > 10 * 1024 * 1024 * 1024) { // 10GB en bytes
-        Swal.fire({
-            icon: "error",
-            title: "Límite de tamaño excedido",
-            text: "El tamaño total de los archivos no puede superar los 10GB."
-        });
+        alert("El tamaño total de los archivos no puede superar los 10GB.");
         return;
     }
 
@@ -118,28 +103,17 @@ async function enviarDatos() {
         if (!response.ok) throw new Error("Error en la subida de archivos");
 
         let result = await response.json();
-        
-        Swal.fire({
-            icon: "success",
-            title: "¡Éxito!",
-            text: `Archivos subidos con éxito: ${result.message}`,
-        }).then(() => {
-            // Cerrar y limpiar el modal después de la subida exitosa
-            $('#guardarModificaciones').modal('hide');
-            archivosInput.value = ""; // Limpiar el input de archivos
-        });
+        alert(`Archivos subidos con éxito: ${result.message}`);
 
+        // Cerrar y limpiar el modal después de la subida exitosa
+        $('#guardarModificaciones').modal('hide');
+        archivosInput.value = ""; // Limpiar el input de archivos
     } catch (error) {
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Error al subir archivos."
-        });
+        alert("Error al subir archivos.");
     } finally {
         hideSpinner(); // Ocultar spinner al finalizar
     }
 }
-
 
 function InicializarBusqueda() {
     const searchInput = document.getElementById("searchInput");
