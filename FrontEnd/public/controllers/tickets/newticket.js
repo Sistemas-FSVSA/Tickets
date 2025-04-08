@@ -52,20 +52,20 @@ document.addEventListener("DOMContentLoaded", () => {
 // Validar horario periódicamente
 function validarHorarioPeriodicamente() {
     setInterval(async () => {
-        const fechaLocal = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000);
+        const ahora = new Date(); // Declarar correctamente la fecha actual
+        const fechaLocalISO = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000).toISOString();
 
         try {
             const response = await fetch(`${url}/api/index/horario`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fechaHora: fechaLocal.toISOString() }), // Enviar en ISO pero con la hora correcta
+                body: JSON.stringify({ fechaHora: fechaLocalISO }),
                 credentials: "include",
             });
 
             const data = await response.json();
 
             if (data.estado !== "true") {
-                // Si el horario no es válido, redirigir al inicio
                 Swal.fire({
                     title: "Horario no disponible",
                     text: "El horario permitido ha finalizado. Serás redirigido al inicio.",
@@ -80,6 +80,7 @@ function validarHorarioPeriodicamente() {
         }
     }, 60000); // Validar cada 60 segundos
 }
+
 
 function contadorCaracteres() {
     const editorContainer = document.querySelector('#editor');
