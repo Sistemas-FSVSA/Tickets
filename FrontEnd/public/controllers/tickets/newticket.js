@@ -52,11 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // Validar horario periódicamente
 function validarHorarioPeriodicamente() {
     setInterval(async () => {
+        const fechaLocal = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000);
+
         try {
             const response = await fetch(`${url}/api/index/horario`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fechaHora: new Date().toISOString() }),
+                body: JSON.stringify({ fechaHora: fechaLocal.toISOString() }), // Enviar en ISO pero con la hora correcta
                 credentials: "include",
             });
 
