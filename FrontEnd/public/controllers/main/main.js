@@ -246,7 +246,7 @@ function resetSessionTimer() {
 
 function checkSessionExpiration() {
     const sessionStartTime = localStorage.getItem('sessionStartTime');
-    const maxInactivityTime = 12 * 60 * 60 * 1000;
+    const maxInactivityTime = 6 * 60 * 60 * 1000;
 
     if (sessionStartTime) {
         const elapsedTime = Date.now() - parseInt(sessionStartTime, 10);
@@ -258,7 +258,7 @@ function checkSessionExpiration() {
 
 function inactivityTime() {
     let time;
-    const maxInactivityTime = 10 * 60 * 1000; // Tiempo máximo de inactividad
+    const maxInactivityTime = 6 * 60 * 60 * 1000; // Tiempo máximo de inactividad
 
     function resetTimer() {
         clearTimeout(time);
