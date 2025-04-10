@@ -235,6 +235,7 @@ let ticketsCerrados = [];
 let Usuarios = [];
 let Mantenimiento = [];
 let EquiposSeleccionados = [];
+let actividadesCargadas = [];
 
 function setSessionStartTime() {
     localStorage.setItem('sessionStartTime', Date.now());
