@@ -78,45 +78,47 @@ function llenarFormularioHVC(data) {
 
 // funcion para cargar actividades
 async function cargarActividades() {
+    if (actividadesCargadas.length > 0) {
+        return;
+    }
+
     try {
         const response = await fetch(`${url}/api/mantenimientos/obtenerActividades`, {
             credentials: "include"
         });
         if (!response.ok) throw new Error("Error al obtener actividades");
+
         const data = await response.json();
         const actividades = data.actividad;
-        
 
         if (!Array.isArray(actividades)) {
             console.error("Error: La respuesta no es un array", actividades);
             return;
         }
 
-        // Obtener el elemento <select>
-        const selectActividad = document.getElementById("tipoMantenimiento");
-        if (!selectActividad) {
-            console.error("Error: No se encontró el select con id 'idactividad'");
-            return;
-        }
-
-        // Limpiar el select antes de llenarlo
-        selectActividad.innerHTML = '<option value="">Seleccione una actividad</option>';
-
-        // Filtrar y agregar las actividades activas
-        actividades
-            .filter(actividad => actividad.estado === 1) // Solo actividades activas
-            .forEach(actividad => {
-                const option = document.createElement("option");
-                option.value = actividad.idactividad;
-                option.textContent = actividad.nombre;
-                selectActividad.appendChild(option);
-            });
+        // Guardar en la variable global
+        actividadesCargadas = actividades;
 
     } catch (error) {
         console.error("Error al cargar actividades:", error);
     }
 }
 
+function renderizarActividades() {
+    const selectActividad = document.getElementById("tipoMantenimiento");
+    if (!selectActividad) return;
+
+    selectActividad.innerHTML = '<option value="">Seleccione una actividad</option>';
+
+    actividadesCargadas
+        .filter(a => a.estado === true || a.estado === 1)  // <- Aquí el cambio
+        .forEach(a => {
+            const option = document.createElement("option");
+            option.value = a.idactividad;
+            option.textContent = a.nombre;
+            selectActividad.appendChild(option);
+        });
+}
 
 // funcion para renderizar los mantenimiento del equipo
 function renderizarMantenimientos(mantenimientos) {
@@ -151,8 +153,6 @@ function renderizarMantenimientos(mantenimientos) {
     });
 }
 
-
-
 // Registrar mantenimiento usando datos del formulario del modal
 async function registrarMantenimientoModal() {
     const idinventario = document.getElementById("idInventario").value;
@@ -163,7 +163,7 @@ async function registrarMantenimientoModal() {
     if (!idinventario || !idactividad || !observacion || !idusuario) {
         console.warn("Por favor, complete todos los campos.");
         return;
-    } 
+    }
 
     const datos = {
         idinventario: parseInt(idinventario),
@@ -186,17 +186,35 @@ async function registrarMantenimientoModal() {
         const urlAnterior = window.history.state?.prevUrl || window.location.href;
         window.history.replaceState({ prevUrl: urlAnterior }, "", `hvc?idinventario=${idinventario}`);
 
-        // 🔄 Recargar la vista
-        location.reload();
+        // ✅ Mostrar SweetAlert antes de recargar
+        Swal.fire({
+            icon: 'success',
+            title: '¡Mantenimiento registrado!',
+            text: 'El mantenimiento se guardó correctamente.',
+            confirmButtonText: 'Aceptar',
+            timer: 3000,
+            timerProgressBar: true,
+        }).then(() => {
+            location.reload(); // 🔄 Recargar después de aceptar la alerta
+        });
 
     } catch (error) {
         console.error("Error al registrar mantenimiento:", error);
+
+        // ❌ Alerta de error con SweetAlert opcional
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al registrar el mantenimiento.',
+        });
     }
 }
-
 
 function abrirModal(e) {
     e.preventDefault();
     const modal = new bootstrap.Modal(document.getElementById("modalMantenimiento"));
-    cargarActividades().then(() => modal.show());
+    cargarActividades().then(() => {
+        renderizarActividades();
+        modal.show();
+    });
 }
