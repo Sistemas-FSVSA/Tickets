@@ -1,5 +1,7 @@
 const { ticketsPoolPromise, sistemasPoolPromise } = require('../../db/conexion');
 const sql = require("mssql");
+const fs = require('fs');
+const path = require('path');
 
 const actualizarEquipo = async (req, res) => {
     const equipoData = req.body;
@@ -50,7 +52,7 @@ const actualizarEquipo = async (req, res) => {
 
             const fieldMapping = {
                 sn: "sn",
-                ip: "ipequipo", 
+                ip: "ipequipo",
                 mac: "mac",
                 datos: "puertodatos",
                 procesador: "procesador",
@@ -151,6 +153,60 @@ const actualizarEquipo = async (req, res) => {
                 .input("sistemas", sql.VarChar, sistemas)
                 .input("observaciones", sql.VarChar, observaciones)
                 .query(queryUpdateDetalleEquipo);
+
+            // ==== Manejo de imágenes (siempre elimina las viejas, agrega nuevas si hay) ====
+
+            // Obtener las imágenes actuales
+            const queryGetImages = `
+                SELECT url FROM imagenes WHERE idinventario = @idinventario;`;
+
+            const currentImagesResult = await transaction.request()
+                .input("idinventario", sql.Int, idinventario)
+                .query(queryGetImages);
+
+            const currentImages = currentImagesResult.recordset;
+
+            // Eliminar de la BD
+            const queryDeleteImages = `
+                DELETE FROM imagenes WHERE idinventario = @idinventario;`;
+
+            await transaction.request()
+                .input("idinventario", sql.Int, idinventario)
+                .query(queryDeleteImages);
+
+            const uploadsPath = path.join(__dirname, '../../../backend/uploads');
+
+            for (const image of currentImages) {
+                const filePath = path.join(uploadsPath, image.url.replace(/^uploads[\\/]/, ''));
+                console.log('Intentando eliminar:', filePath);
+
+                try {
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                        console.log('Archivo eliminado:', filePath);
+                    } else {
+                        console.log('Archivo no encontrado:', filePath);
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar archivo:', error);
+                }
+            }
+
+            // Insertar nuevas si existen
+            const archivosNuevos = req.files?.['archivos[]'];
+            if (archivosNuevos && archivosNuevos.length > 0) {
+                for (const file of archivosNuevos) {
+                    const queryInsertImage = `
+                        INSERT INTO imagenes (idinventario, url)
+                        VALUES (@idinventario, @URL);`;
+
+                    await transaction.request()
+                        .input("idinventario", sql.Int, idinventario)
+                        .input("URL", sql.VarChar, `uploads/${file.filename}`)
+                        .query(queryInsertImage);
+                }
+            }
+
 
             console.log("Detalle del equipo actualizado correctamente.");
             await transaction.commit();

@@ -12,7 +12,7 @@ const obtenerDatos = async (req, res) => {
         const formatosResult = await pool.request().query("SELECT * FROM formatoequipo");
         const almacenamientoResult = await pool.request().query("SELECT * FROM tipoalmacenamiento");
         const ramResult = await pool.request().query("SELECT * FROM tiporam");
-        const ultimoSnResult = await pool.request().query("SELECT TOP 1 sn FROM inventario ORDER BY idinventario DESC");
+        const ultimoSnResult = await pool.request().query("SELECT TOP 1 sn FROM inventario ORDER BY sn DESC");
 
         // Almacenar los datos en variables
         const dependencia = dependenciasResult.recordset;
