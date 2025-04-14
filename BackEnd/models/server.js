@@ -14,6 +14,7 @@ class Server {
     this.mantenimientosPath = "/api/mantenimientos";
     this.automaticosPath = "/api/automaticos";
     this.modificacionesPath = "/api/modificaciones";
+    this.dashboardPath = "/api/dashboard";
 
     this.middlewares();
     this.routes();
@@ -55,6 +56,7 @@ class Server {
     this.app.use(this.mantenimientosPath, require("../routes/mantenimientos"));
     this.app.use(this.automaticosPath, require("../routes/automaticos"));
     this.app.use(this.modificacionesPath, require("../routes/modificaciones"));
+    this.app.use(this.dashboardPath, require("../routes/dashboard"));
   }
 
   listen() {
