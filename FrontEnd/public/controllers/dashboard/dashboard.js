@@ -1,80 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     inicializarDashboard();
 });
+
 async function inicializarDashboard() {
     inicializarUI();
     inicializarGraficos();
+
+    // Establecer fechas predeterminadas
+    const fechaActual = new Date();
+    const fechaInicio = new Date(fechaActual);
+    fechaInicio.setDate(fechaActual.getDate() - 6); // Una semana atrás
+
+    document.getElementById('fechaInicio').value = fechaInicio.toISOString().split('T')[0];
+    document.getElementById('fechaFin').value = fechaActual.toISOString().split('T')[0];
+
     await cargarTicketsDashboard();
     //setInterval(cargarTickets, 30000);
-}
-
-function inicializarUI() {
-    document.getElementById('ticketsActivos').textContent = '...';
-    document.getElementById('ticketsGestionados').textContent = '...';
-    document.getElementById('ticketsPendientes').textContent = '...';
-}
-
-function inicializarGraficos() {
-    if (typeof Chart === 'undefined') {
-        console.error('Error: Chart.js no está cargado correctamente.');
-        return;
-    }
-
-    if (typeof ChartDataLabels === 'undefined') {
-        console.error('Error: El plugin ChartDataLabels no está cargado.');
-        return;
-    }
-
-    Chart.register(ChartDataLabels);
-    const customHeight = 500;
-    document.getElementById('salesChart').parentElement.style.height = `${customHeight}px`;
-    document.getElementById('usersChart').parentElement.style.height = `${customHeight}px`;
-
-    // Verifica si los gráficos existen antes de destruirlos
-    if (window.salesChart instanceof Chart) {
-        window.salesChart.destroy();
-    }
-    if (window.usersChart instanceof Chart) {
-        window.usersChart.destroy();
-    }
-
-    window.salesChart = new Chart(document.getElementById('salesChart').getContext('2d'), {
-        type: 'pie',
-        data: { labels: [], datasets: [{ data: [], backgroundColor: ['#afeeee', '#e0ffff', '#b0e0e6', '#87cefa', '#add5fa'] }] },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'left',
-                    align: 'start',
-                    labels: {
-                        boxWidth: 20,
-                        padding: 10,
-                        font: { size: 14 }
-                    }
-                },
-                datalabels: {
-                    color: '#000',
-                    font: { size: 12 },
-                    formatter: (value, context) => {
-                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                        return `${((value / total) * 100).toFixed(2)}%`;
-                    }
-                }
-            },
-            layout: { padding: { left: 20, right: 20 } }
-        }
-    });
-
-    window.usersChart = new Chart(document.getElementById('usersChart').getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: ['Norte', 'Sur', 'Este', 'Oeste'],
-            datasets: [{ label: 'Usuarios', data: [15, 20, 10, 30], backgroundColor: ['#afeeee', '#e0ffff', '#b0e0e6', '#87cefa'] }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
 }
 
 async function cargarTicketsDashboard() {
@@ -94,8 +35,109 @@ async function cargarTicketsDashboard() {
         actualizarGraficoSales(tickets);
 
     } catch (error) {
-        console.error('Error al cargar los tickets:', error); 
+        console.error('Error al cargar los tickets:', error);
     }
+}
+
+function inicializarUI() {
+    document.getElementById('ticketsActivos').textContent = '...';
+    document.getElementById('ticketsGestionados').textContent = '...';
+    document.getElementById('ticketsPendientes').textContent = '...';
+}
+
+function inicializarGraficos() {
+    Chart.register(ChartDataLabels);
+    const customHeight = 500;
+    document.getElementById('salesChart').parentElement.style.height = `${customHeight}px`;
+    document.getElementById('usersChart').parentElement.style.height = `${customHeight}px`;
+
+    // Verifica si los gráficos existen antes de destruirlos
+    if (window.salesChart instanceof Chart) {
+        window.salesChart.destroy();
+    }
+    if (window.usersChart instanceof Chart) {
+        window.usersChart.destroy();
+    }
+
+    console.log('Inicializando salesChart');
+
+    window.salesChart = new Chart(document.getElementById('salesChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: ['#afeeee', '#e0ffff', '#b0e0e6', '#87cefa', '#add5fa']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'left',
+                    align: 'start',
+                    labels: {
+                        boxWidth: 20,
+                        padding: 10,
+                        font: { size: 14 }
+                    },
+                    onClick: (e, legendItem, legend) => {
+                        const chart = legend.chart;
+                        const index = legendItem.index;
+                    
+                        console.log(`Toggle visibilidad: ${legendItem.text}`);
+                    
+                        // 🔄 Usamos toggleDataVisibility en lugar de modificar meta.data directamente
+                        chart.toggleDataVisibility(index);
+                    
+                        // 🔃 Esto redibuja el gráfico y actualiza los datalabels
+                        chart.update();
+                    }
+                },
+                datalabels: {
+                    color: '#000',
+                    font: { size: 12 },
+                    formatter: (value, context) => {
+                        const chart = context.chart;
+                        const datasetIndex = context.datasetIndex;
+                        const index = context.dataIndex;
+                        const meta = chart.getDatasetMeta(datasetIndex);
+
+                        const totalVisible = meta.data.reduce((sum, arc, i) => {
+                            const isHidden = arc.hidden || chart._hiddenIndices?.[i]; // Verifica si está oculto
+                            return !isHidden ? sum + chart.data.datasets[datasetIndex].data[i] : sum;
+                        }, 0);
+
+                        const currentValue = chart.data.datasets[datasetIndex].data[index];
+                        const isCurrentHidden = meta.data[index].hidden || chart._hiddenIndices?.[index];
+
+                        if (isCurrentHidden) {
+                            console.log(`Oculto slice: ${chart.data.labels[index]} (value: ${currentValue})`);
+                            return '';
+                        }
+
+                        if (totalVisible === 0) return '0%';
+
+                        const porcentaje = (currentValue / totalVisible) * 100;
+                        console.log(`Calculando % para ${chart.data.labels[index]}: ${porcentaje.toFixed(2)}%`);
+                        return `${porcentaje.toFixed(2)}%`;
+                    }
+                }
+            },
+            layout: { padding: { left: 20, right: 20 } }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+    // window.usersChart = new Chart(document.getElementById('usersChart').getContext('2d'), {
+    //     type: 'bar',
+    //     data: {
+    //         labels: ['Norte', 'Sur', 'Este', 'Oeste'],
+    //         datasets: [{ label: 'Usuarios', data: [15, 20, 10, 30], backgroundColor: ['#afeeee', '#e0ffff', '#b0e0e6', '#87cefa'] }]
+    //     },
+    //     options: { responsive: true, maintainAspectRatio: false }
+    // });
 }
 
 function actualizarTarjetas(tickets) {
@@ -108,13 +150,16 @@ function actualizarTarjetas(tickets) {
 
 function actualizarGraficoSales(tickets) {
     requestAnimationFrame(() => {
+        const fechaInicioInput = document.getElementById('fechaInicio').value;
+        const fechaFinInput = document.getElementById('fechaFin').value;
+
         const fechaActual = new Date();
-        const fechaHace6Dias = new Date();
-        fechaHace6Dias.setDate(fechaActual.getDate() - 6);
+        const fechaFin = fechaFinInput ? new Date(fechaFinInput) : fechaActual;
+        const fechaInicio = fechaInicioInput ? new Date(fechaInicioInput) : new Date(fechaActual.setDate(fechaActual.getDate() - 6));
 
         const ticketsFiltrados = tickets.filter(ticket => {
             const fechaInicioTicket = new Date(ticket.fechainicio);
-            return fechaInicioTicket >= fechaHace6Dias && fechaInicioTicket <= fechaActual;
+            return fechaInicioTicket >= fechaInicio && fechaInicioTicket <= fechaFin;
         });
 
         const dependenciasMap = new Map();
@@ -122,37 +167,23 @@ function actualizarGraficoSales(tickets) {
             const iddependencia = ticket.iddependencia;
             const nombreDependencia = ticket.nombreDependencia;
             if (dependenciasMap.has(iddependencia)) {
-                dependenciasMap.set(iddependencia, {
-                    count: dependenciasMap.get(iddependencia).count + 1,
-                    nombreDependencia,
-                });
+                dependenciasMap.get(iddependencia).count++;
             } else {
                 dependenciasMap.set(iddependencia, { count: 1, nombreDependencia });
             }
         });
 
-        const dependenciasArray = Array.from(dependenciasMap, ([iddependencia, data]) => ({
-            iddependencia,
-            count: data.count,
-            nombreDependencia: data.nombreDependencia,
-        }));
-
+        const dependenciasArray = Array.from(dependenciasMap.values());
         dependenciasArray.sort((a, b) => b.count - a.count);
-        const top5Dependencias = dependenciasArray.slice(0, 5);
+        const top5 = dependenciasArray.slice(0, 5);
 
         if (window.salesChart) {
-            window.salesChart.data.labels = top5Dependencias.map(dep => dep.nombreDependencia);
-            window.salesChart.data.datasets[0].data = top5Dependencias.map(dep => dep.count);
+            window.salesChart.data.labels = top5.map(dep => dep.nombreDependencia);
+            window.salesChart.data.datasets[0].data = top5.map(dep => dep.count);
             window.salesChart.update();
-        } else {
-            console.error("Error: salesChart no está definido.");
         }
     });
 }
 
-// if (!window.dashboardInicializado) {
-//     window.dashboardInicializado = true;
-//     inicializarDashboard();
-// } else {
-//     console.log("dashboard.js ya fue ejecutado, evitando duplicación.");
-// }
+document.getElementById('fechaInicio').addEventListener('change', cargarTicketsDashboard);
+document.getElementById('fechaFin').addEventListener('change', cargarTicketsDashboard);
