@@ -37,14 +37,9 @@ async function cargarInventario() {
 
 function renderizarInventario() {
     const tabla = $("#inventario").DataTable();
-
-    // 🔹 Guardar la página actual antes de actualizar
     let paginaActual = tabla.page();
-
-    // 🔹 Limpiar la tabla sin destruirla
     tabla.clear();
 
-    // 🔹 Agregar los nuevos datos
     Inventario.forEach((inventario) => {
         const estadoTexto = inventario.estado == 1 ? "Activo" : "Desactivado";
         const snFormateado = inventario.sn.toString().padStart(3, "0");
@@ -64,28 +59,40 @@ function renderizarInventario() {
         ]);
     });
 
-    // 🔹 Dibujar la tabla con los nuevos datos y mantener la página actual
     tabla.draw(false);
     tabla.page(paginaActual).draw(false);
+
+    // Reasignar eventos después de renderizar
+    $("#inventario tbody").off("click", ".editar-inventario").on("click", ".editar-inventario", function () {
+        const idinventario = $(this).data("id");
+        editarInventario(idinventario);
+    });
 }
 
 // 🔹 Inicializar la tabla si aún no lo está
 $(document).ready(function () {
-    $("#inventario").DataTable({
+    // Destruir la tabla si ya existe
+    if ($.fn.DataTable.isDataTable("#inventario")) {
+        $("#inventario").DataTable().destroy();
+    }
+
+    // Inicializar DataTable
+    const tabla = $("#inventario").DataTable({
         language: {
             url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json"
         },
         order: [[0, "asc"]],
-        pageLength: 10
+        pageLength: 10,
+        destroy: true // Permite reinicializar la tabla
     });
 
-    // 🔹 Delegar evento para botones de edición
-    $("#inventario tbody").on("click", ".editar-inventario", function () {
+    // Delegar evento para botones de edición
+    $("#inventario tbody").off("click", ".editar-inventario").on("click", ".editar-inventario", function () {
         const idinventario = $(this).data("id");
         editarInventario(idinventario);
     });
 
-    // 🔹 Cargar inventario por primera vez
+    // Cargar inventario por primera vez
     cargarInventario();
 });
 
@@ -96,6 +103,15 @@ function editarInventario(idinventario) {
         form.classList.remove("was-validated");
     }
 
+    // Reiniciar estado de imágenes
+    imagenesGuardadas = false;
+    imagenesExistentes = [null, null];
+    inputImagen1Formulario.value = "";
+    inputImagen2Formulario.value = "";
+    preview1Formulario.src = "";
+    preview2Formulario.src = "";
+    preview1Formulario.style.display = "none";
+    preview2Formulario.style.display = "none";
 
     fetch(`${url}/api/inventario/obtenerInventario`, {
         method: "POST",
@@ -158,17 +174,22 @@ function editarInventario(idinventario) {
 
                 // Cargar imágenes en el modal de imágenes
                 if (result.imagenes && result.imagenes.length > 0) {
+                    // Guardar referencias de las imágenes existentes
+                    imagenesExistentes[0] = result.imagenes[0];
                     $("#preview1").attr("src", `${url}${result.imagenes[0]}`).show();
                     $("#download1").attr("href", `${url}${result.imagenes[0]}`).show();
 
                     if (result.imagenes.length > 1) {
+                        imagenesExistentes[1] = result.imagenes[1];
                         $("#preview2").attr("src", `${url}${result.imagenes[1]}`).show();
                         $("#download2").attr("href", `${url}${result.imagenes[1]}`).show();
                     } else {
+                        imagenesExistentes[1] = null;
                         $("#preview2").hide();
                         $("#download2").hide();
                     }
                 } else {
+                    imagenesExistentes = [null, null];
                     $("#preview1, #preview2").hide();
                     $("#download1, #download2").hide();
                 }
@@ -178,6 +199,34 @@ function editarInventario(idinventario) {
             }
         })
         .catch(error => console.error("Error al obtener inventario:", error));
+}
+
+function prepararImagenesParaEnvio() {
+    const archivos = [];
+
+    // Imagen 1
+    if (inputImagen1Formulario.files.length > 0) {
+        archivos.push(inputImagen1Formulario.files[0]);
+    } else if (imagenesExistentes[0]) {
+        // Si no hay nueva imagen pero existe una guardada, enviar null para mantenerla
+        archivos.push(null);
+    } else {
+        // Si no hay imagen nueva ni existente, enviar Blob vacío
+        archivos.push(new Blob([]));
+    }
+
+    // Imagen 2
+    if (inputImagen2Formulario.files.length > 0) {
+        archivos.push(inputImagen2Formulario.files[0]);
+    } else if (imagenesExistentes[1]) {
+        // Si no hay nueva imagen pero existe una guardada, enviar null para mantenerla
+        archivos.push(null);
+    } else {
+        // Si no hay imagen nueva ni existente, enviar Blob vacío
+        archivos.push(new Blob([]));
+    }
+
+    return archivos;
 }
 
 async function actualizarEstadoInventario(idinventario, nuevoEstado, motivoDesactivacion = "") {
@@ -294,10 +343,10 @@ function mostrarVistaPreviaFormulario(input, preview) {
 
 async function actualizarEquipo() {
     const formData = new FormData();
-
     const idinventario = document.getElementById("idinventario").value;
     formData.append("idinventario", idinventario);
 
+    // Agregar datos del equipo
     const equipoData = [
         "sn", "ip", "mac", "datos", "procesador", "tiporam", "cantidadram",
         "tipoalmacenamiento", "cantidadalmacenamiento", "formatoequipo", "marca",
@@ -312,33 +361,76 @@ async function actualizarEquipo() {
         }
     });
 
+    // Agregar usuario
     const idusuario = localStorage.getItem("idusuario");
     if (idusuario) {
         formData.append("idusuario", idusuario);
     }
 
-    // Imagen 1
-    if (inputImagen1Formulario.files.length > 0) {
-        formData.append("archivos[]", inputImagen1Formulario.files[0]);
-    } else {
-        formData.append("archivos[]", new Blob([])); // Imagen vacía
-    }
-
-    // Imagen 2
-    if (inputImagen2Formulario.files.length > 0) {
-        formData.append("archivos[]", inputImagen2Formulario.files[0]);
-    } else {
-        formData.append("archivos[]", new Blob([])); // Imagen vacía
-    }
-
+    // Manejo de imágenes mejorado
     try {
+        // Función para convertir URL de imagen a Blob
+        async function urlToBlob(imageUrl) {
+            if (!imageUrl) return new Blob([]);
+            try {
+                const response = await fetch(`${url}${imageUrl}`);
+                return await response.blob();
+            } catch (error) {
+                console.error("Error al convertir imagen existente:", error);
+                return new Blob([]);
+            }
+        }
+
+        // Procesar imagen 1
+        if (inputImagen1Formulario.files.length > 0) {
+            // Si hay nueva imagen, enviarla
+            formData.append("archivos[]", inputImagen1Formulario.files[0]);
+        } else if (imagenesExistentes[0]) {
+            // Si no hay nueva pero existe una guardada, convertir y reenviar
+            const blob = await urlToBlob(imagenesExistentes[0]);
+            formData.append("archivos[]", blob, `imagen1_${Date.now()}.jpg`);
+        } else {
+            // Si no hay imagen, enviar Blob vacío
+            formData.append("archivos[]", new Blob([]));
+        }
+
+        // Procesar imagen 2
+        if (inputImagen2Formulario.files.length > 0) {
+            formData.append("archivos[]", inputImagen2Formulario.files[0]);
+        } else if (imagenesExistentes[1]) {
+            const blob = await urlToBlob(imagenesExistentes[1]);
+            formData.append("archivos[]", blob, `imagen2_${Date.now()}.jpg`);
+        } else {
+            formData.append("archivos[]", new Blob([]));
+        }
+
+        // Mostrar loader mientras se procesa
+        Swal.fire({
+            title: 'Procesando...',
+            html: 'Por favor espera mientras se actualiza el equipo',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         const response = await fetch(`${url}/api/inventario/actualizarEquipo`, {
             method: "POST",
             credentials: "include",
             body: formData,
         });
 
-        const result = await response.json();
+        // Cerrar loader
+        Swal.close();
+
+        // Verificar si la respuesta es JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            throw new Error(`Respuesta inesperada del servidor: ${text.substring(0, 100)}...`);
+        }
+
+        const result = await handleResponse(response);
 
         if (response.ok) {
             Swal.fire({
@@ -358,14 +450,33 @@ async function actualizarEquipo() {
                 text: result.message || "Ocurrió un error al actualizar el inventario.",
             });
         }
-
     } catch (error) {
         console.error("Error al enviar datos al backend:", error);
+
+        // Mostrar mensaje de error más detallado
+        let errorMessage = "No se pudo conectar con el servidor.";
+        if (error.message.includes("Unexpected token '<'")) {
+            errorMessage = "El servidor respondió con una página de error. Verifica la consola para más detalles.";
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
         Swal.fire({
             icon: "error",
             title: "Error",
-            text: "No se pudo conectar con el servidor.",
+            text: errorMessage,
         });
+    }
+}
+
+// Función auxiliar para verificar la respuesta
+async function handleResponse(response) {
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        console.error("La respuesta no es JSON:", text);
+        throw new Error(text);
     }
 }
 
@@ -424,7 +535,36 @@ $(modal).on("hidden.bs.modal", function () {
     }
 });
 
-// Reiniciar variable cuando se abre el modal
-$('#subirImagenesModal').on("shown.bs.modal", function () {
+// Evento para guardar imágenes seleccionadas
+$('#guardarImagenesBtn').off('click').on('click', function () {
+    imagenesGuardadas = true;
+
+    // Actualizar vistas previas
+    if (inputImagen1Formulario.files.length) {
+        mostrarVistaPreviaFormulario(inputImagen1Formulario, preview1Formulario);
+    }
+    if (inputImagen2Formulario.files.length) {
+        mostrarVistaPreviaFormulario(inputImagen2Formulario, preview2Formulario);
+    }
+
+    $('#subirImagenesModal').modal('hide');
+});
+
+// Manejar eventos del modal principal
+$('#formEditarInventario').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+    if (!imagenesGuardadas) {
+        limpiarImagenesFormulario();
+    }
+});
+
+// Reiniciar variable cuando se abre el modal de imágenes
+$('#subirImagenesModal').off('shown.bs.modal').on('shown.bs.modal', function () {
     imagenesGuardadas = false;
+
+    if (inputImagen1Formulario.files.length) {
+        mostrarVistaPreviaFormulario(inputImagen1Formulario, document.getElementById("preview1"));
+    }
+    if (inputImagen2Formulario.files.length) {
+        mostrarVistaPreviaFormulario(inputImagen2Formulario, document.getElementById("preview2"));
+    }
 });
