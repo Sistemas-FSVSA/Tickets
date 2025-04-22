@@ -183,22 +183,33 @@ $(modal).on("hidden.bs.modal", function () {
 });
 
 // Evento para guardar las imágenes seleccionadas
-guardarImagenesBtn.addEventListener("click", function () {
-    const formData = new FormData();
+function inicializarEventosGuardarImagenes() {
+    const guardarImagenesBtn = document.getElementById("guardarImagenesBtn");
 
-    if (inputImagen1.files.length) {
-        formData.append("imagen1", inputImagen1.files[0]);
+    if (guardarImagenesBtn) {
+        guardarImagenesBtn.addEventListener("click", function () {
+            const formData = new FormData();
+
+            if (inputImagen1.files.length) {
+                formData.append("imagen1", inputImagen1.files[0]);
+            }
+            if (inputImagen2.files.length) {
+                formData.append("imagen2", inputImagen2.files[0]);
+            }
+
+            // Marcar imágenes como guardadas para que no se borren al cerrar el modal
+            imagenesGuardadas = true;
+
+            // Opcional: Cerrar el modal después de guardar
+            $('#subirImagenesModal').modal('hide');
+        });
+    } else {
+        console.warn("El botón 'guardarImagenesBtn' no se encontró en el DOM.");
     }
-    if (inputImagen2.files.length) {
-        formData.append("imagen2", inputImagen2.files[0]);
-    }
+}
 
-    // Marcar imágenes como guardadas para que no se borren al cerrar el modal
-    imagenesGuardadas = true;
-
-    // Opcional: Cerrar el modal después de guardar
-    $('#subirImagenesModal').modal('hide');
-});
+// Llama a esta función después de cargar dinámicamente el contenido
+inicializarEventosGuardarImagenes();
 
 // Reiniciar la variable cuando se abre el modal
 $(modal).on("shown.bs.modal", function () {
@@ -291,3 +302,5 @@ async function enviarEquipo() {
         alert("Error de conexión con el servidor");
     }
 }
+
+inicializarEventosGuardarImagenes(); // Asegurarse de que los eventos se inicializan al cargar el script

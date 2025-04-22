@@ -158,20 +158,42 @@ function renderizarMantenimientos(mantenimientos, esPrimeraCarga = false) {
         return;
     }
 
-    // Convertir fechas a objetos Date para ordenamiento correcto
-    const mantenimientosConFecha = mantenimientos.map(m => ({
-        ...m,
-        fechaOrdenable: m.fechamantenimiento ? new Date(m.fechamantenimiento) : null
-    }));
+    // Procesar fechas para mostrar y ordenar
+    const mantenimientosProcesados = mantenimientos.map(m => {
+        if (!m.fechamantenimiento) {
+            return {
+                ...m,
+                fechaOrdenable: 0,
+                fechaMostrar: 'Fecha no disponible'
+            };
+        }
+
+        // Parsear la fecha ISO del servidor (YYYY-MM-DD)
+        const [year, month, day] = m.fechamantenimiento.split('T')[0].split('-');
+        
+        // Crear fecha en formato local (sin problemas de zona horaria)
+        const fechaLocal = new Date(year, month - 1, day);
+        
+        // Formatear para mostrar (dd-mm-yyyy)
+        const fechaMostrar = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+        
+        return {
+            ...m,
+            fechaOrdenable: fechaLocal.getTime(), // Timestamp para ordenar
+            fechaMostrar: fechaMostrar // Formato dd-mm-yyyy para mostrar
+        };
+    });
+
+    // Ordenar por fecha descendente (más reciente primero)
+    mantenimientosProcesados.sort((a, b) => b.fechaOrdenable - a.fechaOrdenable);
 
     // Inicializar o actualizar DataTable
     if (esPrimeraCarga) {
-        inicializarDataTable(mantenimientosConFecha);
+        inicializarDataTable(mantenimientosProcesados);
     } else {
         const tabla = $("#tablaMantenimientos").DataTable();
-        tabla.clear().rows.add(mantenimientosConFecha).draw();
-        // Forzar reordenamiento después de actualizar datos
-        tabla.order([1, 'desc']).draw();
+        tabla.clear().rows.add(mantenimientosProcesados).draw();
+        tabla.order([4, 'desc']).draw(); // Ordenar por columna oculta
     }
 }
 
@@ -181,7 +203,7 @@ function inicializarDataTable(mantenimientos) {
         $("#tablaMantenimientos").DataTable().destroy();
     }
 
-    // Configuración unificada para todas las instancias
+    // Configuración del DataTable
     const config = {
         language: { 
             url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json",
@@ -192,8 +214,8 @@ function inicializarDataTable(mantenimientos) {
                 previous: "Anterior"
             }
         },
-        order: [[1, "desc"]], // Ordenar por la columna de Fecha (índice 1) descendente
-        pageLength: 5,
+        order: [[4, "desc"]], // Ordenar por la columna oculta (timestamp)
+        pageLength: 10,
         lengthMenu: [5, 10, 15, 20],
         autoWidth: false,
         dom: '<"top"lf>rt<"bottom"ip><"clear">',
@@ -201,27 +223,20 @@ function inicializarDataTable(mantenimientos) {
         columns: [
             { data: 'nombre_actividad', title: 'Actividad' },
             { 
-                data: 'fechamantenimiento', 
+                data: 'fechaMostrar', 
                 title: 'Fecha',
-                type: 'date',
                 render: function(data) {
-                    if (!data) return 'Fecha no disponible';
-                    
-                    // Ajustar la fecha para compensar la zona horaria
-                    const fecha = new Date(data);
-                    const fechaAjustada = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
-                    
-                    return fechaAjustada.toLocaleDateString('es-ES', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric'
-                    });
+                    return data || 'Fecha no disponible';
                 }
             },
             { data: 'observacion_hvc', title: 'Observaciones' },
-            { data: 'nombre_responsable', title: 'Responsable' }
-        ],
-        // ... (resto de la configuración)
+            { data: 'nombre_responsable', title: 'Responsable' },
+            {
+                data: 'fechaOrdenable',
+                visible: false,
+                type: 'num'
+            }
+        ]
     };
 
     return $("#tablaMantenimientos").DataTable(config);
@@ -291,8 +306,14 @@ async function registrarMantenimientoModal(e) {
     }
 }
 
+function limpiarEventosMantenimiento() {
+    $('#tablaMantenimientos').off('click', '.editar-mantenimiento');
+    // Limpia otros eventos relacionados con la vista de mantenimiento
+}
+
 // Función para volver a la vista principal de mantenimientos
 function volverAMantenimientos() {
+    limpiarEventosMantenimiento();
     // Opción 1: Usando el referer (puede no ser confiable en algunos casos)
     const referer = document.referrer;
     
