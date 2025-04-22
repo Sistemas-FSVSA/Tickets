@@ -533,6 +533,7 @@ async function actualizarEquipo() {
                 timer: 2000,
                 showConfirmButton: false,
             }).then(() => {
+                cargarInventario();
                 editarInventario(idinventario);
             });
         } else {
