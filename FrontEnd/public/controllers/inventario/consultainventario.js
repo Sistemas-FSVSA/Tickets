@@ -62,6 +62,11 @@ function inicializarEventosModalImagenes() {
                 abrirModalBtn.focus();
             }
         });
+
+        // Evento para abrir el modal de imágenes
+    $(document).on('click', '#subirImagenesBtn', function() {
+        $('#subirImagenesModal').modal('show');
+    });
 }
 
 function reiniciarEstadoGlobal() {
