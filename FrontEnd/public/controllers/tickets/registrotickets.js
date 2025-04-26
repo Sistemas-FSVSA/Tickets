@@ -147,6 +147,18 @@ function mostrarDatosEnModal(modalId) {
     }
 }
 
+$(document).on('click', '#abrirModalDependencia', function () {
+    $('#nuevaDependenciaModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalSoporte', function () {
+    $('#nuevoSoporteModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalTemas', function () {
+    $('#nuevoTemasModal').modal('show');
+});
+
 // Función para configurar los eventos de los switches
 function configurarSwitches() {
     document.querySelectorAll('.switch-estado').forEach(switchElement => {

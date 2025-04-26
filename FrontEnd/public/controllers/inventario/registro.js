@@ -167,6 +167,30 @@ $(document).on('shown.bs.modal', function (event) {
     }
 });
 
+$(document).on('click', '#abrirModalDependencia', function () {
+    $('#nuevaDependenciaModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalActividad', function () {
+    $('#nuevoActividadModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalRam', function () {
+    $('#nuevaRamModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalAlmacenamiento', function () {
+    $('#nuevoAlmacenamientoModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalFormato', function () {
+    $('#nuevoFormatoModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalMarca', function () {
+    $('#nuevaMarcaModal').modal('show');
+});
+
 // Función para configurar los eventos de los switches (Inventario)
 function configurarSwitchesInventario() {
     document.querySelectorAll('.switch-estado').forEach(switchElement => {
