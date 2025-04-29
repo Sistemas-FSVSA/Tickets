@@ -7,6 +7,10 @@ $(document).on("shown.bs.modal", "#nuevoEquipoModal", async function () {
     }
 });
 
+$(document).on('click', '#abrirModalEquipo', function () {
+    $('#nuevoEquipoModal').modal('show');
+});
+
 // Función para obtener datos del servidor (Inventario)
 async function obtenerDatosParaFormulario() {
     try {

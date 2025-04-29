@@ -21,6 +21,45 @@ async function InicializarConsultaInventario() {
     preview2Formulario.style.display = "none";
 }
 
+$(document).on('change', '#filtroEstado', function () {
+    const estadoSeleccionado = $(this).val();
+    filtrarPorEstado(estadoSeleccionado);
+});
+
+function filtrarPorEstado(estadoSeleccionado) {
+    const tabla = $("#inventario").DataTable();
+    let paginaActual = tabla.page();
+
+    tabla.clear();
+
+    const inventarioFiltrado = estadoSeleccionado
+        ? Inventario.filter(i => (i.estado == 1 ? "Activo" : "Desactivado") === estadoSeleccionado)
+        : Inventario;
+
+    inventarioFiltrado.forEach((inventario) => {
+        const estadoTexto = inventario.estado == 1 ? "Activo" : "Desactivado";
+        const snFormateado = inventario.sn.toString().padStart(3, "0");
+
+        tabla.row.add([
+            snFormateado,
+            inventario.nombre,
+            inventario.marca,
+            inventario.formato,
+            inventario.nombreequipo,
+            inventario.ipequipo,
+            inventario.nombreusuario,
+            estadoTexto,
+            `<button class="btn btn-warning btn-sm editar-inventario" data-id="${inventario.idinventario}">
+                <i class="fas fa-edit"></i> Editar
+            </button>`
+        ]);
+    });
+
+    tabla.draw(false);
+    tabla.page(paginaActual).draw(false);
+}
+
+
 function inicializarEventosModalImagenes() {
     // Reasignar eventos del modal de imágenes
     $('#subirImagenesModal')
@@ -62,6 +101,11 @@ function inicializarEventosModalImagenes() {
                 abrirModalBtn.focus();
             }
         });
+
+    // Evento para abrir el modal de imágenes
+    $(document).on('click', '#subirImagenesBtn', function () {
+        $('#subirImagenesModal').modal('show');
+    });
 }
 
 function reiniciarEstadoGlobal() {
@@ -92,6 +136,10 @@ async function cargarInventario() {
         console.error("Error al cargar inventario:", error);
     }
 
+    const estadoSeleccionado = $("#filtroEstado").val();
+    if (estadoSeleccionado) {
+        filtrarPorEstado(estadoSeleccionado);
+    }
 }
 
 function asignarEventoGuardarCambios() {
@@ -533,6 +581,7 @@ async function actualizarEquipo() {
                 timer: 2000,
                 showConfirmButton: false,
             }).then(() => {
+                cargarInventario();
                 editarInventario(idinventario);
             });
         } else {
