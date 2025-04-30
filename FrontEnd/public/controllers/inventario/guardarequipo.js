@@ -169,22 +169,25 @@ inputImagen2.addEventListener("change", function () {
     mostrarVistaPrevia(inputImagen2, preview2);
 });
 
-// Función para limpiar imágenes al cerrar el modal (solo si no se han guardado)
-function limpiarImagenes() {
+// Función para limpiar las imágenes del formulario
+function limpiarImagenesFormulario() {
     if (!imagenesGuardadas) {
-        inputImagen1.value = "";
-        inputImagen2.value = "";
-        preview1.src = "";
-        preview1.style.display = "none";
-        preview2.src = "";
-        preview2.style.display = "none";
+        if (inputImagen1Formulario) {
+            inputImagen1Formulario.value = "";
+        }
+        if (inputImagen2Formulario) {
+            inputImagen2Formulario.value = "";
+        }
+        if (preview1Formulario) {
+            preview1Formulario.src = "";
+            preview1Formulario.style.display = "none";
+        }
+        if (preview2Formulario) {
+            preview2Formulario.src = "";
+            preview2Formulario.style.display = "none";
+        }
     }
 }
-
-// Asegurar que el evento se ejecuta en todos los cierres del modal
-$(modal).on("hidden.bs.modal", function () {
-    limpiarImagenes();
-});
 
 // Evento para guardar las imágenes seleccionadas
 function inicializarEventosGuardarImagenes() {
@@ -212,8 +215,53 @@ function inicializarEventosGuardarImagenes() {
     }
 }
 
-// Llama a esta función después de cargar dinámicamente el contenido
-inicializarEventosGuardarImagenes();
+function inicializarEventosModalImagenes() {
+    // Reasignar eventos del modal de imágenes
+    $('#subirImagenesModal')
+        .off('shown.bs.modal hidden.bs.modal hide.bs.modal')
+        .on('shown.bs.modal', function () {
+            imagenesGuardadas = false;
+
+            // Actualizar vistas previas de imágenes al abrir el modal
+            if (imagenesExistentes[0] && preview1Formulario) {
+                preview1Formulario.src = `${url}${imagenesExistentes[0]}`;
+                preview1Formulario.style.display = "block";
+            } else if (preview1Formulario) {
+                preview1Formulario.src = "";
+                preview1Formulario.style.display = "none";
+            }
+
+            if (imagenesExistentes[1] && preview2Formulario) {
+                preview2Formulario.src = `${url}${imagenesExistentes[1]}`;
+                preview2Formulario.style.display = "block";
+            } else if (preview2Formulario) {
+                preview2Formulario.src = "";
+                preview2Formulario.style.display = "none";
+            }
+        })
+        .on('hide.bs.modal', function () {
+            // Remueve el foco antes de que Bootstrap aplique aria-hidden
+            const focused = document.activeElement;
+            if (focused && this.contains(focused)) {
+                focused.blur();
+            }
+        })
+        .on('hidden.bs.modal', function () {
+            if (!imagenesGuardadas) {
+                limpiarImagenesFormulario();
+            }
+
+            const abrirModalBtn = document.getElementById("subirImagenesBtn");
+            if (abrirModalBtn) {
+                abrirModalBtn.focus();
+            }
+        });
+
+    // Evento para abrir el modal de imágenes
+    $(document).on('click', '#subirImagenesBtn', function () {
+        $('#subirImagenesModal').modal('show');
+    });
+}
 
 // Reiniciar la variable cuando se abre el modal
 $(modal).on("shown.bs.modal", function () {
@@ -307,4 +355,4 @@ async function enviarEquipo() {
     }
 }
 
-inicializarEventosGuardarImagenes(); // Asegurarse de que los eventos se inicializan al cargar el script
+inicializarEventosModalImagenes(); // Asegurarse de que los eventos se inicializan al cargar el script

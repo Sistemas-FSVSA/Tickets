@@ -1,9 +1,11 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     InicializarHVC();
 });
 async function InicializarHVC() {
+    let actividadesCargadas = [];
     cargarActualizarHVC();
-    cargarActividades(); // Opcional, según necesites en esta vista.
+    cargarActividades(actividadesCargadas); // Opcional, según necesites en esta vista.
     document.getElementById("abrirMantenimiento")?.addEventListener("click", abrirModal);
     document.getElementById("registrarMantenimiento")?.addEventListener("click", (e) => registrarMantenimientoModal(e));
 }
@@ -102,7 +104,7 @@ function llenarFormularioHVC(data) {
 }
 
 // funcion para cargar actividades
-async function cargarActividades() {
+async function cargarActividades(actividadesCargadas) {
     if (actividadesCargadas.length > 0) {
         return;
     }
@@ -121,22 +123,22 @@ async function cargarActividades() {
             return;
         }
 
-        // Guardar en la variable global
-        actividadesCargadas = actividades;
+        // Guardar en la variable local
+        actividadesCargadas.push(...actividades);
 
     } catch (error) {
         console.error("Error al cargar actividades:", error);
     }
 }
 
-function renderizarActividades() {
+function renderizarActividades(actividadesCargadas) {
     const selectActividad = document.getElementById("tipoMantenimiento");
     if (!selectActividad) return;
 
     selectActividad.innerHTML = '<option value="">Seleccione una actividad</option>';
 
     actividadesCargadas
-        .filter(a => a.estado === true || a.estado === 1)  // <- Aquí el cambio
+        .filter(a => a.estado === true || a.estado === 1)
         .forEach(a => {
             const option = document.createElement("option");
             option.value = a.idactividad;
@@ -311,37 +313,31 @@ function limpiarEventosMantenimiento() {
     // Limpia otros eventos relacionados con la vista de mantenimiento
 }
 
-// Función para volver a la vista principal de mantenimientos
-function volverAMantenimientos() {
-    limpiarEventosMantenimiento();
-    // Opción 1: Usando el referer (puede no ser confiable en algunos casos)
-    const referer = document.referrer;
-    
-    if (referer.includes('/mantenimientos/mantenimiento')) {
-        window.location.href = '/mantenimientos/mantenimiento';
-        return;
-    }
-    
-    // Opción 2: Verificar parámetro en URL (más confiable)
-    const urlParams = new URLSearchParams(window.location.search);
-    const fromMaintenance = urlParams.get('fromMaintenance');
-    
-    if (fromMaintenance === 'true') {
-        window.location.href = '/mantenimientos/mantenimiento';
-    } else {
-        // Fallback al dashboard si no se puede determinar el origen
-        window.location.href = '/dashboard/dashboard';
-    }
-}
-
-function abrirModal(e) {
+function abrirModal(e, actividadesCargadas) {
     e.preventDefault();
 
-    // ✅ Limpia el formulario antes de mostrar el modal
     document.getElementById("formMantenimiento").reset();
 
-    cargarActividades().then(() => {
-        renderizarActividades();
-        $('#modalMantenimiento').modal('show'); // Bootstrap 4
+    cargarActividades(actividadesCargadas).then(() => {
+        renderizarActividades(actividadesCargadas);
+        $('#modalMantenimiento').modal('show');
     });
 }
+
+document.getElementById("volver")?.addEventListener("click", async () => {
+    try {
+        const response = await fetch("mantenimiento", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+
+        if (!response.ok) throw new Error("Error al cargar la vista de mantenimiento");
+
+        const html = await response.text();
+        document.getElementById("contenido").innerHTML = html;
+
+        // Actualizar la URL en el historial del navegador
+        window.history.pushState({}, "", "mantenimiento");
+
+        reinitializeScripts(); // Reinicializar scripts específicos de la vista de mantenimiento
+    } catch (error) {
+        console.error("Error al volver a la vista de mantenimiento:", error);
+    }
+});
