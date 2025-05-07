@@ -211,14 +211,6 @@ async function handleEstadoChange(event) {
             return;
         }
 
-        // Mostrar loader durante la actualización
-        Swal.fire({
-            title: 'Actualizando...',
-            html: 'Por favor espera',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-
         // Enviar solicitud al backend
         const response = await fetch(`${url}/api/tickets/actualizarDatos`, {
             method: 'POST',

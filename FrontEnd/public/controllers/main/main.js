@@ -53,11 +53,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Escuchar el evento `popstate` para manejar los botones de navegación
     window.addEventListener("popstate", function (event) {
         if (event.state && event.state.path) {
             cargarVista(event.state.path);
         }
     });
+
+    // Función para cargar dinámicamente una vista
+    async function cargarVista(url) {
+        try {
+            showSpinner(); // Mostrar spinner de carga
+            const response = await fetch(url, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+    
+            if (!response.ok) throw new Error(`Error al cargar la vista: ${response.statusText}`);
+    
+            const html = await response.text();
+            document.getElementById("contenido").innerHTML = html;
+    
+            // Re-ejecutar scripts específicos de la vista
+            reinitializeScripts();
+        } catch (error) {
+            console.error("Error al cargar la vista:", error);
+            Swal.fire("Error", "No se pudo cargar la vista. Intenta nuevamente.", "error");
+        } finally {
+            hideSpinner(); // Ocultar spinner de carga
+        }
+    }
 
     setInterval(cargarTickets, 30000);
 });
@@ -137,42 +159,6 @@ function reinitializeScripts() {
     }
 }
 
-function irAtras() {
-    console.log("Historial de estado:", window.history.state); // Debugging
-
-    if (window.history.state && window.history.state.prevUrl) {
-        cargarVista(window.history.state.prevUrl);
-    } else {
-        cargarVista('/dashboard/dashboard'); // Si no hay nada, va al dashboard
-    }
-}
-
-function limpiarEventos() {
-    $(document).off(); // Elimina todos los eventos de jQuery
-}
-
-// Función reutilizable para cargar vistas dinámicamente
-async function cargarVista(url) {
-    limpiarEventos();
-    try {
-        const response = await fetch(url, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
-
-        if (!response.ok) throw new Error("Error al cargar la vista");
-
-        const html = await response.text();
-        document.getElementById("contenido").innerHTML = html;
-
-        // Actualizar la URL en la barra del navegador
-        window.history.pushState({ path: url }, "", url);
-
-        // Re-ejecutar scripts específicos de la vista
-        reinitializeScripts();
-    } catch (error) {
-        console.error("Error en la navegación:", error);
-        window.location.href = url; // Fallback si hay error
-    }
-}
-
 async function cargarTickets() {
     try {
         const response = await fetch(`${url}/api/tickets/obtenerTickets`, {
@@ -242,7 +228,6 @@ let ticketsCerrados = [];
 let Usuarios = [];
 let Mantenimiento = [];
 let EquiposSeleccionados = [];
-let actividadesCargadas = [];
 
 function setSessionStartTime() {
     localStorage.setItem('sessionStartTime', Date.now());

@@ -1,108 +1,68 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     InicializarHVC();
 });
 async function InicializarHVC() {
-    cargarActualizarHVC();
-    cargarActividades(); // Opcional, según necesites en esta vista.
+    const idInventario = new URLSearchParams(window.location.search).get("idinventario");
+    if (!idInventario) return alert("ID de inventario no proporcionado");
+    cargarHVC(idInventario)
     document.getElementById("abrirMantenimiento")?.addEventListener("click", abrirModal);
-    document.getElementById("registrarMantenimiento")?.addEventListener("click", (e) => registrarMantenimientoModal(e));
+    document.getElementById("registrarMantenimiento")?.addEventListener("click", (e) => registrarMantenimiento(e, idInventario));
 }
 
-async function cargarActualizarHVC(idInventario = null, esActualizacion = false) {
-    // Obtener ID del inventario de la URL si no se proporcionó
-    const id = idInventario || new URLSearchParams(window.location.search).get("idinventario");
-    
-    if (!id) {
-        console.error("ID de inventario no proporcionado");
-        return;
-    }
-
+async function cargarHVC(id) {
     try {
-        // Mostrar indicador de carga solo para actualizaciones
-        if (esActualizacion) {
-            const tablaBody = document.querySelector("#tbodymantenimientos");
-            tablaBody.innerHTML = '<tr><td colspan="4" class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></td></tr>';
-        }
-
-        // Obtener datos del servidor
-        const response = await fetch(`${url}/api/mantenimientos/obtenerHVC`, {
+        const res = await fetch(`${url}/api/mantenimientos/obtenerHVC`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idinventario: id }),
             credentials: "include",
         });
 
-        if (!response.ok) {
-            throw new Error(esActualizacion 
-                ? "Error al obtener mantenimientos" 
-                : "Error al obtener datos del inventario");
-        }
+        const data = await res.json();
+        if (!res.ok) throw new Error("Error al cargar datos del equipo");
 
-        const data = await response.json();
-        
-        if (esActualizacion) {
-            // Solo actualizar la tabla de mantenimientos
-            renderizarMantenimientos(data.mantenimientos || []);
-        } else {
-            // Carga completa del formulario HVC
-            llenarFormularioHVC(data);
-        }
-
-    } catch (error) {
-        console.error(`Error al ${esActualizacion ? 'actualizar' : 'cargar'} HVC:`, error);
-        
-        if (esActualizacion) {
-            const tablaBody = document.querySelector("#tbodymantenimientos");
-            tablaBody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-danger">Error al cargar los mantenimientos</td></tr>';
-            inicializarDataTable([]);
-        } else {
-            // Podrías agregar aquí manejo de errores para la carga inicial
-            // Por ejemplo: mostrar un mensaje al usuario
-        }
+        llenarFormulario(data.equipo);
+        renderizarMantenimientos(data.mantenimientos || []);
+    } catch (err) {
+        console.error(err);
+        mostrarErrorTabla();
     }
 }
 
 // funcion para llenar los campos de la hoja de vida del computo
-function llenarFormularioHVC(data) {
+function llenarFormulario(equipo) {
+    const campos = {
+        sn: "sn",
+        ip: "ipequipo",  // Nuevo: para coincidir con el HTML
+        mac: "mac",
+        datos: "puertodatos",  // Cambiado para coincidir con HTML
+        procesador: "procesador",
+        tiporam: "nombre_tiporam",
+        cantidadram: "cantidadram",
+        tipoalmacenamiento: "nombre_tipoalmacenamiento",
+        cantidadalmacenamiento: "cantidadalmacenamiento",
+        formatoEquipo: "nombre_formato",  // Cambiado para coincidir con HTML
+        marca: "nombre_marca",
+        so: "so",
+        nombreequipo: "nombreequipo",
+        dependencia: "nombre_dependencia",
+        responsable: "responsable",
+        usuario: "nombreusuario",  // Cambiado para coincidir con HTML
+        cargousuario: "cargousuario",
+        observaciones: "observacion"
+    };
 
-    const equipo = data.equipo;
+    document.getElementById("idInventario").value = equipo.idinventario;
 
-    // Función auxiliar para asignar valores solo si el elemento existe
-    function asignarValor(id, valor) {
-        const elemento = document.getElementById(id);
-        if (elemento) {
-            elemento.value = valor || "";
-        } else {
-            console.warn(`Elemento con ID "${id}" no encontrado`);
-        }
-    }
-
-    asignarValor("idInventario", equipo.idinventario);
-    asignarValor("sn", equipo.sn);
-    asignarValor("ip", equipo.ipequipo);
-    asignarValor("mac", equipo.mac);
-    asignarValor("datos", equipo.puertodatos);
-    asignarValor("procesador", equipo.procesador);
-    asignarValor("tiporam", equipo.nombre_tiporam);
-    asignarValor("cantidadram", equipo.cantidadram);
-    asignarValor("tipoalmacenamiento", equipo.nombre_tipoalmacenamiento);
-    asignarValor("cantidadalmacenamiento", equipo.cantidadalmacenamiento);
-    asignarValor("formatoEquipo", equipo.nombre_formato);
-    asignarValor("marca", equipo.nombre_marca);
-    asignarValor("so", equipo.so);
-    asignarValor("nombreequipo", equipo.nombreequipo);
-    asignarValor("dependencia", equipo.nombre_dependencia);
-    asignarValor("responsable", equipo.responsable);
-    asignarValor("usuario", equipo.nombreusuario);
-    asignarValor("cargousuario", equipo.cargousuario);
-    asignarValor("observaciones", equipo.observacion);
-
-    // Renderiza mantenimientos
-    renderizarMantenimientos(data.mantenimientos || [], true); 
+    Object.keys(campos).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = equipo[campos[id]] || "";
+    });
 }
 
 // funcion para cargar actividades
-async function cargarActividades() {
+async function cargarActividades(actividadesCargadas) {
     if (actividadesCargadas.length > 0) {
         return;
     }
@@ -121,22 +81,22 @@ async function cargarActividades() {
             return;
         }
 
-        // Guardar en la variable global
-        actividadesCargadas = actividades;
+        // Guardar en la variable local
+        actividadesCargadas.push(...actividades);
 
     } catch (error) {
         console.error("Error al cargar actividades:", error);
     }
 }
 
-function renderizarActividades() {
+function renderizarActividades(actividadesCargadas) {
     const selectActividad = document.getElementById("tipoMantenimiento");
     if (!selectActividad) return;
 
     selectActividad.innerHTML = '<option value="">Seleccione una actividad</option>';
 
     actividadesCargadas
-        .filter(a => a.estado === true || a.estado === 1)  // <- Aquí el cambio
+        .filter(a => a.estado === true || a.estado === 1)
         .forEach(a => {
             const option = document.createElement("option");
             option.value = a.idactividad;
@@ -146,163 +106,78 @@ function renderizarActividades() {
 }
 
 // funcion para renderizar los mantenimiento del equipo
-function renderizarMantenimientos(mantenimientos, esPrimeraCarga = false) {
-    // Verificar si hay mantenimientos
-    if (!mantenimientos || mantenimientos.length === 0) {
-        const tablaBody = document.querySelector("#tbodymantenimientos");
-        tablaBody.innerHTML = '<tr><td colspan="4" class="text-center py-3">No hay mantenimientos registrados</td></tr>';
-        
-        if (esPrimeraCarga) {
-            inicializarDataTable([]);
-        }
+function renderizarMantenimientos(lista) {
+    const tbody = document.getElementById("tbodymantenimientos");
+    if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay mantenimientos registrados</td></tr>';
+        inicializarDataTable([]);
         return;
     }
 
-    // Procesar fechas para mostrar y ordenar
-    const mantenimientosProcesados = mantenimientos.map(m => {
-        if (!m.fechamantenimiento) {
-            return {
-                ...m,
-                fechaOrdenable: 0,
-                fechaMostrar: 'Fecha no disponible'
-            };
-        }
+    const datos = lista.map(m => {
+        const fecha = m.fechamantenimiento?.split("T")[0]?.split("-") || [];
+        const fechaMostrar = fecha.length === 3 ? `${fecha[2]}-${fecha[1]}-${fecha[0]}` : "No disponible";
+        return { ...m, fechaMostrar, fechaOrdenable: new Date(...fecha).getTime() || 0 };
+    }).sort((a, b) => b.fechaOrdenable - a.fechaOrdenable);
 
-        // Parsear la fecha ISO del servidor (YYYY-MM-DD)
-        const [year, month, day] = m.fechamantenimiento.split('T')[0].split('-');
-        
-        // Crear fecha en formato local (sin problemas de zona horaria)
-        const fechaLocal = new Date(year, month - 1, day);
-        
-        // Formatear para mostrar (dd-mm-yyyy)
-        const fechaMostrar = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
-        
-        return {
-            ...m,
-            fechaOrdenable: fechaLocal.getTime(), // Timestamp para ordenar
-            fechaMostrar: fechaMostrar // Formato dd-mm-yyyy para mostrar
-        };
-    });
-
-    // Ordenar por fecha descendente (más reciente primero)
-    mantenimientosProcesados.sort((a, b) => b.fechaOrdenable - a.fechaOrdenable);
-
-    // Inicializar o actualizar DataTable
-    if (esPrimeraCarga) {
-        inicializarDataTable(mantenimientosProcesados);
-    } else {
-        const tabla = $("#tablaMantenimientos").DataTable();
-        tabla.clear().rows.add(mantenimientosProcesados).draw();
-        tabla.order([4, 'desc']).draw(); // Ordenar por columna oculta
-    }
+    inicializarDataTable(datos);
 }
 
-function inicializarDataTable(mantenimientos) {
-    // Destruir instancia previa si existe
+function inicializarDataTable(data) {
     if ($.fn.DataTable.isDataTable("#tablaMantenimientos")) {
-        $("#tablaMantenimientos").DataTable().destroy();
+        $("#tablaMantenimientos").DataTable().clear().rows.add(data).draw();
+        return;
     }
 
-    // Configuración del DataTable
-    const config = {
-        language: { 
-            url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json",
-            paginate: {
-                first: "Primera",
-                last: "Última",
-                next: "Siguiente",
-                previous: "Anterior"
-            }
-        },
-        order: [[4, "desc"]], // Ordenar por la columna oculta (timestamp)
-        pageLength: 10,
-        lengthMenu: [5, 10, 15, 20],
-        autoWidth: false,
-        dom: '<"top"lf>rt<"bottom"ip><"clear">',
-        data: mantenimientos,
+    $("#tablaMantenimientos").DataTable({
+        language: { url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json" },
+        data,
         columns: [
             { data: 'nombre_actividad', title: 'Actividad' },
-            { 
-                data: 'fechaMostrar', 
-                title: 'Fecha',
-                render: function(data) {
-                    return data || 'Fecha no disponible';
-                }
-            },
+            { data: 'fechaMostrar', title: 'Fecha' },
             { data: 'observacion_hvc', title: 'Observaciones' },
             { data: 'nombre_responsable', title: 'Responsable' },
-            {
-                data: 'fechaOrdenable',
-                visible: false,
-                type: 'num'
-            }
-        ]
-    };
-
-    return $("#tablaMantenimientos").DataTable(config);
+            { data: 'fechaOrdenable', visible: false }
+        ],
+        order: [[4, 'desc']],
+        pageLength: 10
+    });
 }
 
 // Registrar mantenimiento usando datos del formulario del modal
-async function registrarMantenimientoModal(e) {
+async function registrarMantenimiento(e, idInventario) {
     e.preventDefault();
 
-    const idinventario = document.getElementById("idInventario").value;
-    const observacion = document.getElementById("observacionesMantenimiento").value.trim();
-    const idactividad = document.getElementById("tipoMantenimiento").value;
-    const idusuario = parseInt(localStorage.getItem("idusuario") || "0");
-
-    if (!idinventario || !idactividad || !observacion || !idusuario) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Campos incompletos',
-            text: 'Por favor complete todos los campos requeridos.',
-        });
-        return;
-    }
-
     const datos = {
-        idinventario: parseInt(idinventario),
-        observacion: observacion,
-        idactividad: parseInt(idactividad),
-        idusuario: idusuario,
+        idinventario: parseInt(idInventario),
+        observacion: document.getElementById("observacionesMantenimiento").value.trim(),
+        idactividad: parseInt(document.getElementById("tipoMantenimiento").value),
+        idusuario: parseInt(localStorage.getItem("idusuario") || "0")
     };
 
+    if (!datos.observacion || !datos.idactividad || !datos.idusuario) {
+        return Swal.fire({ icon: 'warning', title: 'Complete todos los campos' });
+    }
+
     try {
-        const response = await fetch(`${url}/api/mantenimientos/guardarMantenimientos`, {
+        const res = await fetch(`${url}/api/mantenimientos/guardarMantenimientos`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(datos),
             credentials: "include",
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Error al registrar mantenimiento");
-        }
+        if (!res.ok) throw new Error("Error al registrar mantenimiento");
 
-        // Cerrar el modal y limpiar el formulario
         $('#modalMantenimiento').modal('hide');
         document.getElementById("formMantenimiento").reset();
 
-        // Mostrar notificación de éxito
-        await Swal.fire({
-            icon: 'success',
-            title: '¡Éxito!',
-            text: 'Mantenimiento registrado correctamente',
-            timer: 2000,
-            showConfirmButton: false
-        });
+        await Swal.fire({ icon: 'success', title: 'Registrado con éxito', timer: 1500, showConfirmButton: false });
 
-        // Actualizar la tabla de mantenimientos
-        await cargarActualizarHVC(idinventario, true);
-
-    } catch (error) {
-        console.error("Error al registrar mantenimiento:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message || 'Hubo un problema al registrar el mantenimiento',
-        });
+        cargarHVC(idInventario);
+    } catch (err) {
+        console.error(err);
+        Swal.fire({ icon: 'error', title: 'Error al registrar', text: err.message });
     }
 }
 
@@ -311,37 +186,40 @@ function limpiarEventosMantenimiento() {
     // Limpia otros eventos relacionados con la vista de mantenimiento
 }
 
-// Función para volver a la vista principal de mantenimientos
-function volverAMantenimientos() {
-    limpiarEventosMantenimiento();
-    // Opción 1: Usando el referer (puede no ser confiable en algunos casos)
-    const referer = document.referrer;
-    
-    if (referer.includes('/mantenimientos/mantenimiento')) {
-        window.location.href = '/mantenimientos/mantenimiento';
-        return;
-    }
-    
-    // Opción 2: Verificar parámetro en URL (más confiable)
-    const urlParams = new URLSearchParams(window.location.search);
-    const fromMaintenance = urlParams.get('fromMaintenance');
-    
-    if (fromMaintenance === 'true') {
-        window.location.href = '/mantenimientos/mantenimiento';
-    } else {
-        // Fallback al dashboard si no se puede determinar el origen
-        window.location.href = '/dashboard/dashboard';
-    }
-}
-
-function abrirModal(e) {
-    e.preventDefault();
-
-    // ✅ Limpia el formulario antes de mostrar el modal
+async function abrirModal() {
     document.getElementById("formMantenimiento").reset();
+    try {
+        const res = await fetch(`${url}/api/mantenimientos/obtenerActividades`, { credentials: "include" });
+        const data = await res.json();
 
-    cargarActividades().then(() => {
-        renderizarActividades();
-        $('#modalMantenimiento').modal('show'); // Bootstrap 4
-    });
+        const select = document.getElementById("tipoMantenimiento");
+        select.innerHTML = '<option value="">Seleccione una actividad</option>';
+        (data.actividad || []).forEach(act => {
+            if (act.estado) {
+                select.innerHTML += `<option value="${act.idactividad}">${act.nombre}</option>`;
+            }
+        });
+
+        $('#modalMantenimiento').modal('show');
+    } catch (err) {
+        console.error("Error al cargar actividades", err);
+    }
 }
+
+document.getElementById("volver")?.addEventListener("click", async () => {
+    try {
+        const response = await fetch("mantenimiento", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+
+        if (!response.ok) throw new Error("Error al cargar la vista de mantenimiento");
+
+        const html = await response.text();
+        document.getElementById("contenido").innerHTML = html;
+
+        // Actualizar la URL en el historial del navegador
+        window.history.pushState({}, "", "mantenimiento");
+
+        reinitializeScripts(); // Reinicializar scripts específicos de la vista de mantenimiento
+    } catch (error) {
+        console.error("Error al volver a la vista de mantenimiento:", error);
+    }
+});

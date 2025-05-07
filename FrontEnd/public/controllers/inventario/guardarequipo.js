@@ -92,17 +92,35 @@ $(document).on("hidden.bs.modal", "#nuevoEquipoModal", function () {
     datosFormularioCargados = false; // Permitir recarga cuando se vuelva a abrir
 });
 
-// Mostrar las imágenes en el formulario
-// Evitar doble declaración de variables globales
-// Obtener referencias solo si aún no existen en window
 if (!window.inputImagen1) {
     window.inputImagen1 = document.getElementById("imagen1");
+}
+if (!window.inputImagen2) {
     window.inputImagen2 = document.getElementById("imagen2");
 }
-
 if (!window.preview1) {
     window.preview1 = document.getElementById("preview1");
+}
+if (!window.preview2) {
     window.preview2 = document.getElementById("preview2");
+}
+
+if (!inputImagen1 || !inputImagen2 || !preview1 || !preview2) {
+    console.error("❌ Error: No se encontraron los elementos necesarios para la vista previa.");
+}
+
+function inicializarElementosImagen() {
+    // Buscar elementos cada vez que se abre el modal para asegurar que existen en el DOM
+    window.inputImagen1 = document.getElementById("imagen1");
+    window.inputImagen2 = document.getElementById("imagen2");
+    window.preview1 = document.getElementById("preview1");
+    window.preview2 = document.getElementById("preview2");
+
+    if (!inputImagen1 || !inputImagen2 || !preview1 || !preview2) {
+        console.error("Elementos de imagen no encontrados en el DOM");
+        return false;
+    }
+    return true;
 }
 
 // Función para mostrar la vista previa de las imágenes
@@ -112,112 +130,127 @@ function mostrarVistaPrevia(input, preview) {
         return;
     }
 
-    const archivo = input.files[0];
+    const archivo = input.files[0]; // Obtener el archivo seleccionado
     if (archivo) {
-        const lector = new FileReader();
+        const lector = new FileReader(); // Crear un lector de archivos
         lector.onload = function (e) {
-            preview.src = e.target.result;
-            preview.style.display = "block";
+            preview.src = e.target.result; // Asignar la imagen al elemento `img`
+            preview.style.display = "block"; // Mostrar el elemento `img`
         };
-        lector.readAsDataURL(archivo);
+        lector.readAsDataURL(archivo); // Leer el archivo como una URL de datos
     } else {
-        preview.src = "";
-        preview.style.display = "none";
+        preview.src = ""; // Limpiar la vista previa si no hay archivo
+        preview.style.display = "none"; // Ocultar el elemento `img`
     }
 }
 
 // Asegurar que los eventos solo se asignen si los elementos existen
-if (window.inputImagen1 && window.preview1) {
-    window.inputImagen1.addEventListener("change", function () {
-        mostrarVistaPrevia(window.inputImagen1, window.preview1);
+function configurarEventosImagenes() {
+    if (!inicializarElementosImagen());
+
+    // Asignar eventos a los inputs de archivo
+    inputImagen1.addEventListener("change", function () {
+        mostrarVistaPrevia(inputImagen1, preview1);
+    });
+
+    inputImagen2.addEventListener("change", function () {
+        mostrarVistaPrevia(inputImagen2, preview2);
     });
 }
 
-if (window.inputImagen2 && window.preview2) {
-    window.inputImagen2.addEventListener("change", function () {
-        mostrarVistaPrevia(window.inputImagen2, window.preview2);
-    });
-}
+// Llama a esta función al abrir el modal
+$("#subirImagenesModal").on("shown.bs.modal", function () {
+    configurarEventosImagenes();
+});
 
-if (!window.modal) {
-    window.modal = document.getElementById("subirImagenesModal");
-    window.guardarImagenesBtn = document.getElementById("guardarImagenesBtn");
-}
-
-// Función para mostrar la vista previa de las imágenes
-function mostrarVistaPrevia(input, preview) {
-    const archivo = input.files[0];
-    if (archivo) {
-        const lector = new FileReader();
-        lector.onload = function (e) {
+function actualizarVistaPrevia(preview, input = null, imagenUrl = null) {
+    if (input && input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
             preview.src = e.target.result;
             preview.style.display = "block";
         };
-        lector.readAsDataURL(archivo);
+        reader.readAsDataURL(input.files[0]);
+    } else if (imagenUrl) {
+        preview.src = `${url}${imagenUrl}`;
+        preview.style.display = "block";
     } else {
         preview.src = "";
         preview.style.display = "none";
     }
 }
 
-// Eventos para mostrar la vista previa al seleccionar imágenes
-inputImagen1.addEventListener("change", function () {
-    mostrarVistaPrevia(inputImagen1, preview1);
-});
+// Función para cargar imágenes existentes
+function cargarImagenesExistentes(imagenes) {
+    limpiarImagenesFormulario(); // Limpia cualquier imagen previa
 
-inputImagen2.addEventListener("change", function () {
-    mostrarVistaPrevia(inputImagen2, preview2);
-});
+    if (!imagenes || !Array.isArray(imagenes)) return;
 
-// Función para limpiar imágenes al cerrar el modal (solo si no se han guardado)
-function limpiarImagenes() {
-    if (!imagenesGuardadas) {
-        inputImagen1.value = "";
-        inputImagen2.value = "";
+    imagenesExistentes = [...imagenes]; // Copiar el array
+
+    actualizarVistaPrevia(preview1, null, imagenesExistentes[0]);
+    actualizarVistaPrevia(preview2, null, imagenesExistentes[1]);
+}
+
+// Función para limpiar las imágenes del formulario
+function limpiarImagenesFormulario() {
+    if (preview1) {
         preview1.src = "";
         preview1.style.display = "none";
+    }
+    if (preview2) {
         preview2.src = "";
         preview2.style.display = "none";
     }
+    if (inputImagen1) inputImagen1.value = "";
+    if (inputImagen2) inputImagen2.value = "";
+    imagenesGuardadas = []; // Limpia las imágenes guardadas
+    imagenesExistentes = []; // Limpia las imágenes existentes
 }
-
-// Asegurar que el evento se ejecuta en todos los cierres del modal
-$(modal).on("hidden.bs.modal", function () {
-    limpiarImagenes();
-});
 
 // Evento para guardar las imágenes seleccionadas
-function inicializarEventosGuardarImagenes() {
-    const guardarImagenesBtn = document.getElementById("guardarImagenesBtn");
-
-    if (guardarImagenesBtn) {
-        guardarImagenesBtn.addEventListener("click", function () {
-            const formData = new FormData();
-
-            if (inputImagen1.files.length) {
-                formData.append("imagen1", inputImagen1.files[0]);
-            }
-            if (inputImagen2.files.length) {
-                formData.append("imagen2", inputImagen2.files[0]);
-            }
-
-            // Marcar imágenes como guardadas para que no se borren al cerrar el modal
-            imagenesGuardadas = true;
-
-            // Opcional: Cerrar el modal después de guardar
-            $('#subirImagenesModal').modal('hide');
-        });
-    } else {
-        console.warn("El botón 'guardarImagenesBtn' no se encontró en el DOM.");
-    }
+function manejarGuardarImagenes(event) {
+    event.preventDefault();
+    imagenesGuardadas = true;
+    $('#subirImagenesModal').modal('hide');
 }
 
-// Llama a esta función después de cargar dinámicamente el contenido
-inicializarEventosGuardarImagenes();
+// Esta línea enlaza el botón con el evento
+document.getElementById("guardarImagenesBtn").addEventListener("click", manejarGuardarImagenes);
 
-// Reiniciar la variable cuando se abre el modal
-$(modal).on("shown.bs.modal", function () {
-    imagenesGuardadas = false; // Si el usuario vuelve a abrir, debe volver a guardar
+// Evento para limpiar imágenes después de un registro exitoso
+document.getElementById("guardarEquipoBtn").addEventListener("click", function (event) {
+    let form = document.getElementById("nuevoEquipoForm");
+
+    // Validar el formulario
+    if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+    } else {
+        enviarEquipo(); // Llamar a la función de envío si es válido
+    }
+
+    form.classList.add("was-validated"); // Agregar clase de Bootstrap para resaltar errores
+});
+
+$("#subirImagenesModal").on("shown.bs.modal", function () {
+    limpiarImagenesFormulario(); // Limpia las imágenes previas
+    configurarEventosImagenes(); // Configura los eventos de los inputs de imágenes
+    imagenesGuardadas = false;
+    if (imagenesExistentes.length > 0) {
+        cargarImagenesExistentes(imagenesExistentes);
+    }
+});
+
+$("#subirImagenesModal").on("hidden.bs.modal", function () {
+    if (!imagenesGuardadas) {
+        limpiarImagenesFormulario();
+    }
+});
+
+// Evento para limpiar los inputs de imágenes después de un registro exitoso
+$("#nuevoEquipoModal").on("hidden.bs.modal", function () {
+    limpiarImagenesFormulario(); // Limpia las imágenes al cerrar el modal principal
 });
 
 document.getElementById("guardarEquipoBtn").addEventListener("click", function (event) {
@@ -233,6 +266,18 @@ document.getElementById("guardarEquipoBtn").addEventListener("click", function (
 
     form.classList.add("was-validated"); // Agregar clase de Bootstrap para resaltar errores
 });
+
+async function procesarImagen(input, imagenExistente, formData, nombreArchivo) {
+    if (input.files.length > 0) {
+        formData.append("archivos[]", input.files[0]);
+    } else if (imagenExistente) {
+        const response = await fetch(`${url}${imagenExistente}`);
+        const blob = await response.blob();
+        formData.append("archivos[]", blob, nombreArchivo);
+    } else {
+        formData.append("archivos[]", new Blob([]), nombreArchivo);
+    }
+}
 
 async function enviarEquipo() {
     const formData = new FormData();
@@ -262,12 +307,9 @@ async function enviarEquipo() {
         return;
     }
 
-    if (inputImagen1.files.length) {
-        formData.append("archivos[]", inputImagen1.files[0]);
-    }
-    if (inputImagen2.files.length) {
-        formData.append("archivos[]", inputImagen2.files[0]);
-    }
+    // Uso en enviarEquipo
+    await procesarImagen(inputImagen1, imagenesExistentes[0], formData, "imagen1.jpg");
+    await procesarImagen(inputImagen2, imagenesExistentes[1], formData, "imagen2.jpg");
 
     try {
         const response = await fetch(`${url}/api/inventario/guardarEquipo`, {
@@ -295,6 +337,7 @@ async function enviarEquipo() {
                 formulario.reset();
                 formulario.classList.remove("was-validated"); // Resetear validación
             }
+            limpiarImagenesFormulario(); // Limpiar imágenes
 
         } else {
             const errorText = await response.text();
@@ -306,5 +349,3 @@ async function enviarEquipo() {
         alert("Error de conexión con el servidor");
     }
 }
-
-inicializarEventosGuardarImagenes(); // Asegurarse de que los eventos se inicializan al cargar el script

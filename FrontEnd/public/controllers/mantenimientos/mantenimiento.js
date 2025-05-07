@@ -111,7 +111,6 @@ $(document).off("click", ".btn.btn-primary").on("click", ".btn.btn-primary", asy
     if (!idinventario) return;
 
     const url = `hvc?idinventario=${idinventario}`;
-    const prevUrl = window.location.pathname + window.location.search;
 
     try {
         const response = await fetch(url, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
@@ -121,17 +120,11 @@ $(document).off("click", ".btn.btn-primary").on("click", ".btn.btn-primary", asy
         const html = await response.text();
         document.getElementById("contenido").innerHTML = html;
 
-        window.history.pushState({ prevUrl: prevUrl }, "", url);
+        window.history.pushState({}, "", url); // Solo actualiza la URL sin guardar la anterior
         reinitializeScripts();
     } catch (error) {
         console.error("Error en la navegación:", error);
     }
-});
-
-// 🔹 Manejo del botón "Atrás" en el historial del navegador
-window.addEventListener("popstate", function (event) {
-    const urlAnterior = event.state?.prevUrl || "/dashboard";
-    cargarVista(urlAnterior);
 });
 
 // 🔹 Función para actualizar la barra de progreso
