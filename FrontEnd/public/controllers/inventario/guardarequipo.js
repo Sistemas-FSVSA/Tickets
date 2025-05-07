@@ -253,20 +253,6 @@ $("#nuevoEquipoModal").on("hidden.bs.modal", function () {
     limpiarImagenesFormulario(); // Limpia las imágenes al cerrar el modal principal
 });
 
-document.getElementById("guardarEquipoBtn").addEventListener("click", function (event) {
-    let form = document.getElementById("nuevoEquipoForm");
-
-    // Validar el formulario
-    if (form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
-    } else {
-        enviarEquipo(); // Llamar a la función de envío si es válido
-    }
-
-    form.classList.add("was-validated"); // Agregar clase de Bootstrap para resaltar errores
-});
-
 async function procesarImagen(input, imagenExistente, formData, nombreArchivo) {
     if (input.files.length > 0) {
         formData.append("archivos[]", input.files[0]);
