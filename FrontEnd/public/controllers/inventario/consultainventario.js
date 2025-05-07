@@ -66,39 +66,12 @@ function inicializarEventosModalImagenes() {
         .off('shown.bs.modal hidden.bs.modal hide.bs.modal')
         .on('shown.bs.modal', function () {
             imagenesGuardadas = false;
-
-            // Actualizar vistas previas de imágenes al abrir el modal
-            if (imagenesExistentes[0] && preview1Formulario) {
-                preview1Formulario.src = `${url}${imagenesExistentes[0]}`;
-                preview1Formulario.style.display = "block";
-            } else if (preview1Formulario) {
-                preview1Formulario.src = "";
-                preview1Formulario.style.display = "none";
-            }
-
-            if (imagenesExistentes[1] && preview2Formulario) {
-                preview2Formulario.src = `${url}${imagenesExistentes[1]}`;
-                preview2Formulario.style.display = "block";
-            } else if (preview2Formulario) {
-                preview2Formulario.src = "";
-                preview2Formulario.style.display = "none";
-            }
-        })
-        .on('hide.bs.modal', function () {
-            // Remueve el foco antes de que Bootstrap aplique aria-hidden
-            const focused = document.activeElement;
-            if (focused && this.contains(focused)) {
-                focused.blur();
-            }
+            actualizarVistaPrevia(preview1Formulario, null, imagenesExistentes[0]);
+            actualizarVistaPrevia(preview2Formulario, null, imagenesExistentes[1]);
         })
         .on('hidden.bs.modal', function () {
             if (!imagenesGuardadas) {
                 limpiarImagenesFormulario();
-            }
-
-            const abrirModalBtn = document.getElementById("subirImagenesBtn");
-            if (abrirModalBtn) {
-                abrirModalBtn.focus();
             }
         });
 
@@ -106,6 +79,21 @@ function inicializarEventosModalImagenes() {
     $(document).on('click', '#subirImagenesBtn', function () {
         $('#subirImagenesModal').modal('show');
     });
+
+    // Evento para guardar imágenes
+    guardarImagenesBtn.addEventListener("click", function () {
+        imagenesGuardadas = true; // Marca que las imágenes fueron guardadas
+        $('#subirImagenesModal').modal('hide'); // Cierra el modal de imágenes
+    });
+}
+
+function cargarImagenesExistentes(imagenes) {
+    limpiarImagenesFormulario(); // Limpia cualquier imagen previa
+    if (!imagenes || !Array.isArray(imagenes)) return;
+
+    imagenesExistentes = [...imagenes]; // Copiar el array
+    actualizarVistaPrevia(preview1Formulario, imagenes[0]);
+    actualizarVistaPrevia(preview2Formulario, imagenes[1]);
 }
 
 function reiniciarEstadoGlobal() {
@@ -186,12 +174,6 @@ function renderizarInventario() {
 
     tabla.draw(false);
     tabla.page(paginaActual).draw(false);
-
-    // Reasignar eventos después de renderizar
-    $("#inventario tbody").off("click", ".editar-inventario").on("click", ".editar-inventario", function () {
-        const idinventario = $(this).data("id");
-        editarInventario(idinventario);
-    });
 }
 
 // 🔹 Inicializar la tabla si aún no lo está
@@ -302,28 +284,15 @@ function editarInventario(idinventario) {
                 // Manejo de imágenes
                 if (result.imagenes && result.imagenes.length > 0) {
                     imagenesExistentes[0] = result.imagenes[0];
-                    if (preview1Formulario) {
-                        preview1Formulario.src = `${url}${result.imagenes[0]}`;
-                        preview1Formulario.style.display = "block";
-                    }
-
+                    actualizarVistaPrevia(preview1Formulario, null, result.imagenes[0]);
+                
                     if (result.imagenes.length > 1) {
                         imagenesExistentes[1] = result.imagenes[1];
-                        if (preview2Formulario) {
-                            preview2Formulario.src = `${url}${result.imagenes[1]}`;
-                            preview2Formulario.style.display = "block";
-                        }
+                        actualizarVistaPrevia(preview2Formulario, null, result.imagenes[1]);
                     }
                 } else {
-                    // Si no hay imágenes, oculta las vistas previas
-                    if (preview1Formulario) {
-                        preview1Formulario.src = "";
-                        preview1Formulario.style.display = "none";
-                    }
-                    if (preview2Formulario) {
-                        preview2Formulario.src = "";
-                        preview2Formulario.style.display = "none";
-                    }
+                    actualizarVistaPrevia(preview1Formulario);
+                    actualizarVistaPrevia(preview2Formulario);
                 }
 
                 // Mostrar el modal
@@ -426,90 +395,52 @@ function cargarSelect(selector, opciones, seleccionada, idKey, nombreKey) {
 }
 
 function asignarEventosImagenes() {
-    // Limpiar eventos anteriores para evitar duplicados
-    inputImagen1Formulario.removeEventListener("change", manejarCambioImagen1);
-    inputImagen2Formulario.removeEventListener("change", manejarCambioImagen2);
-    guardarImagenesBtn.removeEventListener("click", manejarGuardarImagenes);
-
-    // Asignar nuevos eventos
-    inputImagen1Formulario.addEventListener("change", manejarCambioImagen1);
-    inputImagen2Formulario.addEventListener("change", manejarCambioImagen2);
-    guardarImagenesBtn.addEventListener("click", manejarGuardarImagenes);
+    inputImagen1Formulario.addEventListener("change", () => actualizarVistaPrevia(preview1Formulario, inputImagen1Formulario));
+    inputImagen2Formulario.addEventListener("change", () => actualizarVistaPrevia(preview2Formulario, inputImagen2Formulario));
 }
 
-function manejarCambioImagen1() {
-    if (this.files && this.files[0]) {
+function manejarCambioImagen(input, preview, index) {
+    if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            if (preview1Formulario) {
-                preview1Formulario.src = e.target.result;
-                preview1Formulario.style.display = "block";
-                imagenesModificadas[0] = true;
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+                imagenesModificadas[index] = true;
             }
         };
-        reader.readAsDataURL(this.files[0]);
+        reader.readAsDataURL(input.files[0]);
     }
 }
 
-function manejarCambioImagen2() {
-    if (this.files && this.files[0]) {
+async function procesarImagen(input, imagenExistente, formData, nombreArchivo) {
+    if (input.files.length > 0) {
+        formData.append("archivos[]", input.files[0]);
+    } else if (imagenExistente) {
+        const response = await fetch(`${url}${imagenExistente}`);
+        const blob = await response.blob();
+        formData.append("archivos[]", blob, nombreArchivo);
+    } else {
+        formData.append("archivos[]", new Blob([]), nombreArchivo);
+    }
+}
+
+function actualizarVistaPrevia(preview, input = null, imagenUrl = null) {
+    if (input && input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            if (preview2Formulario) {
-                preview2Formulario.src = e.target.result;
-                preview2Formulario.style.display = "block";
-                imagenesModificadas[1] = true;
-            }
+            preview.src = e.target.result;
+            preview.style.display = "block";
         };
-        reader.readAsDataURL(this.files[0]);
-    }
-}
-
-function manejarGuardarImagenes(event) {
-    event.preventDefault();
-
-    // Actualiza las imágenes existentes solo para el registro actual
-    if (inputImagen1Formulario.files.length > 0) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            if (preview1Formulario) {
-                preview1Formulario.src = e.target.result;
-                preview1Formulario.style.display = "block";
-            }
-        };
-        reader.readAsDataURL(inputImagen1Formulario.files[0]);
-    }
-
-    if (inputImagen2Formulario.files.length > 0) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            if (preview2Formulario) {
-                preview2Formulario.src = e.target.result;
-                preview2Formulario.style.display = "block";
-            }
-        };
-        reader.readAsDataURL(inputImagen2Formulario.files[0]);
-    }
-
-    imagenesGuardadas = true;
-    $('#subirImagenesModal').modal('hide');
-}
-
-function mostrarVistaPreviaFormulario(input, preview) {
-    const file = input.files[0];
-    if (!file) {
-        preview.style.display = "none";
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        preview.src = e.target.result;
+        reader.readAsDataURL(input.files[0]);
+    } else if (imagenUrl) {
+        preview.src = `${url}${imagenUrl}`;
         preview.style.display = "block";
-    };
-    reader.readAsDataURL(file);
+    } else {
+        preview.src = "";
+        preview.style.display = "none";
+    }
 }
-
 
 async function actualizarEquipo() {
     const formData = new FormData();
@@ -537,32 +468,8 @@ async function actualizarEquipo() {
         formData.append("idusuario", idusuario);
     }
 
-    // Procesar imágenes y enviarlas en un array `archivos[]`
-    if (inputImagen1Formulario.files.length > 0) {
-        // Si hay una nueva imagen seleccionada, envíala
-        formData.append("archivos[]", inputImagen1Formulario.files[0]);
-    } else if (imagenesExistentes[0]) {
-        // Si no hay nueva imagen, envía la imagen existente como un archivo virtual
-        const response = await fetch(`${url}${imagenesExistentes[0]}`);
-        const blob = await response.blob();
-        formData.append("archivos[]", blob, "imagen1.jpg");
-    } else {
-        // Si no hay imagen nueva ni existente, envía un archivo vacío
-        formData.append("archivos[]", new Blob([]), "imagen1.jpg");
-    }
-
-    if (inputImagen2Formulario.files.length > 0) {
-        // Si hay una nueva imagen seleccionada, envíala
-        formData.append("archivos[]", inputImagen2Formulario.files[0]);
-    } else if (imagenesExistentes[1]) {
-        // Si no hay nueva imagen, envía la imagen existente como un archivo virtual
-        const response = await fetch(`${url}${imagenesExistentes[1]}`);
-        const blob = await response.blob();
-        formData.append("archivos[]", blob, "imagen2.jpg");
-    } else {
-        // Si no hay imagen nueva ni existente, envía un archivo vacío
-        formData.append("archivos[]", new Blob([]), "imagen2.jpg");
-    }
+    await procesarImagen(inputImagen1Formulario, imagenesExistentes[0], formData, "imagen1.jpg");
+    await procesarImagen(inputImagen2Formulario, imagenesExistentes[1], formData, "imagen2.jpg");
 
     try {
         const response = await fetch(`${url}/api/inventario/actualizarEquipo`, {
@@ -629,25 +536,22 @@ function limpiarModal() {
     }
 }
 
+function limpiarImagen(preview, input, index) {
+    if (input) input.value = "";
+    if (preview) {
+        preview.src = "";
+        preview.style.display = "none";
+    }
+    if (typeof index !== "undefined") {
+        imagenesModificadas[index] = false;
+    }
+}
+
 // Función para limpiar imágenes en el formulario si no se guardaron
 function limpiarImagenesFormulario() {
     if (!imagenesGuardadas) {
-        if (inputImagen1Formulario) {
-            inputImagen1Formulario.value = "";
-            if (preview1Formulario) {
-                preview1Formulario.src = "";
-                preview1Formulario.style.display = "none";
-            }
-            imagenesModificadas[0] = false;
-        }
-        if (inputImagen2Formulario) {
-            inputImagen2Formulario.value = "";
-            if (preview2Formulario) {
-                preview2Formulario.src = "";
-                preview2Formulario.style.display = "none";
-            }
-            imagenesModificadas[1] = false;
-        }
+        limpiarImagen(preview1Formulario, inputImagen1Formulario, 0);
+        limpiarImagen(preview2Formulario, inputImagen2Formulario, 1);
     }
 }
 
