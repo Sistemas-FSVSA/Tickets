@@ -8,20 +8,34 @@ async function InicializarMantenimiento() {
     setInterval(actualizarProgreso, 30000); // Refresca la barra cada 30 segundos
 }
 
-// funcion para cargar la informacion del estado de mantenimiento de los equipos
-async function cargarMantenimiento() {
+async function obtenerMantenimientos() {
     try {
         const response = await fetch(`${url}/api/mantenimientos/obtenerMantenimientos`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
         });
-        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error("Error al obtener mantenimientos");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error al obtener mantenimientos:", error);
+        throw error; // Propaga el error para manejarlo en las funciones que la llamen
+    }
+}
+
+// funcion para cargar la informacion del estado de mantenimiento de los equipos
+async function cargarMantenimiento() {
+    try {
+        const result = await obtenerMantenimientos();
         Mantenimiento = result.mantenimiento;
         renderizarMantenimiento();
-        actualizarProgreso();
+        actualizarProgreso(result.progreso); // Pasar el progreso directamente
     } catch (error) {
-        console.error("Error al cargar inventario:", error);
+        console.error("Error al cargar mantenimiento:", error);
     }
 }
 
@@ -90,14 +104,13 @@ $(document).ready(function () {
 });
 
 // funcion para la redireccion a hvc
-$(document).on("click", ".btn.btn-primary", async function (event) {
-    event.preventDefault(); // Evita la recarga de la página
+$(document).off("click", ".btn.btn-primary").on("click", ".btn.btn-primary", async function (event) {
+    event.preventDefault();
 
     const idinventario = $(this).data("id");
     if (!idinventario) return;
 
     const url = `hvc?idinventario=${idinventario}`;
-    const prevUrl = window.location.pathname + window.location.search; // Guarda la URL actual
 
     try {
         const response = await fetch(url, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
@@ -107,41 +120,25 @@ $(document).on("click", ".btn.btn-primary", async function (event) {
         const html = await response.text();
         document.getElementById("contenido").innerHTML = html;
 
-        // Guardar la URL anterior en el historial antes de cambiar la vista
-        window.history.pushState({ prevUrl: prevUrl }, "", url);
-
-        // Re-ejecutar scripts específicos de la vista
+        window.history.pushState({}, "", url); // Solo actualiza la URL sin guardar la anterior
         reinitializeScripts();
     } catch (error) {
         console.error("Error en la navegación:", error);
     }
 });
 
-// 🔹 Manejo del botón "Atrás" en el historial del navegador
-window.addEventListener("popstate", function (event) {
-    const urlAnterior = event.state?.prevUrl || "/dashboard";
-    cargarVista(urlAnterior);
-});
-
 // 🔹 Función para actualizar la barra de progreso
-async function actualizarProgreso() {
+async function actualizarProgreso(progresoData = null) {
     try {
-        const response = await fetch(`${url}/api/mantenimientos/obtenerMantenimientos`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-        });
-
-        if (!response.ok) throw new Error("Error al obtener el progreso");
-
-        const data = await response.json();
-        const progreso = parseInt(data.progreso.replace("%", ""), 10);
+        // Si no se pasa progresoData, obtenerlo desde el servidor
+        const progreso = progresoData || (await obtenerMantenimientos()).progreso;
 
         const progresoBarra = document.getElementById("progresoBarra");
         if (progresoBarra) {
-            progresoBarra.style.width = `${progreso}%`;
-            progresoBarra.setAttribute("aria-valuenow", progreso);
-            progresoBarra.textContent = `${progreso}%`;
+            const progresoNumerico = parseInt(progreso.replace("%", ""), 10);
+            progresoBarra.style.width = `${progresoNumerico}%`;
+            progresoBarra.setAttribute("aria-valuenow", progresoNumerico);
+            progresoBarra.textContent = `${progresoNumerico}%`;
         }
     } catch (error) {
         console.error("Error al actualizar la barra de progreso:", error);
@@ -329,10 +326,26 @@ async function programarMantenimiento() {
             $("#tablaResultados").DataTable().clear().draw();
             await cargarMantenimiento();
             cerrarModalProgramacion();
+            
             // ✅ Mostrar mensaje de éxito
-            alert("Mantenimiento programado exitosamente.");
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: 'Mantenimiento programado correctamente',
+                showConfirmButton: true,
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#28a745',
+                timer: 3000,
+                timerProgressBar: true
+            });
         } else {
-            alert("Error: " + result.message);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: result.message || 'Ocurrió un error al programar el mantenimiento',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#d33'
+            });
         }
     } catch (error) {
         console.error("Error:", error);

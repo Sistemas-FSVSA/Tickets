@@ -3,7 +3,6 @@ const sql = require("mssql");
 
 const obtenerEquipoSN = async (req, res) => {
     const { sn } = req.body; // Obtener el S/N desde la solicitud
-    console.log(req.body)
     try {
         const pool = await sistemasPoolPromise;
 

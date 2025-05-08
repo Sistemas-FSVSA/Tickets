@@ -3,21 +3,107 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function InicializarConsultaInventario() {
+    reiniciarEstadoGlobal();
     cargarInventario();
+    inicializarEventosModalImagenes();
+    asignarEventosImagenes();
+    asignarEventoGuardarCambios();
 
-    guardarCambiosBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-        let form = document.getElementById("editarInventarioForm");
+    if (!inputImagen1Formulario || !inputImagen2Formulario || !preview1Formulario || !preview2Formulario || !guardarImagenesBtn) {
+        console.error("No se encontraron todos los elementos de imágenes necesarios");
+        return; // Detener la ejecución si faltan elementos
+    }
 
-        if (form.checkValidity() === false) {
-            event.stopPropagation();
-        } else {
-            actualizarEquipo(); // Esta sí está definida correctamente
-        }
+    // Reiniciar vistas previas de imágenes
+    preview1Formulario.src = "";
+    preview1Formulario.style.display = "none";
+    preview2Formulario.src = "";
+    preview2Formulario.style.display = "none";
+}
 
-        form.classList.add("was-validated");
+$(document).on('change', '#filtroEstado', function () {
+    const estadoSeleccionado = $(this).val();
+    filtrarPorEstado(estadoSeleccionado);
+});
+
+function filtrarPorEstado(estadoSeleccionado) {
+    const tabla = $("#inventario").DataTable();
+    let paginaActual = tabla.page();
+
+    tabla.clear();
+
+    const inventarioFiltrado = estadoSeleccionado
+        ? Inventario.filter(i => (i.estado == 1 ? "Activo" : "Desactivado") === estadoSeleccionado)
+        : Inventario;
+
+    inventarioFiltrado.forEach((inventario) => {
+        const estadoTexto = inventario.estado == 1 ? "Activo" : "Desactivado";
+        const snFormateado = inventario.sn.toString().padStart(3, "0");
+
+        tabla.row.add([
+            snFormateado,
+            inventario.nombre,
+            inventario.marca,
+            inventario.formato,
+            inventario.nombreequipo,
+            inventario.ipequipo,
+            inventario.nombreusuario,
+            estadoTexto,
+            `<button class="btn btn-warning btn-sm editar-inventario" data-id="${inventario.idinventario}">
+                <i class="fas fa-edit"></i> Editar
+            </button>`
+        ]);
     });
 
+    tabla.draw(false);
+    tabla.page(paginaActual).draw(false);
+}
+
+
+function inicializarEventosModalImagenes() {
+    // Reasignar eventos del modal de imágenes
+    $('#subirImagenesModal')
+        .off('shown.bs.modal hidden.bs.modal hide.bs.modal')
+        .on('shown.bs.modal', function () {
+            imagenesGuardadas = false;
+            actualizarVistaPrevia(preview1Formulario, null, imagenesExistentes[0]);
+            actualizarVistaPrevia(preview2Formulario, null, imagenesExistentes[1]);
+        })
+        .on('hidden.bs.modal', function () {
+            if (!imagenesGuardadas) {
+                limpiarImagenesFormulario();
+            }
+        });
+
+    // Evento para abrir el modal de imágenes
+    $(document).on('click', '#subirImagenesBtn', function () {
+        $('#subirImagenesModal').modal('show');
+    });
+
+    // Evento para guardar imágenes
+    guardarImagenesBtn.addEventListener("click", function () {
+        imagenesGuardadas = true; // Marca que las imágenes fueron guardadas
+        $('#subirImagenesModal').modal('hide'); // Cierra el modal de imágenes
+    });
+}
+
+function cargarImagenesExistentes(imagenes) {
+    limpiarImagenesFormulario(); // Limpia cualquier imagen previa
+    if (!imagenes || !Array.isArray(imagenes)) return;
+
+    imagenesExistentes = [...imagenes]; // Copiar el array
+    actualizarVistaPrevia(preview1Formulario, imagenes[0]);
+    actualizarVistaPrevia(preview2Formulario, imagenes[1]);
+}
+
+function reiniciarEstadoGlobal() {
+    inputImagen1Formulario = document.getElementById("imagen1");
+    inputImagen2Formulario = document.getElementById("imagen2");
+    preview1Formulario = document.getElementById("preview1");
+    preview2Formulario = document.getElementById("preview2");
+    guardarImagenesBtn = document.getElementById("guardarImagenesBtn");
+    imagenesGuardadas = false;
+    imagenesExistentes = [];
 }
 
 async function cargarInventario() {
@@ -30,9 +116,36 @@ async function cargarInventario() {
         const result = await response.json();
         Inventario = result.inventarios;
         renderizarInventario();
+
+        if (result.imagenes && result.imagenes.length > 0) {
+            imagenesExistentes = result.imagenes; // Actualiza las imágenes existentes
+        }
     } catch (error) {
         console.error("Error al cargar inventario:", error);
     }
+
+    const estadoSeleccionado = $("#filtroEstado").val();
+    if (estadoSeleccionado) {
+        filtrarPorEstado(estadoSeleccionado);
+    }
+}
+
+function asignarEventoGuardarCambios() {
+    const guardarCambiosBtn = document.getElementById("guardarCambiosBtn");
+    if (!guardarCambiosBtn) return;
+
+    guardarCambiosBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        const form = document.getElementById("editarInventarioForm");
+
+        if (!form.checkValidity()) {
+            event.stopPropagation();
+        } else {
+            actualizarEquipo();
+        }
+
+        form.classList.add("was-validated");
+    });
 }
 
 function renderizarInventario() {
@@ -61,12 +174,6 @@ function renderizarInventario() {
 
     tabla.draw(false);
     tabla.page(paginaActual).draw(false);
-
-    // Reasignar eventos después de renderizar
-    $("#inventario tbody").off("click", ".editar-inventario").on("click", ".editar-inventario", function () {
-        const idinventario = $(this).data("id");
-        editarInventario(idinventario);
-    });
 }
 
 // 🔹 Inicializar la tabla si aún no lo está
@@ -99,19 +206,21 @@ $(document).ready(function () {
 function editarInventario(idinventario) {
     // Limpiar validación previa antes de abrir el modal
     const form = document.getElementById("editarInventarioForm");
-    if (form) {
-        form.classList.remove("was-validated");
+    const modal = document.getElementById("subirImagenesModal");
+    if (!modal) {
+        console.error("El modal de imágenes no está disponible en el DOM.");
+        return;
     }
+    if (form) form.classList.remove("was-validated");
 
-    // Reiniciar estado de imágenes
+    // Reiniciar estados de imágenes
     imagenesGuardadas = false;
-    imagenesExistentes = [null, null];
-    inputImagen1Formulario.value = "";
-    inputImagen2Formulario.value = "";
-    preview1Formulario.src = "";
-    preview2Formulario.src = "";
-    preview1Formulario.style.display = "none";
-    preview2Formulario.style.display = "none";
+    imagenesExistentes = []
+    imagenesModificadas = [false, false];
+
+    // Limpiar inputs pero mantener referencias a imágenes existentes
+    if (inputImagen1Formulario) inputImagen1Formulario.value = "";
+    if (inputImagen2Formulario) inputImagen2Formulario.value = "";
 
     fetch(`${url}/api/inventario/obtenerInventario`, {
         method: "POST",
@@ -172,26 +281,18 @@ function editarInventario(idinventario) {
                     actualizarEstadoInventario(idinventario, nuevoEstado);
                 });
 
-                // Cargar imágenes en el modal de imágenes
+                // Manejo de imágenes
                 if (result.imagenes && result.imagenes.length > 0) {
-                    // Guardar referencias de las imágenes existentes
                     imagenesExistentes[0] = result.imagenes[0];
-                    $("#preview1").attr("src", `${url}${result.imagenes[0]}`).show();
-                    $("#download1").attr("href", `${url}${result.imagenes[0]}`).show();
-
+                    actualizarVistaPrevia(preview1Formulario, null, result.imagenes[0]);
+                
                     if (result.imagenes.length > 1) {
                         imagenesExistentes[1] = result.imagenes[1];
-                        $("#preview2").attr("src", `${url}${result.imagenes[1]}`).show();
-                        $("#download2").attr("href", `${url}${result.imagenes[1]}`).show();
-                    } else {
-                        imagenesExistentes[1] = null;
-                        $("#preview2").hide();
-                        $("#download2").hide();
+                        actualizarVistaPrevia(preview2Formulario, null, result.imagenes[1]);
                     }
                 } else {
-                    imagenesExistentes = [null, null];
-                    $("#preview1, #preview2").hide();
-                    $("#download1, #download2").hide();
+                    actualizarVistaPrevia(preview1Formulario);
+                    actualizarVistaPrevia(preview2Formulario);
                 }
 
                 // Mostrar el modal
@@ -201,33 +302,16 @@ function editarInventario(idinventario) {
         .catch(error => console.error("Error al obtener inventario:", error));
 }
 
-function prepararImagenesParaEnvio() {
-    const archivos = [];
-
-    // Imagen 1
-    if (inputImagen1Formulario.files.length > 0) {
-        archivos.push(inputImagen1Formulario.files[0]);
-    } else if (imagenesExistentes[0]) {
-        // Si no hay nueva imagen pero existe una guardada, enviar null para mantenerla
-        archivos.push(null);
-    } else {
-        // Si no hay imagen nueva ni existente, enviar Blob vacío
-        archivos.push(new Blob([]));
+$('#formEditarInventario').on('shown.bs.modal', function () {
+    if (imagenesExistentes[0] && preview1Formulario) {
+        preview1Formulario.src = `${url}${imagenesExistentes[0]}`;
+        preview1Formulario.style.display = "block";
     }
-
-    // Imagen 2
-    if (inputImagen2Formulario.files.length > 0) {
-        archivos.push(inputImagen2Formulario.files[0]);
-    } else if (imagenesExistentes[1]) {
-        // Si no hay nueva imagen pero existe una guardada, enviar null para mantenerla
-        archivos.push(null);
-    } else {
-        // Si no hay imagen nueva ni existente, enviar Blob vacío
-        archivos.push(new Blob([]));
+    if (imagenesExistentes[1] && preview2Formulario) {
+        preview2Formulario.src = `${url}${imagenesExistentes[1]}`;
+        preview2Formulario.style.display = "block";
     }
-
-    return archivos;
-}
+});
 
 async function actualizarEstadoInventario(idinventario, nuevoEstado, motivoDesactivacion = "") {
     // 🔹 Cerrar modal antes de mostrar la alerta
@@ -310,31 +394,48 @@ function cargarSelect(selector, opciones, seleccionada, idKey, nombreKey) {
     });
 }
 
-const guardarCambiosBtn = document.getElementById("guardarCambiosBtn");
-const inputImagen1Formulario = document.getElementById("imagen1");
-const inputImagen2Formulario = document.getElementById("imagen2");
-const preview1Formulario = document.getElementById("preview1");
-const preview2Formulario = document.getElementById("preview2");
-const guardarImagenesBtn = document.getElementById("guardarImagenesBtn");
-const modal = document.getElementById("formEditarInventario");
+function asignarEventosImagenes() {
+    inputImagen1Formulario.addEventListener("change", () => actualizarVistaPrevia(preview1Formulario, inputImagen1Formulario));
+    inputImagen2Formulario.addEventListener("change", () => actualizarVistaPrevia(preview2Formulario, inputImagen2Formulario));
+}
 
-inputImagen1Formulario.addEventListener("change", () => {
-    mostrarVistaPreviaFormulario(inputImagen1Formulario, preview1Formulario);
-});
+function manejarCambioImagen(input, preview, index) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+                imagenesModificadas[index] = true;
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
-inputImagen2Formulario.addEventListener("change", () => {
-    mostrarVistaPreviaFormulario(inputImagen2Formulario, preview2Formulario);
-});
+async function procesarImagen(input, imagenExistente, formData, nombreArchivo) {
+    if (input.files.length > 0) {
+        formData.append("archivos[]", input.files[0]);
+    } else if (imagenExistente) {
+        const response = await fetch(`${url}${imagenExistente}`);
+        const blob = await response.blob();
+        formData.append("archivos[]", blob, nombreArchivo);
+    } else {
+        formData.append("archivos[]", new Blob([]), nombreArchivo);
+    }
+}
 
-function mostrarVistaPreviaFormulario(input, preview) {
-    const file = input.files[0];
-    if (file) {
+function actualizarVistaPrevia(preview, input = null, imagenUrl = null) {
+    if (input && input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = (e) => {
             preview.src = e.target.result;
             preview.style.display = "block";
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(input.files[0]);
+    } else if (imagenUrl) {
+        preview.src = `${url}${imagenUrl}`;
+        preview.style.display = "block";
     } else {
         preview.src = "";
         preview.style.display = "none";
@@ -367,68 +468,15 @@ async function actualizarEquipo() {
         formData.append("idusuario", idusuario);
     }
 
-    // Manejo de imágenes mejorado
+    await procesarImagen(inputImagen1Formulario, imagenesExistentes[0], formData, "imagen1.jpg");
+    await procesarImagen(inputImagen2Formulario, imagenesExistentes[1], formData, "imagen2.jpg");
+
     try {
-        // Función para convertir URL de imagen a Blob
-        async function urlToBlob(imageUrl) {
-            if (!imageUrl) return new Blob([]);
-            try {
-                const response = await fetch(`${url}${imageUrl}`);
-                return await response.blob();
-            } catch (error) {
-                console.error("Error al convertir imagen existente:", error);
-                return new Blob([]);
-            }
-        }
-
-        // Procesar imagen 1
-        if (inputImagen1Formulario.files.length > 0) {
-            // Si hay nueva imagen, enviarla
-            formData.append("archivos[]", inputImagen1Formulario.files[0]);
-        } else if (imagenesExistentes[0]) {
-            // Si no hay nueva pero existe una guardada, convertir y reenviar
-            const blob = await urlToBlob(imagenesExistentes[0]);
-            formData.append("archivos[]", blob, `imagen1_${Date.now()}.jpg`);
-        } else {
-            // Si no hay imagen, enviar Blob vacío
-            formData.append("archivos[]", new Blob([]));
-        }
-
-        // Procesar imagen 2
-        if (inputImagen2Formulario.files.length > 0) {
-            formData.append("archivos[]", inputImagen2Formulario.files[0]);
-        } else if (imagenesExistentes[1]) {
-            const blob = await urlToBlob(imagenesExistentes[1]);
-            formData.append("archivos[]", blob, `imagen2_${Date.now()}.jpg`);
-        } else {
-            formData.append("archivos[]", new Blob([]));
-        }
-
-        // Mostrar loader mientras se procesa
-        Swal.fire({
-            title: 'Procesando...',
-            html: 'Por favor espera mientras se actualiza el equipo',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
         const response = await fetch(`${url}/api/inventario/actualizarEquipo`, {
             method: "POST",
             credentials: "include",
             body: formData,
         });
-
-        // Cerrar loader
-        Swal.close();
-
-        // Verificar si la respuesta es JSON
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            const text = await response.text();
-            throw new Error(`Respuesta inesperada del servidor: ${text.substring(0, 100)}...`);
-        }
 
         const result = await handleResponse(response);
 
@@ -440,8 +488,8 @@ async function actualizarEquipo() {
                 timer: 2000,
                 showConfirmButton: false,
             }).then(() => {
-                $("#formEditarInventario").modal("hide");
                 cargarInventario();
+                editarInventario(idinventario);
             });
         } else {
             Swal.fire({
@@ -452,19 +500,10 @@ async function actualizarEquipo() {
         }
     } catch (error) {
         console.error("Error al enviar datos al backend:", error);
-
-        // Mostrar mensaje de error más detallado
-        let errorMessage = "No se pudo conectar con el servidor.";
-        if (error.message.includes("Unexpected token '<'")) {
-            errorMessage = "El servidor respondió con una página de error. Verifica la consola para más detalles.";
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-
         Swal.fire({
             icon: "error",
             title: "Error",
-            text: errorMessage,
+            text: error.message || "No se pudo conectar con el servidor.",
         });
     }
 }
@@ -497,74 +536,28 @@ function limpiarModal() {
     }
 }
 
-// Función para limpiar imágenes en el formulario si no se guardaron
-function limpiarImagenesFormulario() {
-    if (!imagenesGuardadas) {
-        if (inputImagen1Formulario) {
-            inputImagen1Formulario.value = "";
-            preview1Formulario.src = "";
-            preview1Formulario.style.display = "none";
-        }
-        if (inputImagen2Formulario) {
-            inputImagen2Formulario.value = "";
-            preview2Formulario.src = "";
-            preview2Formulario.style.display = "none";
-        }
+function limpiarImagen(preview, input, index) {
+    if (input) input.value = "";
+    if (preview) {
+        preview.src = "";
+        preview.style.display = "none";
+    }
+    if (typeof index !== "undefined") {
+        imagenesModificadas[index] = false;
     }
 }
 
-// Evento para guardar imágenes seleccionadas en el formulario al actualizar
-guardarImagenesBtn.addEventListener("click", function () {
-    imagenesGuardadas = true;
-
-    // Copiar imágenes del modal al formulario
-    if (inputImagen1Formulario.files.length) {
-        mostrarVistaPreviaFormulario(inputImagen1Formulario, preview1Formulario);
-    }
-    if (inputImagen2Formulario.files.length) {
-        mostrarVistaPreviaFormulario(inputImagen2Formulario, preview2Formulario);
-    }
-
-    // Cerrar el modal
-    $('#subirImagenesModal').modal('hide');
-});
-
-$(modal).on("hidden.bs.modal", function () {
+// Función para limpiar imágenes en el formulario si no se guardaron
+function limpiarImagenesFormulario() {
     if (!imagenesGuardadas) {
-        limpiarImagenesFormulario();
+        limpiarImagen(preview1Formulario, inputImagen1Formulario, 0);
+        limpiarImagen(preview2Formulario, inputImagen2Formulario, 1);
     }
-});
-
-// Evento para guardar imágenes seleccionadas
-$('#guardarImagenesBtn').off('click').on('click', function () {
-    imagenesGuardadas = true;
-
-    // Actualizar vistas previas
-    if (inputImagen1Formulario.files.length) {
-        mostrarVistaPreviaFormulario(inputImagen1Formulario, preview1Formulario);
-    }
-    if (inputImagen2Formulario.files.length) {
-        mostrarVistaPreviaFormulario(inputImagen2Formulario, preview2Formulario);
-    }
-
-    $('#subirImagenesModal').modal('hide');
-});
+}
 
 // Manejar eventos del modal principal
 $('#formEditarInventario').off('hidden.bs.modal').on('hidden.bs.modal', function () {
     if (!imagenesGuardadas) {
         limpiarImagenesFormulario();
-    }
-});
-
-// Reiniciar variable cuando se abre el modal de imágenes
-$('#subirImagenesModal').off('shown.bs.modal').on('shown.bs.modal', function () {
-    imagenesGuardadas = false;
-
-    if (inputImagen1Formulario.files.length) {
-        mostrarVistaPreviaFormulario(inputImagen1Formulario, document.getElementById("preview1"));
-    }
-    if (inputImagen2Formulario.files.length) {
-        mostrarVistaPreviaFormulario(inputImagen2Formulario, document.getElementById("preview2"));
     }
 });

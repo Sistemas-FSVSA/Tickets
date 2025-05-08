@@ -147,6 +147,18 @@ function mostrarDatosEnModal(modalId) {
     }
 }
 
+$(document).on('click', '#abrirModalDependencia', function () {
+    $('#nuevaDependenciaModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalSoporte', function () {
+    $('#nuevoSoporteModal').modal('show');
+});
+
+$(document).on('click', '#abrirModalTemas', function () {
+    $('#nuevoTemasModal').modal('show');
+});
+
 // Función para configurar los eventos de los switches
 function configurarSwitches() {
     document.querySelectorAll('.switch-estado').forEach(switchElement => {
@@ -198,14 +210,6 @@ async function handleEstadoChange(event) {
             isUpdating = false;
             return;
         }
-
-        // Mostrar loader durante la actualización
-        Swal.fire({
-            title: 'Actualizando...',
-            html: 'Por favor espera',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
 
         // Enviar solicitud al backend
         const response = await fetch(`${url}/api/tickets/actualizarDatos`, {
