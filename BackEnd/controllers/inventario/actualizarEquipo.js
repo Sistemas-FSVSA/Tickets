@@ -154,21 +154,6 @@ const actualizarEquipo = async (req, res) => {
                 .input("observaciones", sql.VarChar, observaciones)
                 .query(queryUpdateDetalleEquipo);
 
-            // Actualización de la tabla mantenimiento
-            console.log("Iniciando actualización de la tabla mantenimiento...");
-            const queryUpdateMantenimiento = `
-                UPDATE mantenimiento
-                SET iddependencia = @dependencia
-                WHERE idinventario = @idinventario;`;
-
-            await transaction
-                .request()
-                .input("idinventario", sql.Int, idinventario)
-                .input("dependencia", sql.Int, dependencia)
-                .query(queryUpdateMantenimiento);
-
-            console.log("Tabla mantenimiento actualizada correctamente.");
-
             // ==== Manejo de imágenes (siempre elimina las viejas, agrega nuevas si hay) ====
 
             // Obtener las imágenes actuales
