@@ -23,7 +23,7 @@ const actualizarEquipo = async (req, res) => {
             // Obtener los datos de ambas tablas
             const queryGetCurrentData = `
                 SELECT 
-                    i.sn, i.iddependencia, i.idmarca, i.idformato, i.nombreequipo, 
+                    i.iddependencia, i.idmarca, i.idformato, i.nombreequipo, 
                     i.ipequipo, i.mantenimiento,
                     d.responsable, d.cargousuario, d.ipequipo AS ip_detalle, d.mac, 
                     d.puertodatos, d.procesador, d.idram, d.cantidadram, d.idalmacenamiento, 
@@ -45,13 +45,12 @@ const actualizarEquipo = async (req, res) => {
 
             // Mapeo de campos (deben coincidir con los de la consulta SQL)
             const fieldsToCheck = {
-                sn, ip, mac, datos, procesador, tiporam, cantidadram, tipoalmacenamiento,
+                ip, mac, datos, procesador, tiporam, cantidadram, tipoalmacenamiento,
                 cantidadalmacenamiento, formatoequipo, marca, so, nombreequipo, sistemas,
                 mantenimiento, dependencia, responsable, usuario, cargousuario, observaciones
             };
 
             const fieldMapping = {
-                sn: "sn",
                 ip: "ipequipo",
                 mac: "mac",
                 datos: "puertodatos",
@@ -101,14 +100,13 @@ const actualizarEquipo = async (req, res) => {
             console.log("Iniciando actualización del inventario...");
             const queryUpdateInventario = `
             UPDATE inventario
-            SET sn = @sn, iddependencia = @dependencia, idmarca = @marca, idformato = @formatoequipo, 
+            SET iddependencia = @dependencia, idmarca = @marca, idformato = @formatoequipo, 
                 nombreequipo = @nombreequipo, ipequipo = @ip, mantenimiento = @mantenimiento
             WHERE idinventario = @idinventario;`;
 
             await transaction
                 .request()
                 .input("idinventario", sql.Int, idinventario)
-                .input("sn", sql.VarChar, sn)
                 .input("dependencia", sql.Int, dependencia)
                 .input("marca", sql.Int, marca)
                 .input("formatoequipo", sql.Int, formatoequipo)
