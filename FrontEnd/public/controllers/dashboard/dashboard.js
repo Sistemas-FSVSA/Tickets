@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function inicializarDashboard() {
     inicializarUI();
     inicializarGraficos();
+    llenarSelectAnios();
 
     // Establecer fechas predeterminadas
     const fechaActual = new Date();
@@ -14,35 +15,15 @@ async function inicializarDashboard() {
     document.getElementById('fechaInicio').value = fechaInicio.toISOString().split('T')[0];
     document.getElementById('fechaFin').value = fechaActual.toISOString().split('T')[0];
 
-    await cargarTicketsDashboard();
+    await cargarTodosLosDatos();
     //setInterval(cargarTickets, 30000);
-}
-
-async function cargarTicketsDashboard() {
-    try {
-        const response = await fetch(`${url}/api/tickets/obtenerTickets`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-        });
-
-        if (!response.ok) throw new Error(`Error al obtener tickets: ${response.statusText}`);
-
-        const result = await response.json();
-        const tickets = result.tickets || [];
-
-        actualizarTarjetas(tickets);
-        actualizarGraficoSales(tickets);
-
-    } catch (error) {
-        console.error('Error al cargar los tickets:', error);
-    }
 }
 
 function inicializarUI() {
     document.getElementById('ticketsActivos').textContent = '...';
     document.getElementById('ticketsGestionados').textContent = '...';
     document.getElementById('ticketsPendientes').textContent = '...';
+    document.getElementById('equiposActivos').textContent = '...';
 }
 
 function inicializarGraficos() {
@@ -50,6 +31,8 @@ function inicializarGraficos() {
     const customHeight = 500;
     document.getElementById('salesChart').parentElement.style.height = `${customHeight}px`;
     document.getElementById('usersChart').parentElement.style.height = `${customHeight}px`;
+    document.getElementById('maintenanceChart').parentElement.style.height = `${customHeight}px`;
+    document.getElementById('modificationsChart').parentElement.style.height = `${customHeight}px`;
 
     // Verifica si los gráficos existen antes de destruirlos
     if (window.salesChart instanceof Chart) {
@@ -58,8 +41,12 @@ function inicializarGraficos() {
     if (window.usersChart instanceof Chart) {
         window.usersChart.destroy();
     }
-
-    console.log('Inicializando salesChart');
+    if (window.maintenanceChart instanceof Chart) {
+        window.maintenanceChart.destroy();
+    }
+    if (window.modificationsChart instanceof Chart) {
+        window.modificationsChart.destroy();
+    }
 
     window.salesChart = new Chart(document.getElementById('salesChart').getContext('2d'), {
         type: 'pie',
@@ -85,12 +72,10 @@ function inicializarGraficos() {
                     onClick: (e, legendItem, legend) => {
                         const chart = legend.chart;
                         const index = legendItem.index;
-                    
-                        console.log(`Toggle visibilidad: ${legendItem.text}`);
-                    
+
                         // 🔄 Usamos toggleDataVisibility en lugar de modificar meta.data directamente
                         chart.toggleDataVisibility(index);
-                    
+
                         // 🔃 Esto redibuja el gráfico y actualiza los datalabels
                         chart.update();
                     }
@@ -113,14 +98,12 @@ function inicializarGraficos() {
                         const isCurrentHidden = meta.data[index].hidden || chart._hiddenIndices?.[index];
 
                         if (isCurrentHidden) {
-                            console.log(`Oculto slice: ${chart.data.labels[index]} (value: ${currentValue})`);
                             return '';
                         }
 
                         if (totalVisible === 0) return '0%';
 
                         const porcentaje = (currentValue / totalVisible) * 100;
-                        console.log(`Calculando % para ${chart.data.labels[index]}: ${porcentaje.toFixed(2)}%`);
                         return `${porcentaje.toFixed(2)}%`;
                     }
                 }
@@ -130,60 +113,495 @@ function inicializarGraficos() {
         plugins: [ChartDataLabels]
     });
 
-    // window.usersChart = new Chart(document.getElementById('usersChart').getContext('2d'), {
-    //     type: 'bar',
-    //     data: {
-    //         labels: ['Norte', 'Sur', 'Este', 'Oeste'],
-    //         datasets: [{ label: 'Usuarios', data: [15, 20, 10, 30], backgroundColor: ['#afeeee', '#e0ffff', '#b0e0e6', '#87cefa'] }]
-    //     },
-    //     options: { responsive: true, maintainAspectRatio: false }
-    // });
+    window.usersChart = new Chart(document.getElementById('usersChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: [], // Se llenará con los nombres de soporte
+            datasets: [{
+                data: [], // Se llenará con las cantidades
+                backgroundColor: [
+                    '#afeeee', '#e0ffff', '#b0e0e6', '#87cefa', '#add5fa',
+                    '#b0c4de', '#4682b4', '#5f9ea0', '#6495ed', '#00bfff'
+                ],
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            barPercentage: 0.6,  // Controla el ancho de la barra en relación al espacio disponible (0-1)
+            categoryPercentage: 0.6,
+            layout: {
+                padding: {
+                    top: 25 // Aumenta el margen superior
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    callbacks: {
+                        // Modificamos el tooltip para mostrar solo el valor
+                        label: function (context) {
+                            return context.raw.toString();
+                        },
+                        // Opcional: puedes personalizar el título también
+                        title: function (context) {
+                            return context[0].label;
+                        }
+                    }
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value,
+                    font: {
+                        weight: 'bold'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Tipos de Soporte',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Cantidad de Tickets',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+    window.maintenanceChart = new Chart(document.getElementById('maintenanceChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Vigente', 'Próximos', 'Atrasados'],
+            datasets: [{
+                data: [0, 0, 0],
+                backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '40%',
+            plugins: {
+                legend: {
+                    position: 'left',
+                    align: 'start',
+                    labels: {
+                        boxWidth: 20,
+                        padding: 10,
+                        font: {
+                            size: 14,
+                            family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                        },
+                        color: '#000'
+                    },
+                    onClick: (e, legendItem, legend) => {
+                        const chart = legend.chart;
+                        const index = legendItem.index;
+                        chart.toggleDataVisibility(index);
+                        chart.update();
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: ${context.raw} equipos`;
+                        }
+                    }
+                },
+                datalabels: {
+                    color: '#000',
+                    font: {
+                        size: 14,
+                    },
+                    formatter: (value, context) => {
+                        const chart = context.chart;
+                        const dataset = chart.data.datasets[context.datasetIndex];
+                        const total = dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = Math.round((value / total) * 100);
+                        return `${percentage}%`;
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    left: 20,
+                    right: 20
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+    window.modificationsChart = new Chart(document.getElementById('modificationsChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            datasets: [{
+                label: 'Modificaciones',
+                data: Array(12).fill(0),
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1, // Aumentar grosor de línea
+                pointRadius: 4, // Tamaño de los puntos
+                pointHoverRadius: 6 // Tamaño al hacer hover
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 25, // Aumenta el margen superior
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Cantidad de Modificaciones',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Meses del Año',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `Modificaciones: ${context.raw}`;
+                        }
+                    }
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#000',
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                    formatter: function (value) {
+                        return value > 0 ? value : ''; // Solo mostrar valor si es mayor a 0
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
 }
 
-function actualizarTarjetas(tickets) {
+function actualizarTarjetas(conteoTickets, equiposData) {
     requestAnimationFrame(() => {
-        document.getElementById('ticketsActivos').textContent = tickets.filter(ticket => ticket.estado === "CREADO").length;
-        document.getElementById('ticketsGestionados').textContent = tickets.filter(ticket => ticket.estado === "CERRADO").length;
-        document.getElementById('ticketsPendientes').textContent = tickets.filter(ticket => ticket.estado === "LEIDO").length;
+        // Actualizamos directamente con los valores del conteo
+        document.getElementById('ticketsActivos').textContent = conteoTickets.activos || 0;
+        document.getElementById('ticketsGestionados').textContent = conteoTickets.cerrados || 0;
+        document.getElementById('ticketsPendientes').textContent = conteoTickets.leidos || 0;
+
+        // Obtén el total de equipos activos desde equiposData
+        const equiposActivos = equiposData.totalEquiposActivos || equiposData.data?.totalEquiposActivos || 0;
+        document.getElementById('equiposActivos').textContent = equiposActivos;
     });
 }
 
 function actualizarGraficoSales(tickets) {
+    if (!tickets || !Array.isArray(tickets)) {
+        return;
+    }
+
     requestAnimationFrame(() => {
-        const fechaInicioInput = document.getElementById('fechaInicio').value;
-        const fechaFinInput = document.getElementById('fechaFin').value;
+        try {
+            // Contar tickets por dependencia
+            const conteo = tickets.reduce((acc, ticket) => {
+                if (!ticket.iddependencia || !ticket.nombreDependencia) return acc;
 
-        const fechaActual = new Date();
-        const fechaFin = fechaFinInput ? new Date(fechaFinInput) : fechaActual;
-        const fechaInicio = fechaInicioInput ? new Date(fechaInicioInput) : new Date(fechaActual.setDate(fechaActual.getDate() - 6));
+                const key = `${ticket.iddependencia}-${ticket.nombreDependencia}`;
+                acc[key] = (acc[key] || 0) + 1;
+                return acc;
+            }, {});
 
-        const ticketsFiltrados = tickets.filter(ticket => {
-            const fechaInicioTicket = new Date(ticket.fechainicio);
-            return fechaInicioTicket >= fechaInicio && fechaInicioTicket <= fechaFin;
-        });
+            // Convertir a array y formatear
+            const datos = Object.entries(conteo).map(([key, count]) => {
+                const [id, nombre] = key.split('-');
+                return { id: parseInt(id), nombre, count };
+            });
 
-        const dependenciasMap = new Map();
-        ticketsFiltrados.forEach(ticket => {
-            const iddependencia = ticket.iddependencia;
-            const nombreDependencia = ticket.nombreDependencia;
-            if (dependenciasMap.has(iddependencia)) {
-                dependenciasMap.get(iddependencia).count++;
-            } else {
-                dependenciasMap.set(iddependencia, { count: 1, nombreDependencia });
+            // Ordenar y tomar top 5
+            const top5 = datos.sort((a, b) => b.count - a.count).slice(0, 5);
+
+            // Actualizar gráfico si existe
+            if (window.salesChart instanceof Chart) {
+                window.salesChart.data.labels = top5.map(d => d.nombre);
+                window.salesChart.data.datasets[0].data = top5.map(d => d.count);
+                window.salesChart.update();
             }
-        });
-
-        const dependenciasArray = Array.from(dependenciasMap.values());
-        dependenciasArray.sort((a, b) => b.count - a.count);
-        const top5 = dependenciasArray.slice(0, 5);
-
-        if (window.salesChart) {
-            window.salesChart.data.labels = top5.map(dep => dep.nombreDependencia);
-            window.salesChart.data.datasets[0].data = top5.map(dep => dep.count);
-            window.salesChart.update();
+        } catch (error) {
+            console.error('Error al actualizar gráfico de ventas:', error);
         }
     });
 }
 
-document.getElementById('fechaInicio').addEventListener('change', cargarTicketsDashboard);
-document.getElementById('fechaFin').addEventListener('change', cargarTicketsDashboard);
+async function cargarTodosLosDatos() {
+    try {
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
+        const anio = document.getElementById('selectAnio').value; // Obtener el año seleccionado
+
+        // 1. Cargar datos para las tarjetas y gráficos
+        const [
+            responseConteoTickets,
+            responseDependencias,
+            responseSoportes,
+            responseEquipos,
+            responseMantenimientos,
+            responseModificaciones // Nueva petición para modificaciones
+        ] = await Promise.all([
+            fetch(`${url}/api/dashboard/obtenerEstadoTickets`, {
+                method: 'GET',
+                credentials: 'include'
+            }),
+            fetch(`${url}/api/dashboard/obtenerDependencias`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fechainicio: fechaInicio,
+                    fechafin: fechaFin
+                }),
+                credentials: 'include'
+            }),
+            fetch(`${url}/api/dashboard/obtenerSoportes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fechainicio: fechaInicio,
+                    fechafin: fechaFin
+                }),
+                credentials: 'include'
+            }),
+            fetch(`${url}/api/dashboard/obtenerEquipos`, {
+                method: 'GET',
+                credentials: 'include'
+            }),
+            fetch(`${url}/api/dashboard/obtenerEstadoMantenimiento`, {
+                method: 'GET',
+                credentials: 'include'
+            }),
+            fetch(`${url}/api/dashboard/obtenerModificaciones`, { // Nueva petición
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ anio }), // Enviar el año en el cuerpo de la solicitud
+                credentials: 'include'
+            })
+        ]);
+
+        // 2. Procesar todas las respuestas
+        if (!responseConteoTickets.ok || !responseDependencias.ok ||
+            !responseSoportes.ok || !responseEquipos.ok || !responseMantenimientos.ok || !responseModificaciones.ok) {
+            throw new Error('Error en una o más peticiones');
+        }
+
+        const [
+            conteoTickets,
+            datosDependencias,
+            datosSoportes,
+            datosEquipos,
+            datosMantenimientos,
+            datosModificaciones // Nueva respuesta
+        ] = await Promise.all([
+            responseConteoTickets.json(),
+            responseDependencias.json(),
+            responseSoportes.json(),
+            responseEquipos.json(),
+            responseMantenimientos.json(),
+            responseModificaciones.json() // Nueva respuesta
+        ]);
+
+        // 3. Actualizar componentes
+        actualizarTarjetas(conteoTickets.data, datosEquipos);
+        actualizarGraficoSales(datosDependencias.data || []);
+        actualizarGraficoSoportes(datosSoportes.data || []);
+        actualizarGraficoMantenimientos(datosMantenimientos.data);
+        actualizarGraficoModificaciones(datosModificaciones.data || []); // Actualizar gráfico de modificaciones
+
+    } catch (error) {
+        console.error('Error al cargar datos:', error);
+        alert('Error al cargar datos: ' + error.message);
+    }
+}
+
+function actualizarGraficoSoportes(tickets) {
+    requestAnimationFrame(() => {
+        // Agrupar tickets por tipo de soporte
+        const soportesMap = new Map();
+
+        tickets.forEach(ticket => {
+            const nombreSoporte = ticket.nombreSoporte;
+            if (soportesMap.has(nombreSoporte)) {
+                soportesMap.set(nombreSoporte, soportesMap.get(nombreSoporte) + 1);
+            } else {
+                soportesMap.set(nombreSoporte, 1);
+            }
+        });
+
+        // Convertir a arrays para el gráfico
+        const labels = Array.from(soportesMap.keys());
+        const data = Array.from(soportesMap.values());
+
+        // Actualizar el gráfico de barras
+        if (window.usersChart) {
+            window.usersChart.data.labels = labels;
+            window.usersChart.data.datasets[0].data = data;
+            window.usersChart.data.datasets[0].label;
+            window.usersChart.update();
+        }
+    });
+}
+
+function actualizarGraficoMantenimientos(mantenimientosData) {
+    requestAnimationFrame(() => {
+        // Preparar datos para el gráfico
+        const labels = ['Vigente', 'Próximos', 'Atrasados'];
+        const data = [
+            mantenimientosData.conteos.alDia,
+            mantenimientosData.conteos.proximos,
+            mantenimientosData.conteos.atrasados
+        ];
+
+        // Colores para cada estado
+        const backgroundColors = ['#FFC107', '#4CAF50', '#F44336'];
+
+        // Actualizar el gráfico de doughnut
+        if (window.maintenanceChart) {
+            window.maintenanceChart.data.labels = labels;
+            window.maintenanceChart.data.datasets[0].data = data;
+            window.maintenanceChart.data.datasets[0].backgroundColor = backgroundColors;
+            window.maintenanceChart.update();
+        }
+
+        // Actualizar la barra de progreso
+        const progresoText = document.getElementById('progresoText');
+        const progresoBar = document.getElementById('progresoBar');
+        const progresoDetail = document.getElementById('progresoDetail');
+
+        // Extraer el valor de progreso (eliminando el % si existe)
+        const progreso = parseInt(mantenimientosData.progreso) || 0;
+        const equiposProximoAno = mantenimientosData.equiposProximoAno || 0;
+        const totalEquipos = mantenimientosData.conteos.total || 0;
+
+        progresoText.textContent = `${progreso}%`;
+        progresoBar.style.width = `${progreso}%`;
+        progresoBar.setAttribute('aria-valuenow', progreso);
+        progresoDetail.textContent = `${equiposProximoAno} de ${totalEquipos} equipos realizados`;
+
+        // Cambiar color según el porcentaje
+        if (progreso < 30) {
+            progresoBar.className = 'progress-bar bg-danger';
+        } else if (progreso < 70) {
+            progresoBar.className = 'progress-bar bg-warning';
+        } else {
+            progresoBar.className = 'progress-bar bg-success';
+        }
+    });
+}
+
+// Llenar select con años
+function llenarSelectAnios() {
+    const selectAnio = document.getElementById('selectAnio');
+    const anioActual = new Date().getFullYear();
+    const anioInicio = 2023; // Cambia este valor si necesitas un rango diferente
+
+    // Limpiar el select antes de llenarlo
+    selectAnio.innerHTML = '';
+
+    // Agregar opciones de años
+    for (let anio = anioActual; anio >= anioInicio; anio--) {
+        const option = document.createElement('option');
+        option.value = anio;
+        option.textContent = anio;
+        selectAnio.appendChild(option);
+    }
+
+    // Seleccionar el año actual por defecto
+    selectAnio.value = anioActual;
+}
+
+function actualizarGraficoModificaciones(modificacionesData) {
+    requestAnimationFrame(() => {
+        // Verificar si hay datos válidos
+        if (!modificacionesData || !Array.isArray(modificacionesData)) {
+            console.warn('Datos de modificaciones no válidos:', modificacionesData);
+            return;
+        }
+
+        // Crear array completo para los 12 meses
+        const datosCompletos = Array(12).fill(0);
+
+        // Llenar con los datos recibidos
+        modificacionesData.forEach(item => {
+            // Asegurarse que el mes está en rango (1-12)
+            if (item.mes >= 1 && item.mes <= 12) {
+                datosCompletos[item.mes - 1] = item.cantidad;
+            }
+        });
+
+        // Actualizar gráfico si existe
+        if (window.modificationsChart) {
+            window.modificationsChart.data.datasets[0].data = datosCompletos;
+            window.modificationsChart.update();
+        } else {
+            console.error('El gráfico de modificaciones no está inicializado');
+        }
+    });
+}
+
+document.getElementById('selectAnio').addEventListener('change', cargarTodosLosDatos);
+document.getElementById('fechaInicio').addEventListener('change', cargarTodosLosDatos);
+document.getElementById('fechaFin').addEventListener('change', cargarTodosLosDatos);
+

@@ -1,0 +1,21 @@
+/* Estilos para igualar los cards */
+.card {
+    height: 97%;
+}
+
+.card-header h6 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.progress-container {
+    padding: 8px;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.chart-container {
+    min-height: 300px;
+    width: 100%;
+}
