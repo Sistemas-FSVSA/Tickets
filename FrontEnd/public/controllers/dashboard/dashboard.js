@@ -16,6 +16,7 @@ async function inicializarDashboard() {
     document.getElementById('fechaFin').value = fechaActual.toISOString().split('T')[0];
 
     await cargarTodosLosDatos();
+    await cargarUsuariosMasActivos();
     //setInterval(cargarTickets, 30000);
 }
 
@@ -237,14 +238,23 @@ function inicializarGraficos() {
                 },
                 datalabels: {
                     color: '#000',
-                    font: {
-                        size: 14,
-                    },
+                    font: { size: 14 },
                     formatter: (value, context) => {
                         const chart = context.chart;
                         const dataset = chart.data.datasets[context.datasetIndex];
-                        const total = dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = Math.round((value / total) * 100);
+
+                        // Suma solo los valores visibles usando getDataVisibility
+                        let totalVisible = 0;
+                        dataset.data.forEach((val, i) => {
+                            if (chart.getDataVisibility(i)) totalVisible += val;
+                        });
+
+                        // Si este segmento está oculto, no mostrar nada
+                        if (!chart.getDataVisibility(context.dataIndex)) return '';
+
+                        if (totalVisible === 0) return '0%';
+
+                        const percentage = Math.round((value / totalVisible) * 100);
                         return `${percentage}%`;
                     }
                 }
@@ -278,7 +288,7 @@ function inicializarGraficos() {
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    top: 25, // Aumenta el margen superior
+                    top: 40, // Aumenta el margen superior
                 }
             },
             scales: {
@@ -598,6 +608,88 @@ function actualizarGraficoModificaciones(modificacionesData) {
         } else {
             console.error('El gráfico de modificaciones no está inicializado');
         }
+    });
+}
+
+function renderizarUsuariosMasActivos(usuarios) {
+    const container = document.getElementById('usuariosMasActivosContainer');
+    if (!usuarios || usuarios.length === 0) {
+        container.innerHTML = '<p class="text-muted">No hay datos de usuarios más activos.</p>';
+        return;
+    }
+
+    let html = `
+    <div class="table-responsive usuarios-tabla">
+    <table class="table table-sm table-bordered align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Usuario</th>
+                <th>Dependencia</th>
+                <th>Cargo</th>
+                <th>IP</th>
+                <th>Tickets</th>
+                <th>Última Fecha</th>
+                <th>Último Ticket</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    usuarios.forEach((u, idx) => {
+        html += `
+            <tr>
+                <td>${idx + 1}</td>
+                <td>${u.usuario?.nombre || '-'}</td>
+                <td>${u.usuario?.dependencia || '-'}</td>
+                <td>${u.usuario?.cargo || '-'}</td>
+                <td>${u.estadisticas.ip || '-'}</td>
+                <td>${u.estadisticas.cantidad_tickets}</td>
+                <td>${formatDate(u.estadisticas.ultima_fecha)}</td>
+                <td>
+                    ${u.ultimo_ticket
+                ? `<b>${u.ultimo_ticket.tema}</b><br>
+                           <small>${u.ultimo_ticket.detalle}</small><br>
+                           <span class="badge bg-secondary">${u.ultimo_ticket.estado}</span>
+                           <br><small>${formatDate(u.ultimo_ticket.fecha)}</small>`
+                : '-'}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+async function cargarUsuariosMasActivos() {
+    try {
+        const resp = await fetch(`${url}/api/dashboard/usuarioMasTickets`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        const data = await resp.json();
+        renderizarUsuariosMasActivos(data.data || []);
+    } catch (err) {
+        console.error('Error al cargar usuarios más activos:', err);
+        renderizarUsuariosMasActivos([]);
+    }
+}
+
+function formatDate(date) {
+    if (!date) return '-';
+
+    const d = new Date(date);
+    // Ajustar manualmente la hora sumando 5 horas (UTC → Bogotá UTC-5)
+    d.setHours(d.getHours() + 5); // ← Restar 5 horas para compensar la diferencia
+
+    return d.toLocaleString('es-CO', {
+        hour12: true,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
 

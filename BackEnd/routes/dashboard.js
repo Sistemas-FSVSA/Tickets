@@ -5,6 +5,7 @@ const { obtenerEquiposActivos } = require('../controllers/dashboard/obtenerEquip
 const { obtenerConteoTicketsPorEstado } = require('../controllers/dashboard/obtenerEstadoTickets');
 const { obtenerEstadoMantenimientos } = require('../controllers/dashboard/obtenerEstadoMantenimiento');
 const { obtenerModificacionesPorMes } = require('../controllers/dashboard/obtenerModificaciones');
+const { obtenerUsuarioMasActivo } = require('../controllers/dashboard/usuarioMasTickets');
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.get('/obtenerEquipos', obtenerEquiposActivos);
 router.get('/obtenerEstadoTickets', obtenerConteoTicketsPorEstado);
 router.get('/obtenerEstadoMantenimiento', obtenerEstadoMantenimientos);
 router.post('/obtenerModificaciones', obtenerModificacionesPorMes);
+router.get('/usuarioMasTickets', obtenerUsuarioMasActivo);
 
 module.exports = router;
