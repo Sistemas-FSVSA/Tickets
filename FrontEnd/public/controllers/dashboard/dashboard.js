@@ -1,11 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
-    inicializarDashboard();
+    loadSocketIO().then(() => {
+        inicializarDashboard();
+    });
 });
+
+function loadSocketIO() {
+    return new Promise((resolve) => {
+        if (typeof io !== 'undefined') {
+            return resolve();
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdn.socket.io/4.5.4/socket.io.min.js';
+        script.onload = resolve;
+        script.onerror = () => {
+            console.error('Error cargando Socket.IO');
+            resolve(); // Continuar aunque falle
+        };
+        document.head.appendChild(script);
+    });
+}
 
 async function inicializarDashboard() {
     inicializarUI();
     inicializarGraficos();
     llenarSelectAnios();
+    const { cpuData, memData } = inicializarMonitorChart();
+    initServerMonitor(cpuData, memData);
 
     // Establecer fechas predeterminadas
     const fechaActual = new Date();
@@ -18,6 +39,77 @@ async function inicializarDashboard() {
     await cargarTodosLosDatos();
     await cargarUsuariosMasActivos();
     //setInterval(cargarTickets, 30000);
+}
+
+// Verifica que socket.io esté disponible antes de inicializar el monitor, se conecta al backend y define los id del HTML
+function initServerMonitor(cpuData, memData) {
+    if (typeof io === 'undefined') {
+        console.error('Socket.IO no está disponible');
+        return;
+    }
+
+    const socket = io(window.API_URL_IP || `http://${window.location.hostname}:3101`);
+
+    socket.on('system-metrics', (data) => {
+        const memUsed = ((data.totalMem - data.freeMem) / data.totalMem * 100).toFixed(2);
+
+        cpuData.push(parseFloat(data.cpu));
+        cpuData.shift();
+        memData.push(parseFloat(memUsed));
+        memData.shift();
+
+        if (window.monitorChart) {
+            window.monitorChart.update();
+        }
+
+        updateServerStatus(parseFloat(data.cpu), parseFloat(memUsed));
+    });
+
+    socket.on('connect_error', (err) => {
+        if (window.monitorChart) {
+            window.monitorChart.data.datasets[0].data = [0, 0];
+            window.monitorChart.update();
+        }
+        updateServerStatus(0, 0, true);
+    });
+}
+
+// Función para actualizar el estado del servidor
+function updateServerStatus(cpuUsage, memUsage, offline = false) {
+    const statusElement = document.getElementById('server-status');
+    const statusIcon = document.querySelector('#server-status-icon i');
+    if (!statusElement || !statusIcon) return;
+
+    if (offline) {
+        statusElement.textContent = "❌ Offline";
+        statusElement.className = "card-text fs-2 text-danger";
+        statusIcon.className = "fas fa-circle text-danger";
+        return;
+    }
+
+    const maxUsage = Math.max(cpuUsage, memUsage);
+
+    let statusText = '';
+    let statusClass = '';
+    let iconClass = '';
+
+    if (maxUsage <= 50) {
+        statusText = " Óptimo";
+        statusClass = "card-text fs-2 text-success";
+        iconClass = "fas fa-circle text-success";
+    } else if (maxUsage <= 80) {
+        statusText = " Aceptable";
+        statusClass = "card-text fs-2 text-warning";
+        iconClass = "fas fa-circle text-warning";
+    } else {
+        statusText = " Sobrecargado";
+        statusClass = "card-text fs-2 text-danger";
+        iconClass = "fas fa-circle text-danger";
+    }
+
+    statusElement.textContent = statusText;
+    statusElement.className = statusClass;
+    statusIcon.className = iconClass;
 }
 
 function inicializarUI() {
@@ -129,6 +221,7 @@ function inicializarGraficos() {
             }]
         },
         options: {
+            // indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             barPercentage: 0.6,  // Controla el ancho de la barra en relación al espacio disponible (0-1)
@@ -346,6 +439,70 @@ function inicializarGraficos() {
         },
         plugins: [ChartDataLabels]
     });
+}
+
+function inicializarMonitorChart() {
+    const maxPoints = 30;
+    const cpuData = Array(maxPoints).fill(0);
+    const memData = Array(maxPoints).fill(0);
+
+    // Verifica que el canvas existe
+    const canvas = document.getElementById('monitorChart');
+    if (!canvas) {
+        console.warn('El canvas monitorChart no existe en el DOM.');
+        return { cpuData, memData };
+    }
+
+    // Si ya existe un gráfico, destrúyelo antes de crear uno nuevo
+    if (window.monitorChart instanceof Chart) {
+        window.monitorChart.destroy();
+    }
+
+    window.monitorChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: maxPoints }, () => ''),
+            datasets: [
+                {
+                    label: 'CPU (%)',
+                    data: cpuData,
+                    borderColor: '#42a5f5',
+                    backgroundColor: 'rgba(66,165,245,0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Memoria (%)',
+                    data: memData,
+                    borderColor: '#66bb6a',
+                    backgroundColor: 'rgba(102,187,106,0.1)',
+                    fill: true,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: false,
+            plugins: {
+                datalabels: {
+                    anchor: 'end',      // Ancla la etiqueta al final del punto
+                    align: 'top',       // La coloca arriba del punto
+                    offset: 6,          // Ajusta la distancia hacia arriba (aumenta para más separación)
+                    font: {
+                        size: 12,       // Tamaño de la fuente
+                    },
+                    color: '#222',      // Color del texto
+                    formatter: (value) => value ? value.toFixed(1) + '%' : ''
+                }
+            },
+            scales: {
+                y: { min: 0, max: 100, title: { display: true, text: '%' } }
+            }
+        }
+    });
+
+    return { cpuData, memData };
 }
 
 function actualizarTarjetas(conteoTickets, equiposData) {
