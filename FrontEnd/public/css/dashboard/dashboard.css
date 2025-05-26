@@ -19,3 +19,27 @@
     min-height: 300px;
     width: 100%;
 }
+
+/* Quita el margen superior del contenedor */
+.usuarios-tabla {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Ajusta el tamaño de la letra y el ancho de la tabla */
+.usuarios-tabla table {
+    font-size: 16px; /* Cambia este valor según lo que prefieras */
+    width: 100%;
+}
+
+/* Opcional: ajusta el tamaño de la letra del encabezado */
+.usuariostabla th {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Opcional: ajusta el tamaño de la letra de las celdas */
+.usuarios-tabla td {
+    font-size: 16px;
+    vertical-align: middle;
+}

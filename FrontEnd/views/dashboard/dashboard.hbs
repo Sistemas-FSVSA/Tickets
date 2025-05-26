@@ -79,6 +79,16 @@
                     </div>
                 </div>
             </div>
+            {{!-- <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header text-white" style="background-color: #007bff;">
+                        <h6>Usuarios más Activos</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="usuariosMasActivosContainer" class="mt-2"></div>
+                    </div>
+                </div>
+            </div> --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header text-white" style="background-color: #007bff;">
@@ -125,6 +135,23 @@
                 </div>
             </div>
         </div>
+
+        <!-- Nueva Sección: Estadísticas del Servidor -->
+        <div class="card mb-4">
+            <!-- Monitor del Servidor en una carta -->
+            <div class="card-body">
+                <h5 class="card-title">Monitor del Servidor</h5>
+                <div class="d-flex align-items-center mb-3 justify-content-end">
+                    <h5 class="card-title mb-1 me-3">Monitor del Servidor:</h5>
+                    <span id="server-status" class="card-text fs-2 text-success"> Óptimo</span>
+                    <span id="server-status-icon" class="ms-2"><i class="fas fa-circle text-success"></i></span>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="monitorChart" height="100"></canvas>
+            </div>
+        </div>
     </div>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="/controllers/dashboard/dashboard.js" defer></script>
 </body>
