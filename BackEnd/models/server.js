@@ -2,10 +2,36 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const { createServer } = require("http"); // Añadir
+const socketIo = require("socket.io"); // Añadir
 
 class Server {
   constructor() {
     this.app = express();
+    this.server = createServer(this.app); 
+    // Obtener los orígenes permitidos desde la variable de entorno y convertirlos en array
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(",")
+      : [];
+
+    this.io = socketIo(this.server, {
+      cors: {
+      origin: function (origin, callback) {
+        // Permitir solicitudes sin origen (como Postman o herramientas locales)
+        if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        } else {
+        callback(new Error('Origen no permitido por CORS'));
+        }
+      },
+      methods: ["GET", "POST"],
+      credentials: true
+      },
+      transports: ['websocket', 'polling'],
+      allowUpgrades: true,
+      pingInterval: 25000,
+      pingTimeout: 20000
+    });
     this.port = process.env.PORT;
     this.indexPath = "/api/index";
     this.ticketsPath = "/api/tickets";
@@ -18,10 +44,11 @@ class Server {
 
     this.middlewares();
     this.routes();
+    this.monitorSetup(); //funcion para el monitor
   }
 
   middlewares() {
-    
+
     const allowedOrigins = process.env.ALLOWED_ORIGINS
       ? process.env.ALLOWED_ORIGINS.split(",")
       : [];
@@ -59,8 +86,14 @@ class Server {
     this.app.use(this.dashboardPath, require("../routes/dashboard"));
   }
 
+  monitorSetup() {
+    // Pasamos io al controlador del dashboard
+    const { setupMonitor } = require("../controllers/dashboard/monitorController");
+    setupMonitor(this.io);
+  }
+
   listen() {
-    this.app.listen(this.port, () => {
+    this.server.listen(this.port, () => {
       console.log(`Escuchando desde http://localhost:${this.port}`);
       console.log(`Archivos estáticos disponibles en http://localhost:${this.port}/uploads`);
     });
