@@ -205,6 +205,13 @@ app.get("/modificaciones/modificaciones", (req, res) => {
   res.render("modificaciones/modificaciones");
 });
 
+app.get("/configuraciones/consultarcorreo", (req, res) => {
+  if (req.xhr) {
+    return res.render("configuraciones/consultarcorreo", { layout: false }); // Solo la vista
+  }
+  res.render("configuraciones/consultarcorreo");
+});
+
 app.get("/config.js", (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
 
