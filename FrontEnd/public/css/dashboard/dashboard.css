@@ -10,7 +10,7 @@
 
 .progress-container {
     padding: 8px;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
     margin-bottom: 8px;
 }
@@ -28,7 +28,8 @@
 
 /* Ajusta el tamaño de la letra y el ancho de la tabla */
 .usuarios-tabla table {
-    font-size: 16px; /* Cambia este valor según lo que prefieras */
+    font-size: 16px;
+    /* Cambia este valor según lo que prefieras */
     width: 100%;
 }
 
@@ -42,4 +43,42 @@
 .usuarios-tabla td {
     font-size: 16px;
     vertical-align: middle;
+}
+
+/* En tu archivo CSS */
+.server-status-container {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    /* Espacio uniforme entre elementos */
+}
+
+.server-status-text {
+    margin-right: 0.3rem;
+    font-weight: 500;
+}
+
+.server-status-icon {
+    font-size: 1rem;
+    margin-left: 0.3rem;
+}
+
+/* Estilos personalizados para mejor presentación */
+.server-status-container {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+#monitorInfo {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+
+    .col-md-4,
+    .col-md-8 {
+        width: 100%;
+    }
 }

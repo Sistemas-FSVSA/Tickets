@@ -1,0 +1,33 @@
+.table-container {
+    margin: 20px auto;
+    max-width: 1000px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+    background-color: #343a40;
+    color: white;
+}
+
+.status-active {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: #dc3545;
+}
+
+.action-btn {
+    min-width: 80px;
+}
+
+.loading-spinner {
+    display: none;
+    margin: 20px auto;
+}
+
+.error-message {
+    color: #dc3545;
+    display: none;
+}
