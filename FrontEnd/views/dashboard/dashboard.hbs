@@ -138,17 +138,38 @@
 
         <!-- Nueva Sección: Estadísticas del Servidor -->
         <div class="card mb-4">
-            <!-- Monitor del Servidor en una carta -->
-            <div class="card-body">
-                <h5 class="card-title">Monitor del Servidor</h5>
-                <div class="d-flex align-items-center mb-3 justify-content-end">
-                    <h5 class="card-title mb-1 me-3">Monitor del Servidor:</h5>
-                    <span id="server-status" class="card-text fs-2 text-success"> Óptimo</span>
-                    <span id="server-status-icon" class="ms-2"><i class="fas fa-circle text-success"></i></span>
+            <div class="row g-0"> <!-- row sin espacio entre columnas (g-0) -->
+                <!-- Columna izquierda (información de texto) -->
+                <div class="col-md-3 d-flex flex-column">
+                    <div class="card-body">
+                        <!-- Cabecera del monitor -->
+                        <div class="server-status-container mb-3">
+                            <h5 class="card-title mb-1">Monitor del Servidor:</h5>
+                            <div class="d-flex align-items-center">
+                                <span id="server-status"
+                                    class="server-status-text card-text fs-2 text-success">Óptimo</span>
+                                <span id="server-status-icon">
+                                    <i class="fas fa-circle text-success"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div id="monitorInfo" class="small text-muted mt-auto">
+                            <!-- Contenido dinámico irá aquí -->
+                            <div class="mb-2"><strong>CPU:</strong> <span id="cpu-usage">0%</span></div>
+                            <div class="mb-2"><strong>Memoria:</strong> <span id="memory-usage">0 MB/0 MB</span></div>
+                            <div><strong>Últ. actualización:</strong> <span id="last-update">00:00:00</span></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <canvas id="monitorChart" height="100"></canvas>
+
+                <!-- Columna derecha (gráfico) -->
+                <div class="col-md-9">
+                    <div class="card-body" style="position: relative; height: 600px;">
+                        <canvas id="monitorChart" height="300"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
