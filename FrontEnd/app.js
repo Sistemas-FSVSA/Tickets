@@ -212,6 +212,13 @@ app.get("/configuraciones/consultarcorreo", (req, res) => {
   res.render("configuraciones/consultarcorreo");
 });
 
+app.get("/configuraciones/festivos", (req, res) => {
+  if (req.xhr) {
+    return res.render("configuraciones/festivos", { layout: false }); // Solo la vista
+  }
+  res.render("configuraciones/festivos");
+});
+
 app.get("/config.js", (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
 

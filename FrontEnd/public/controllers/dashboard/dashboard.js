@@ -1,25 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    loadSocketIO().then(() => {
+
         inicializarDashboard();
-    });
+
 });
 
-function loadSocketIO() {
-    return new Promise((resolve) => {
-        if (typeof io !== 'undefined') {
-            return resolve();
-        }
-
-        const script = document.createElement('script');
-        script.src = 'https://cdn.socket.io/4.5.4/socket.io.min.js';
-        script.onload = resolve;
-        script.onerror = () => {
-            console.error('Error cargando Socket.IO');
-            resolve(); // Continuar aunque falle
-        };
-        document.head.appendChild(script);
-    });
-}
 
 async function inicializarDashboard() {
     inicializarUI();
