@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-        inicializarDashboard();
+    inicializarDashboard();
 
 });
 
@@ -146,7 +146,7 @@ function inicializarGraficos() {
             labels: [],
             datasets: [{
                 data: [],
-                backgroundColor: ['#afeeee', '#e0ffff', '#b0e0e6', '#87cefa', '#add5fa']
+                backgroundColor: ['#00205C', '#8A2432', '#e0e0e0', '#4b8abe', '#b3b3b3']
             }]
         },
         options: {
@@ -173,7 +173,12 @@ function inicializarGraficos() {
                     }
                 },
                 datalabels: {
-                    color: '#000',
+                    color: (context) => {
+                        textColors = ['#FFFFFF', '#FFFFFF', '#000000', '#FFFFFF', '#FFFFFF']
+                        const datasetIndex = context.datasetIndex;
+                        const index = context.dataIndex;
+                        return textColors[index];
+                    },
                     font: { size: 12 },
                     formatter: (value, context) => {
                         const chart = context.chart;
@@ -182,7 +187,7 @@ function inicializarGraficos() {
                         const meta = chart.getDatasetMeta(datasetIndex);
 
                         const totalVisible = meta.data.reduce((sum, arc, i) => {
-                            const isHidden = arc.hidden || chart._hiddenIndices?.[i]; // Verifica si está oculto
+                            const isHidden = arc.hidden || chart._hiddenIndices?.[i];
                             return !isHidden ? sum + chart.data.datasets[datasetIndex].data[i] : sum;
                         }, 0);
 
@@ -212,8 +217,8 @@ function inicializarGraficos() {
             datasets: [{
                 data: [], // Se llenará con las cantidades
                 backgroundColor: [
-                    '#afeeee', '#e0ffff', '#b0e0e6', '#87cefa', '#add5fa',
-                    '#b0c4de', '#4682b4', '#5f9ea0', '#6495ed', '#00bfff'
+                    '#00205C', '#8A2432', '#e0e0e0', '#4b8abe', '#b3b3b3',
+                    '#c14b3e', '#e27b6f', '#f7cca1', '#6495ed', '#00bfff'
                 ],
                 borderColor: '#fff',
                 borderWidth: 1
