@@ -37,7 +37,7 @@ async function inicializarDashboard() {
     document.getElementById('fechaFin').value = fechaActual.toISOString().split('T')[0];
 
     await cargarTodosLosDatos();
-    await cargarUsuariosMasActivos();
+    // await cargarUsuariosMasActivos();
     //setInterval(cargarTickets, 30000);
 }
 
@@ -51,7 +51,10 @@ function initServerMonitor(cpuData, memData) {
     const socket = io(window.API_URL_IP || `http://${window.location.hostname}:3101`);
 
     socket.on('system-metrics', (data) => {
-        const memUsed = ((data.totalMem - data.freeMem) / data.totalMem * 100).toFixed(2);
+        // Calcula el porcentaje de memoria usada correctamente
+        const memUsed = (data.totalMemMb > 0)
+            ? ((data.usedMemMb / data.totalMemMb) * 100).toFixed(2)
+            : 0;
 
         cpuData.push(parseFloat(data.cpu));
         cpuData.shift();
@@ -60,6 +63,18 @@ function initServerMonitor(cpuData, memData) {
 
         if (window.monitorChart) {
             window.monitorChart.update();
+        }
+
+        // Mostrar info adicional
+        const infoDiv = document.getElementById('monitorInfo');
+        if (infoDiv) {
+            infoDiv.innerHTML = `
+            <b>CPU:</b> ${data.cpuModel || '-'}<br>
+            <b>Núcleos:</b> ${data.cpuCount || '-'}<br>
+            <b>RAM:</b> ${data.usedMemMb} MB / ${data.totalMemMb} MB<br>
+            <b>Red ↓:</b> ${(data.netRx / 1024).toFixed(1)} KB/s &nbsp; 
+            <b>Red ↑:</b> ${(data.netTx / 1024).toFixed(1)} KB/s
+        `;
         }
 
         updateServerStatus(parseFloat(data.cpu), parseFloat(memUsed));
@@ -442,7 +457,7 @@ function inicializarGraficos() {
 }
 
 function inicializarMonitorChart() {
-    const maxPoints = 30;
+    const maxPoints = 20;
     const cpuData = Array(maxPoints).fill(0);
     const memData = Array(maxPoints).fill(0);
 
@@ -483,6 +498,7 @@ function inicializarMonitorChart() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             animation: false,
             plugins: {
                 datalabels: {

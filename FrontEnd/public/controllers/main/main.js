@@ -157,6 +157,9 @@ function reinitializeScripts() {
     if (path.includes("/modificaciones/modificaciones")) {
         loadAndRunScript("/controllers/modificaciones/modificaciones.js", "InicializarModificaciones");
     }
+    if (path.includes("/configuraciones/consultarcorreo")) {
+        loadAndRunScript("/controllers/configuraciones/consultarcorreo.js", "InicializarConsultarCorreo");
+    }
 }
 
 async function cargarTickets() {
@@ -333,6 +336,7 @@ function setupMenuToggle(menuId, toggleId, submenuId, iconId) {
 // Configurar cada menú desplegable
 setupMenuToggle('menuTickets', 'toggleTickets', 'submenuTickets', 'iconTickets');
 setupMenuToggle('menuInventario', 'toggleInventario', 'submenuInventario', 'iconInventario');
+setupMenuToggle('menuConfiguraciones', 'toggleConfiguraciones', 'submenuConfiguraciones', 'iconConfiguraciones');
 
 function formatoHora(fecha) {
     if (!fecha) return 'Fecha no disponible';
