@@ -1,104 +1,135 @@
 <link rel="stylesheet" href="/css/configuraciones/correo.css">
 
 <body>
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-12">
-                <h2 class="text-center mb-4">Configuraciones de Correo Electrónico</h2>
+    <header class="header mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="titulo-correos mb-0 ms-3">Configuraciones de Correo</h5> <!-- Añadido ms-3 -->
+            <div class="d-flex align-items-center">
+                <button id="nuevoCorreoBtn" class="btn btn-success me-3" data-toggle="modal"
+                    data-target="#modalRegistrarCorreo">
+                    <i class="fas fa-plus"></i> Crear Correo
+                </button>
+                {{!-- <label for="filtroEstadoCorreo" class="mb-0 me-2">Filtrar por estado:</label> <!-- Añadido me-2 -->
+                <select id="filtroEstadoCorreo" class="form-control form-control-sm ms-2" style="width: 150px;">
+                    <!-- Añadido ms-2 -->
+                    <option value="todos">Todos</option>
+                    <option value="activo">Activos</option>
+                    <option value="inactivo">Inactivos</option>
+                </select> --}}
             </div>
         </div>
+    </header>
 
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="card table-container">
-                    <div class="card-header table-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Listado de Configuraciones</h5>
-                        <button id="refreshBtn" class="btn btn-sm btn-light">
-                            <i class="fas fa-sync-alt"></i> Actualizar
-                        </button>
-                        <button id="nuevoCorreoBtn" class="btn btn-sm btn-success ml-2">
-                            <i class="fas fa-plus"></i> Nuevo Correo
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div id="errorMessage" class="alert alert-danger error-message" role="alert"></div>
-                        <div class="mb-3">
-                            <label for="filtroEstadoCorreo" class="form-label">Filtrar por estado:</label>
-                            <select id="filtroEstadoCorreo" class="form-select form-select-sm"
-                                style="width: 200px; display: inline-block;">
-                                <option value="todos">Todos</option>
-                                <option value="activo">Activos</option>
-                                <option value="inactivo">Inactivos</option>
+    <div class="container-fluid mt-4">
+        <div class="table-responsive">
+            <table id="emailConfigTable" class="table table-striped table-bordered" style="width: 99%;">
+                <thead>
+                    <tr>
+                        <th>Proveedor</th>
+                        <th>Correo Electrónico</th>
+                        <th>Contraseña</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyCorreos">
+                    <!-- Los datos se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="modalEditarCorreo" aria-labelledby="modalEditarCorreoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarCorreoLabel">Editar Configuración</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarCorreo" novalidate>
+                        <input type="hidden" id="editCorreoId">
+                        <div class="form-group">
+                            <label for="editProveedor">Proveedor</label>
+                            <select id="editProveedor" class="form-control" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Gmail">Gmail</option>
+                                <option value="Outlook">Outlook</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione un proveedor válido.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCorreo">Correo Electrónico</label>
+                            <input type="email" id="editCorreo" class="form-control" required>
+                            <div class="invalid-feedback">Ingrese un correo válido.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPassword">Contraseña</label>
+                            <input type="text" id="editPassword" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEstado">Estado</label>
+                            <select id="editEstado" class="form-control" required>
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
                             </select>
                         </div>
-
-                        <div class="table-responsive">
-                            <table id="emailConfigTable" class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Proveedor</th>
-                                        <th>Correo Electrónico</th>
-                                        <th>Password</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="emailConfigTableBody">
-                                    <!-- Los datos se cargarán aquí dinámicamente -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="guardarCambiosCorreo">Guardar</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Modal de edición de correo -->
-        <!-- Modal de edición de correo (Bootstrap 4) -->
-        <div class="modal fade" id="modalEditarCorreo" tabindex="-1" role="dialog"
-            aria-labelledby="modalEditarCorreoLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form id="formEditarCorreo">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modalEditarCorreoLabel">Editar Configuración de Correo</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+    <!-- Modal de Registro -->
+    <div class="modal fade" id="modalRegistrarCorreo" aria-labelledby="modalRegistrarCorreoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalRegistrarCorreoLabel">Nueva Configuración</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formRegistrarCorreo" novalidate>
+                        <div class="form-group">
+                            <label for="nuevoProveedor">Proveedor</label>
+                            <select id="nuevoProveedor" class="form-control" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Gmail">Gmail</option>
+                                <option value="Outlook">Outlook</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione un proveedor válido.</div>
                         </div>
-                        <div class="modal-body">
-                            <input type="hidden" id="editCorreoId">
-                            <div class="form-group">
-                                <label for="editProveedor">Proveedor</label>
-                                <select id="editProveedor" class="form-control" required>
-                                    <option value="">Seleccione...</option>
-                                    <option value="Gmail">Gmail</option>
-                                    <option value="Outlook">Outlook</option>
-                                </select>
-                                <div class="invalid-feedback">Seleccione un proveedor válido.</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="editCorreo">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="editCorreo" required>
-                                <div class="invalid-feedback">Ingrese un correo válido.</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="editPassword">Password</label>
-                                <input type="text" class="form-control" id="editPassword" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEstado">Estado</label>
-                                <select id="editEstado" class="form-control" required>
-                                    <option value="1">Activo</option>
-                                    <option value="0">Inactivo</option>
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label for="nuevoCorreo">Correo Electrónico</label>
+                            <input type="email" id="nuevoCorreo" class="form-control" required>
+                            <div class="invalid-feedback">Ingrese un correo válido.</div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        <div class="form-group">
+                            <label for="crearPassword">Contraseña</label>
+                            <input type="text" class="form-control" id="crearPassword" required>
                         </div>
+                        {{!-- <div class="form-group">
+                            <label for="nuevoEstado">Estado</label>
+                            <select id="nuevoEstado" class="form-control" required>
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
+                            </select>
+                        </div> --}}
                     </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="guardarRegistroCorreo">Guardar</button>
                 </div>
             </div>
         </div>

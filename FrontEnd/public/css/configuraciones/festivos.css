@@ -1,0 +1,22 @@
+/* Estilos para el header de festivos */
+.header {
+    padding: 0 1rem; /* Añade padding general a los lados */
+}
+
+/* Ajuste fino para el título si es necesario */
+.header h5 {
+    margin-left: 0rem;
+}
+
+/* Espaciado adicional para el botón "Crear Festivo" */
+#nuevoFestivoBtn {
+    margin-right: 0.5rem !important; /* Ajusta el valor según necesites */
+}
+
+/* En tu festivos.css */
+.acciones-col {
+    width: 10px;
+    min-width: 70px;
+    max-width: 120px;
+    text-align: center;
+}
