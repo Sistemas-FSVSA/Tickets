@@ -1,33 +1,19 @@
-.table-container {
-    margin: 20px auto;
-    max-width: 1000px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+/* Estilos para el header */
+.header {
+    padding: 0 1rem; /* Añade padding general a los lados */
 }
 
-.table-header {
-    background-color: #343a40;
-    color: white;
+/* Ajuste fino para el título si es necesario */
+.titulo-correos {
+    margin-left: 0rem;
 }
 
-.status-active {
-    color: #28a745;
-    font-weight: bold;
+/* Espaciado adicional para el select si sigue pegado */
+#filtroEstadoCorreo {
+    margin-left: 0.5rem;
 }
 
-.status-inactive {
-    color: #dc3545;
-}
-
-.action-btn {
-    min-width: 80px;
-}
-
-.loading-spinner {
-    display: none;
-    margin: 20px auto;
-}
-
-.error-message {
-    color: #dc3545;
-    display: none;
+/* Añade espacio entre el botón y el label */
+#nuevoCorreoBtn {
+    margin-right: 0.5rem !important; /* Ajusta el valor según necesites */
 }
