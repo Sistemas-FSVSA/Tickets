@@ -10,6 +10,8 @@ const { registrarCorreo } = require('../controllers/configuraciones/registrarCor
 const { obtenerFestivos } = require('../controllers/configuraciones/obtenerFestivos');
 const { actualizarFestivo } = require('../controllers/configuraciones/actualizarFestivos'); 
 const { obtenerFestivosColombia, registrarFestivosColombia } = require('../controllers/configuraciones/registrarFestivos');
+const { obtenerHorarios } = require('../controllers/configuraciones/obtenerHorario');
+const { actualizarHorario } = require('../controllers/configuraciones/actualizarHorario');
 
 const authenticateToken = require('../models/authMiddleware');
 
@@ -20,5 +22,7 @@ router.get('/obtenerFestivos', authenticateToken, rateLimiterFast, obtenerFestiv
 router.post('/actualizarFestivo/:fecha', authenticateToken, rateLimiterFast, actualizarFestivo);
 router.get('/festivosColombia/:year', obtenerFestivosColombia);
 router.post('/registrarFestivosColombia', authenticateToken, rateLimiterFast, registrarFestivosColombia);
+router.get('/obtenerHorario', authenticateToken, rateLimiterFast, obtenerHorarios);
+router.post('/actualizarHorario/:id', authenticateToken, rateLimiterFast, actualizarHorario);
 
 module.exports = router;

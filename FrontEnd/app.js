@@ -219,6 +219,13 @@ app.get("/configuraciones/festivos", (req, res) => {
   res.render("configuraciones/festivos");
 });
 
+app.get("/configuraciones/horario", (req, res) => {
+  if (req.xhr) {
+    return res.render("configuraciones/horario", { layout: false }); // Solo la vista
+  }
+  res.render("configuraciones/horario");
+});
+
 app.get("/config.js", (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
 

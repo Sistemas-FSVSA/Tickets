@@ -184,6 +184,10 @@ function reinitializeScripts() {
     if (path.includes("/configuraciones/festivos")) {
         loadAndRunScript("/controllers/configuraciones/festivos.js", "InicializarFestivos");
     }
+
+    if (path.includes("/configuraciones/horario")) {
+        loadAndRunScript("/controllers/configuraciones/horario.js", "InicializarHorario");
+    }
 }
 
 async function cargarTickets() {

@@ -371,7 +371,6 @@ function actualizarEstadoBotonRegistrar() {
 
 async function registrarFestivosSeleccionados() {
     try {
-        // Obtener los festivos seleccionados desde sessionStorage
         const seleccionados = JSON.parse(sessionStorage.getItem('festivosSeleccionados')) || [];
 
         if (seleccionados.length === 0) {
@@ -383,7 +382,6 @@ async function registrarFestivosSeleccionados() {
             return;
         }
 
-        // Registrar solo los festivos que están en sessionStorage
         const response = await fetch(`${url}/api/configuraciones/registrarFestivosColombia`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -399,17 +397,31 @@ async function registrarFestivosSeleccionados() {
             if (result.data.existentes.length > 0) {
                 mensaje += `<br><br>Las siguientes fechas ya estaban registradas:<br>`;
                 mensaje += `<table border="1" style="width:100%; text-align:center;">`;
-
                 result.data.existentes.forEach((fecha, index) => {
-                    if (index % 3 === 0) mensaje += `<tr>`; // Inicia una nueva fila cada 3 elementos
+                    if (index % 3 === 0) mensaje += `<tr>`;
                     mensaje += `<td>${fecha}</td>`;
-                    if ((index + 1) % 3 === 0) mensaje += `</tr>`; // Cierra la fila cada 3 elementos
+                    if ((index + 1) % 3 === 0) mensaje += `</tr>`;
                 });
-
                 mensaje += `</table>`;
             }
 
-            Swal.fire({
+            // 1. Limpiar primero los elementos del DOM que vamos a modificar
+            const contenedor = document.getElementById('festivosColombiaContainer');
+            contenedor.innerHTML = '<p>Seleccione un año para cargar los festivos</p>';
+            
+            // 2. Resetear otros controles
+            document.getElementById('selectAnioFestivos').value = new Date().getFullYear();
+            document.getElementById('btnRegistrarFestivos').disabled = true;
+            document.getElementById('btnRegistrarFestivos').classList.remove('btn-success');
+            document.getElementById('btnRegistrarFestivos').classList.add('btn-secondary');
+
+            // 3. Limpiar sessionStorage después de actualizar el DOM
+            sessionStorage.removeItem('festivosSeleccionados');
+            sessionStorage.removeItem('festivosColombia');
+            sessionStorage.removeItem('anioSeleccionado');
+
+            // 4. Mostrar la alerta después de hacer todos los cambios
+            await Swal.fire({
                 icon: 'success',
                 title: 'Proceso completado',
                 html: mensaje,
@@ -417,15 +429,8 @@ async function registrarFestivosSeleccionados() {
                 confirmButtonText: 'Entendido'
             });
 
-            // Limpiar los seleccionados después de registrar
-            sessionStorage.removeItem('festivosSeleccionados');
-
-            // Actualizar la interfaz
-            document.getElementById('selectAllFestivos').checked = false;
-            document.querySelectorAll('.festivo-check').forEach(check => check.checked = false);
-            actualizarEstadoBotonRegistrar();
-
-            await cargarFestivos(); // Recargar la lista de festivos registrados
+            // 5. Recargar datos
+            await cargarFestivos();
         } else {
             throw new Error(result.message || 'Error al registrar festivos');
         }
