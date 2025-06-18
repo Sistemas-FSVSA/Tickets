@@ -37,7 +37,7 @@ const registrarMovimiento = async (req, res) => {
       .input('valor_nuevo', stockNuevo)
       .input('idresponsable', idresponsable)
       .query(`
-        INSERT INTO [sistemas].[dbo].[bitacora]
+        INSERT INTO [sistemas].[dbo].[bitacorabodega]
         (iditem, tipomovimiento, cantidad, valor_anterior, valor_nuevo, fecha, idresponsable)
         VALUES (@iditem, @tipomovimiento, @cantidad, @valor_anterior, @valor_nuevo, GETDATE(), @idresponsable)
       `);

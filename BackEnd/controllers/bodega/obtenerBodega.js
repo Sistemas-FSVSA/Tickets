@@ -17,7 +17,7 @@ const obtenerBodega = async (req, res) => {
         b.idresponsable, 
         r.nombres AS responsable_nombres, 
         r.apellidos AS responsable_apellidos
-      FROM [sistemas].[dbo].[bitacora] b
+      FROM [sistemas].[dbo].[bitacorabodega] b
       LEFT JOIN [sistemas].[dbo].[items] i ON b.iditem = i.iditem
       LEFT JOIN [sistemas].[dbo].[responsable] r ON b.idresponsable = r.idresponsable
       ORDER BY b.fecha DESC;
