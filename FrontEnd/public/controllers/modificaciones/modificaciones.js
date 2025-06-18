@@ -159,8 +159,8 @@ function renderizarResultados(resultados) {
                 <div class="card-body">
                     <p class="card-text">${mod.nombre} - ${mod.fecha}</p>
                     <div class="button-group">
-                        <button class="btn btn-primary btn-sm abrir-btn" data-url="${imageUrl}">Abrir</button>
-                        <button class="btn btn-secondary btn-sm imprimir-btn" data-url="${imageUrl}">Imprimir</button>
+                        <button class="btn btn-fsvsaon abrir-btn" data-url="${imageUrl}"><i class="far fa-eye mr-1"></i>Abrir</button>
+                        <button class="btn btn-fsvsaoff imprimir-btn" data-url="${imageUrl}"><i class="fas fa-print mr-1"></i>Imprimir</button>
                     </div>
                 </div>
             </div>

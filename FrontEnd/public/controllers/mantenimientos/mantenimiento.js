@@ -77,8 +77,8 @@ function renderizarMantenimiento() {
             formatearFecha(mantenimiento.fechaproximo).split(" ")[0],
             mantenimiento.nombre_responsable,
             semaforoHTML,
-            `<button class="btn btn-primary" data-id="${mantenimiento.idinventario}">
-                <i class="fas fa-file-medical-alt"></i>
+            `<button class="btn btn-fsvsaon" data-id="${mantenimiento.idinventario}">
+                <i class="fas fa-file-medical-alt mr-1"></i> HVC
             </button>`
         ]);
     });
@@ -104,7 +104,7 @@ $(document).ready(function () {
 });
 
 // funcion para la redireccion a hvc
-$(document).off("click", ".btn.btn-primary").on("click", ".btn.btn-primary", async function (event) {
+$(document).off("click", ".btn.btn-fsvsaon").on("click", ".btn.btn-fsvsaon", async function (event) {
     event.preventDefault();
 
     const idinventario = $(this).data("id");
@@ -210,10 +210,10 @@ function actualizarTabla(equipo) {
             equipo.sn,
             equipo.nombreequipo,
             equipo.nombre_dependencia,
-            `<button class="btn btn-danger btn-sm eliminar-equipo" 
+            `<button class="btn btn-fsvsaoff btn-sm eliminar-equipo" 
                 data-idinventario="${equipo.idinventario}" 
                 data-sn="${equipo.sn}">
-                <i class="fas fa-trash"></i> Eliminar
+                <i class="fas fa-minus mr-1"></i> Eliminar
             </button>`
         ]).draw();
     } else {
@@ -255,10 +255,10 @@ function actualizarTablaSeleccionados() {
             equipo.sn,
             equipo.nombreequipo,
             equipo.nombre_dependencia,
-            `<button class="btn btn-danger btn-sm eliminar-equipo" 
+            `<button class="btn btn-fsvsaoff btn-sm eliminar-equipo" 
                 data-idinventario="${equipo.idinventario}" 
                 data-sn="${equipo.sn}">
-                <i class="fas fa-trash"></i> Eliminar
+                <i class="fas fa-minus"></i> Eliminar
             </button>`
         ]).draw();
     });
