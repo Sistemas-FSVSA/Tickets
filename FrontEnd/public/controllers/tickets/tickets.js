@@ -181,7 +181,7 @@ function mostrarTicketInfo(result) {
                 <span>
                     ${result.ticket.idusuario
                 ? `<span class="text">Encargado: ${result.ticket.nombresUsuario} ${result.ticket.apellidosUsuario}</span>`
-                : `<button type="button" id="asignarBtn" class="btn btn-primary btn-sm">Asignar</button>`}
+                : `<button type="button" id="asignarBtn" class="btn btn-fsvsaoff"><i class="fas fa-plus mr-1"></i>Asignar</button>`}
                 </span>
             </div>
         `;
@@ -273,8 +273,8 @@ function mostrarTicketInfo(result) {
                     adjuntosContainer.appendChild(imgElement);
                 } else if (adjunto.tipo === 'pdf') {
                     const openButton = document.createElement('button');
-                    openButton.textContent = 'Abrir PDF';
-                    openButton.className = 'btn btn-success adjunto-pdf';
+                    openButton.innerHTML = '<i class="fas fa-paperclip mr-1"></i>Abrir PDF';
+                    openButton.className = 'btn btn-fsvsaon adjunto-pdf';
                     openButton.style.margin = '5px';
                     openButton.addEventListener('click', () => {
                         window.open(adjuntoUrl, '_blank');
@@ -282,8 +282,8 @@ function mostrarTicketInfo(result) {
                     adjuntosContainer.appendChild(openButton);
                 } else {
                     const downloadButton = document.createElement('button');
-                    downloadButton.textContent = `Descargar ${adjunto.tipo}`;
-                    downloadButton.className = 'btn btn-success adjunto-descarga';
+                    downloadButton.innerHTML = `<i class="fas fa-download mr-1"></i>Descargar ${adjunto.tipo}`;
+                    downloadButton.className = 'btn btn-fsvsaon adjunto-descarga';
                     downloadButton.style.margin = '5px';
                     downloadButton.addEventListener('click', () => {
                         window.open(adjuntoUrl, '_blank');
@@ -303,10 +303,7 @@ function mostrarTicketInfo(result) {
             const gestionarBtnContainer = document.createElement('div');
             gestionarBtnContainer.className = 'ticket-gestionar-btn-container text-right';
             gestionarBtnContainer.innerHTML = `
-                <button type="button" id="gestionarBtn" class="btn btn-primary">
-                    Gestionar
-                </button>
-            `;
+                <button type="button" id="gestionarBtn" class="btn btn-fsvsaon"><i class="fas fa-cog mr-1"></i>Gestionar</button>`;
             emailContent.appendChild(gestionarBtnContainer);
         }
 

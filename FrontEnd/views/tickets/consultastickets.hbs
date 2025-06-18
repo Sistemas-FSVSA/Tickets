@@ -28,12 +28,12 @@
         <div class="modal-dialog modal-xl custom-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="btn btn-primary btn-sm mr-2" id="gestionesBtn">
-                        <i class="fas fa-tasks"></i> Gestiones
+                    <button type="button" class="btn btn-fsvsaoff" id="gestionesBtn">
+                        <i class="fas fa-cogs mr-1"></i>Gestiones
                     </button>
                     <h5 class="modal-title mx-auto" id="ticketModalLabel">Detalles del Ticket</h5>
-                    <button type="button" class="btn btn-outline-secondary" id="toggleFechas">
-                        <i class="fas fa-clock"></i>
+                    <button type="button" class="btn btn-fsvsaon" id="toggleFechas">
+                        <i class="fas fa-clock mr-1"></i>Fechas
                     </button>
                 </div>
                 <div class="modal-body">
@@ -78,17 +78,13 @@
                             <label for="notemail" class="form-label">Notificación por Email</label>
                             <input type="text" class="form-control" id="notemail" readonly>
                         </div>
-                        <!-- Botón para mostrar las gestiones -->
-                        <button type="button" class="btn btn-primary" id="gestionesBtn" style="display:none;">
-                            Gestiones
-                        </button>
                         <div class="col-md-12 adjuntos-container">
                             <!-- Aquí se insertarán los archivos adjuntos -->
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary cerrar-modal" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-fsvsaoff cerrar-modal" data-dismiss="modal"><i class="fas fa-times mr-1"></i>Cerrar</button>
                 </div>
             </div>
         </div>

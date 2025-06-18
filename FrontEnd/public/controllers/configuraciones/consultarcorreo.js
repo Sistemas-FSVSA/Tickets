@@ -83,8 +83,8 @@ function renderizarTablaCorreo(datos = configuracionesCorreo) {
             : '<i class="fas fa-times-circle"></i>';  // Icono para inactivo
 
         const botonEditar = `
-            <button class="btn btn-warning btn-sm editar-correo" data-id="${config.idconfigemail}">
-                <i class="fas fa-edit"></i> Editar
+            <button class="btn btn-fsvsaon editar-correo" data-id="${config.idconfigemail}">
+                <i class="fas fa-pen mr-1"></i>Editar
             </button>
         `;
 

@@ -61,8 +61,8 @@ function renderizarTablaFestivos(festivos) {
         }
 
         const botonEditar = `
-        <button class="btn btn-warning btn-sm editar-festivo" data-fecha="${festivo.fecha}" data-motivo="${festivo.motivo}">
-            <i class="fas fa-edit"></i> Editar
+        <button class="btn btn-fsvsaon editar-festivo" data-fecha="${festivo.fecha}" data-motivo="${festivo.motivo}">
+            <i class="fas fa-pen mr-1"></i>Editar
         </button>
     `;
         tabla.row.add([

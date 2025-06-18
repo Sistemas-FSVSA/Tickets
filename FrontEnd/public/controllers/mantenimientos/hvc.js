@@ -223,3 +223,110 @@ document.getElementById("volver")?.addEventListener("click", async () => {
         console.error("Error al volver a la vista de mantenimiento:", error);
     }
 });
+
+function formatearFechaHora(fechaISO) {
+    if (!fechaISO) return '';
+    const fecha = new Date(fechaISO);
+    fecha.setHours(fecha.getHours() + 5);
+    const yyyy = fecha.getFullYear();
+    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dd = String(fecha.getDate()).padStart(2, '0');
+    let horas = fecha.getHours();
+    const min = String(fecha.getMinutes()).padStart(2, '0');
+    const ampm = horas >= 12 ? 'PM' : 'AM';
+    horas = horas % 12;
+    horas = horas ? horas : 12; // el 0 debe ser 12
+    const hh = String(horas).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd} ${hh}:${min} ${ampm}`;
+}
+
+document.getElementById('verTickets').addEventListener('click', async () => {
+    const sn = document.getElementById('sn').value; // O toma el SN de donde corresponda
+
+    try {
+        const response = await fetch(`${url}/api/mantenimientos/obtenerTickets/${sn}`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        const data = await response.json();
+
+        if (response.status === 404) {
+            Swal.fire('Sin tickets', data.message || 'No hay tickets para este equipo', 'info');
+            return;
+        }
+
+        // Construir el HTML de las cartas
+        let html = `
+        <div class="row mb-3">
+            <div class="col">
+                <input type="text" id="filtroTickets" class="form-control" placeholder="Filtrar tickets...">
+            </div>
+            <div class="col">
+                <input type="date" id="filtroFechaTickets" class="form-control" placeholder="Filtrar por fecha">
+            </div>
+        </div>
+        <div id="contenedorCartasTickets">
+        `;
+
+        data.tickets.forEach(ticket => {
+            html += `
+        <div class="card mb-3 ticket-carta">
+            <div class="card-header">
+                Ticket #${ticket.idticket} - Estado: ${ticket.estado}
+            </div>
+            <div class="card-body">
+                <p><strong>Detalle:</strong> ${ticket.detalle}</p>
+                <p><strong>Observación:</strong> ${ticket.observacion || 'Sin observación'}</p>
+                <p><strong>Falsa alarma:</strong> ${ticket.falsaalarma ? 'Sí' : 'No'}</p>
+                <p><strong>Fecha gestión:</strong> ${formatearFechaHora(ticket.fechagestion)}</p>
+                <p><strong>Usuario:</strong> ${ticket.usuario}</p>
+                <p><strong>Fecha inicio:</strong> ${formatearFechaHora(ticket.fechainicio)}</p>
+                <p><strong>Fecha cierre:</strong> ${formatearFechaHora(ticket.fechacierre)}</p>
+            </div>
+        </div>
+            `;
+        });
+        html += `</div>`;
+
+        // Muestra el modal con el contenido
+        Swal.fire({
+            title: `Tickets del equipo`,
+            html: `<div style="max-height:400px;overflow:auto">${html}</div>`,
+            width: 700,
+            showCloseButton: true,
+            showConfirmButton: false
+        });
+
+        // Espera a que el DOM del modal esté listo
+        setTimeout(() => {
+            const inputTexto = document.getElementById('filtroTickets');
+            const inputFecha = document.getElementById('filtroFechaTickets');
+            const cartas = document.querySelectorAll('.ticket-carta');
+
+            function filtrarCartas() {
+                const filtro = inputTexto.value.toLowerCase();
+                const fechaFiltro = inputFecha.value; // formato: 'YYYY-MM-DD'
+
+                cartas.forEach(carta => {
+                    const texto = carta.textContent.toLowerCase();
+                    // Busca la fecha en el texto de la carta (ajusta según tu formato)
+                    const fechaEnCarta = (carta.querySelector('.card-body p strong')?.nextSibling?.textContent || '').trim();
+                    // O mejor: busca la fecha en el campo correspondiente
+                    const fechaGestion = carta.querySelector('p:nth-child(4)')?.textContent.match(/\d{4}-\d{2}-\d{2}/)?.[0] || '';
+
+                    const coincideTexto = texto.includes(filtro);
+                    const coincideFecha = !fechaFiltro || fechaGestion === fechaFiltro;
+
+                    carta.style.display = (coincideTexto && coincideFecha) ? '' : 'none';
+                });
+            }
+
+            inputTexto?.addEventListener('input', filtrarCartas);
+            inputFecha?.addEventListener('input', filtrarCartas);
+        }, 100);
+
+    } catch (error) {
+        Swal.fire('Error', 'No se pudieron obtener los tickets', 'error');
+        console.error(error);
+    }
+});

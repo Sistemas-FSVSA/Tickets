@@ -10,6 +10,7 @@ const { obtenerMantenimientos } = require('../controllers/mantenimientos/obtener
 const { obtenerEquipoSN } = require('../controllers/mantenimientos/obtenerEquipoSN');
 const { obtenerHVC } = require('../controllers/mantenimientos/obtenerHVC');
 const { guardarMantenimientos } = require('../controllers/mantenimientos/guardarMantenimientos');
+const { obtenerTicketsPorSN } = require('../controllers/mantenimientos/obtenertickets');
 
 const authenticateToken = require('../models/authMiddleware');
 
@@ -20,5 +21,6 @@ router.post('/obtenerMantenimientos', authenticateToken, rateLimiterFast, obtene
 router.post('/obtenerHVC', authenticateToken, rateLimiterFast, obtenerHVC);
 router.post('/guardarMantenimientos', authenticateToken, rateLimiterFast, guardarMantenimientos);
 router.post('/obtenerEquipoSN', authenticateToken, rateLimiterFast, obtenerEquipoSN);
+router.get('/obtenerTickets/:sn', authenticateToken, rateLimiterFast, obtenerTicketsPorSN);
 
 module.exports = router;

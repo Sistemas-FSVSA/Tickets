@@ -49,8 +49,8 @@ function filtrarPorEstado(estadoSeleccionado) {
             inventario.ipequipo,
             inventario.nombreusuario,
             estadoTexto,
-            `<button class="btn btn-warning btn-sm editar-inventario" data-id="${inventario.idinventario}">
-                <i class="fas fa-edit"></i> Editar
+            `<button class="btn btn-fsvsaon editar-inventario" data-id="${inventario.idinventario}">
+                <i class="fas fa-pen mr-1"></i>Editar
             </button>`
         ]);
     });
@@ -166,8 +166,8 @@ function renderizarInventario() {
             inventario.ipequipo,
             inventario.nombreusuario,
             estadoTexto,
-            `<button class="btn btn-warning btn-sm editar-inventario" data-id="${inventario.idinventario}">
-                <i class="fas fa-edit"></i> Editar
+            `<button class="btn btn-fsvsaon editar-inventario" data-id="${inventario.idinventario}">
+                <i class="fas fa-pen mr-1"></i>Editar
             </button>`
         ]);
     });
@@ -266,13 +266,13 @@ function editarInventario(idinventario) {
                 const nuevoBtnEstado = document.getElementById("estadoEquipoBtn");
 
                 if (inventario.estado === 1) {
-                    nuevoBtnEstado.textContent = "Desactivar";
-                    nuevoBtnEstado.classList.remove("btn-success");
-                    nuevoBtnEstado.classList.add("btn-danger");
+                    nuevoBtnEstado.innerHTML = '<i class="fas fa-toggle-on mr-1"></i>Desactivar';
+                    nuevoBtnEstado.classList.remove("btn-fsvsaon");
+                    nuevoBtnEstado.classList.add("btn-fsvsaoff");
                 } else {
-                    nuevoBtnEstado.textContent = "Activar";
-                    nuevoBtnEstado.classList.remove("btn-danger");
-                    nuevoBtnEstado.classList.add("btn-success");
+                    nuevoBtnEstado.innerHTML = '<i class="fas fa-toggle-off mr-1"></i>Activar';
+                    nuevoBtnEstado.classList.remove("btn-fsvsaoff");
+                    nuevoBtnEstado.classList.add("btn-fsvsaon");
                 }
 
                 // Evento para cambiar el estado
@@ -285,7 +285,7 @@ function editarInventario(idinventario) {
                 if (result.imagenes && result.imagenes.length > 0) {
                     imagenesExistentes[0] = result.imagenes[0];
                     actualizarVistaPrevia(preview1Formulario, null, result.imagenes[0]);
-                
+
                     if (result.imagenes.length > 1) {
                         imagenesExistentes[1] = result.imagenes[1];
                         actualizarVistaPrevia(preview2Formulario, null, result.imagenes[1]);
