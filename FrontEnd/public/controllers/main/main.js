@@ -188,6 +188,10 @@ function reinitializeScripts() {
     if (path.includes("/configuraciones/horario")) {
         loadAndRunScript("/controllers/configuraciones/horario.js", "InicializarHorario");
     }
+
+    if (path.includes("/bodega/consultarbodega")) {
+        loadAndRunScript("/controllers/bodega/bodega.js", "inicializarConsultarBodega");
+    }
 }
 
 async function cargarTickets() {
@@ -365,6 +369,7 @@ function setupMenuToggle(menuId, toggleId, submenuId, iconId) {
 setupMenuToggle('menuTickets', 'toggleTickets', 'submenuTickets', 'iconTickets');
 setupMenuToggle('menuInventario', 'toggleInventario', 'submenuInventario', 'iconInventario');
 setupMenuToggle('menuConfiguraciones', 'toggleConfiguraciones', 'submenuConfiguraciones', 'iconConfiguraciones');
+setupMenuToggle('menuBodega', 'toggleBodega', 'submenuBodega', 'iconBodega');
 
 function formatoHora(fecha) {
     if (!fecha) return 'Fecha no disponible';

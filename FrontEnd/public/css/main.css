@@ -49,86 +49,104 @@ html,
 
 
 
-    .btn-fsvsaoff {
-        background-color: #96072D;
-        /* Color normal */
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        /* Suaviza las transiciones */
-    }
+   .swal-cancel-button {
+  background-color: #96072d !important; /* Rojo Oscuro*/
+  color: white !important;
+  border-radius: 5px !important;
+  padding: 8px 16px !important;
+  font-size: 16px !important;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out !important;
+}
 
-    .btn-fsvsaoff:focus {
-        background-color: #748d2e;
-        outline: none;
-        /* Elimina el borde por defecto del navegador */
-        border: 2px solid #ffc800;
-        /* Borde más claro al tener el foco */
-        box-shadow: 0 0 8px #ffc800;
-        /* Resplandor alrededor */
-    }
+.swal-cancel-button:hover {
+  background-color: #c24d4d !important; /* Rojo más claro */
+  transform: scale(1.05) !important;
+}
 
-    .btn-fsvsaon {
-        background-color: #163c64;
-        /* Color normal */
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        /* Suaviza las transiciones */
-    }
+.btn-fsvsaoff {
+  background-color: #96072d; /* Rojo oscuro */
+  color: white;
+  border-radius: 5px;
+  font-size: 15px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
 
-    .btn-fsvsaon:focus {
-        background-color: #2e5c8d;
-        outline: none;
-        /* Elimina el borde por defecto del navegador */
-        border: 2px solid #ffc800;
-        /* Borde más claro al tener el foco */
-        box-shadow: 0 0 8px #ffc800;
-        /* Resplandor alrededor */
-    }
+.btn-fsvsaoff:hover {
+  background-color: #c24d4d !important; /* Rojo más claro */
+  transform: scale(1.05);
+}
 
-    .spinner-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        /* Fondo semitransparente */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1050;
-        /* Más alto que el contenido */
-        visibility: hidden;
-        /* Oculto por defecto */
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-    }
 
-    .spinner-overlay.active {
-        visibility: visible;
-        opacity: 1;
-    }
+.swal-confirm-button {
+  background-color: #163c64 !important; /* Verde */
+  color: white !important;
+  border-radius: 5px !important;
+  padding: 8px 16px !important;
+  font-size: 16px !important;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out !important;
+}
 
-    .spinner {
-        border: 8px solid rgba(255, 255, 255, 0.3);
-        /* Fondo del spinner */
-        border-top: 8px solid #ffffff;
-        /* Color del borde animado */
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
-        /* Animación de rotación */
-    }
+/* Efecto hover */
+.swal-confirm-button:hover {
+  background-color: #295c92 !important; /* Verde más oscuro */
+  transform: scale(1.05) !important;
+}
 
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
+.btn-fsvsaon {
+  background-color: #163c64;
+  color: white;
+  border-radius: 5px;
+  font-size: 15px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
 
-        100% {
-            transform: rotate(360deg);
-        }
-    }
+.btn-fsvsaon:hover {
+  background-color: #2e5c8d !important; /* Rojo más claro */
+  transform: scale(1.05);
+}
+
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Fondo semitransparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  /* Más alto que el contenido */
+  visibility: hidden;
+  /* Oculto por defecto */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.spinner-overlay.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+.spinner {
+  border: 8px solid rgba(255, 255, 255, 0.3);
+  /* Fondo del spinner */
+  border-top: 8px solid #ffffff;
+  /* Color del borde animado */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  /* Animación de rotación */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

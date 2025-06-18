@@ -42,10 +42,7 @@ module.exports = {
 
     // Manejar conexiones de Socket.io
     io.on('connection', (socket) => {
-      console.log(`Cliente conectado al monitor: ${socket.id}`);
-
       socket.on('disconnect', () => {
-        console.log(`Cliente desconectado: ${socket.id}`);
       });
 
       // Opcional: Manejar eventos personalizados

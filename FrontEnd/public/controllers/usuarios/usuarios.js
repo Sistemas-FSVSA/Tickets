@@ -66,8 +66,8 @@ function renderizarUsuarios() {
         `;
 
         const botonEditar = `
-            <button class="btn btn-warning btn-sm editar-usuario" data-id="${usuario.idresponsable}">
-                <i class="fas fa-edit"></i> Editar
+            <button class="btn btn-fsvsaoff editar-usuario" data-id="${usuario.idresponsable}">
+                <i class="fas fa-pen mr-1"></i>Editar
             </button>
         `;
 

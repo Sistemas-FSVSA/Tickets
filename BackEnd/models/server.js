@@ -42,6 +42,7 @@ class Server {
     this.modificacionesPath = "/api/modificaciones";
     this.dashboardPath = "/api/dashboard";
     this.configuracionesPath = "/api/configuraciones";
+    this.bodegaPath = "/api/bodega";
 
     this.middlewares();
     this.routes();
@@ -86,6 +87,7 @@ class Server {
     this.app.use(this.modificacionesPath, require("../routes/modificaciones"));
     this.app.use(this.dashboardPath, require("../routes/dashboard"));
     this.app.use(this.configuracionesPath, require("../routes/configuraciones"));
+    this.app.use(this.bodegaPath, require("../routes/bodega"));
   }
 
   monitorSetup() {

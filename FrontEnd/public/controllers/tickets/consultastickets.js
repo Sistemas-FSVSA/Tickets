@@ -44,8 +44,8 @@ function renderizarTickets(tickets) {
             <td>${ticket.nombreTema}</td>
             <td>${ticket.detalle}</td>
             <td>
-                <button class="btn btn-info btn-sm ver-ticket" data-id="${ticket.idticket}">
-                    <i class="fas fa-eye"></i> Ver
+                <button class="btn btn-fsvsaon ver-ticket" data-id="${ticket.idticket}">
+                    <i class="far fa-eye mr-1"></i>Ver
                 </button>
             </td>
         `;

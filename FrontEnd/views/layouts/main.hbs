@@ -82,7 +82,7 @@
                         data-accordion="false">
                         <li class="nav-item" id="menuPlanillas">
                             <a href="/usuarios/usuarios/" class="nav-link" data-navigate tabindex="-1">
-                                <i class="nav-icon fas fa-tasks"></i>
+                                <i class="nav-icon fas fa-users"></i>
                                 <p>Usuarios</p>
                             </a>
                         </li>
@@ -101,7 +101,7 @@
                                 style="display: none;">
                                 <li class="nav-item">
                                     <a href="/tickets/tickets" class="nav-link" data-navigate>
-                                        <i class="nav-icon fas fa-pencil-alt"></i>
+                                        <i class="nav-icon fas fa-cogs"></i>
                                         <p>Gestionar</p>
                                     </a>
                                 </li>
@@ -113,7 +113,7 @@
                                 </li>
                                 <li class="nav-item">
                                     <a href="/tickets/registrotickets" class="nav-link" data-navigate>
-                                        <i class="nav-icon fas fa-pencil-alt"></i>
+                                        <i class="nav-icon fas fa-plus"></i>
                                         <p>Registrar</p>
                                     </a>
                                 </li>
@@ -135,7 +135,7 @@
                                 style="display: none;">
                                 <li class="nav-item">
                                     <a href="/inventario/registro" class="nav-link" data-navigate>
-                                        <i class="nav-icon fas fa-pencil-alt"></i>
+                                        <i class="nav-icon fas fa-plus"></i>
                                         <p>Registrar</p>
                                     </a>
                                 </li>
@@ -160,11 +160,39 @@
                             </ul>
                         </li>
                     </ul>
+
+                    <!-- Menú Bodega -->
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="false">
+                        <li class="nav-item" id="menuBodega">
+                            <a href="#" class="nav-link" id="toggleBodega">
+                                <i class="nav-icon fas fa-warehouse"></i> <!-- Icono de Bodega -->
+                                <p>Bodega
+                                    <i class="fas fa-chevron-down ml-auto" id="iconBodega"></i>
+                                </p>
+                            </a>
+                            <ul id="submenuBodega" class="nav nav-pills nav-sidebar flex-column"
+                                style="display: none;">
+                                <li class="nav-item">
+                                    <a href="/bodega/consultarbodega" class="nav-link" data-navigate>
+                                        <i class="nav-icon fas fa-search"></i>
+                                        <p>Consultar</p>
+                                    </a>
+                                </li>
+                                {{!-- <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-file-alt"></i>
+                                        <p>Reportes</p>
+                                    </a>
+                                </li> --}}
+                            </ul>
+                        </li>
+                    </ul>
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         <li class="nav-item" id="modificaciones">
                             <a href="/modificaciones/modificaciones" class="nav-link" data-navigate tabindex="-1">
-                                <i class="nav-icon fas fa-map-marked-alt"></i>
+                                <i class="nav-icon fas fa-file-signature"></i>
                                 <p>Modificaciones</p>
                             </a>
                         </li>

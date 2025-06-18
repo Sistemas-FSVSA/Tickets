@@ -3,7 +3,7 @@
 <header class="header">
     <h1>Mantenimiento</h1>
     <div class="header-right">
-        <button id="btnProgramarMantenimiento" class="btn btn-success" onclick="abrirModalMantenimiento()">Programar Mantenimiento</button>
+        <button id="btnProgramarMantenimiento" class="btn btn-fsvsaoff" onclick="abrirModalMantenimiento()"><i class="fas fa-clock mr-1"></i>Programar Mantenimiento</button>
         <div class="progreso-container">
             <label for="progresoBarra" class="small">Progreso:</label>
             <div class="progress">
@@ -18,7 +18,7 @@
 
 <div class="container-fluid mt-4">
     <div class="table-responsive">
-        <table id="mantenimiento" class="table table-striped table-bordered" style="width: 99%;">
+        <table id="mantenimiento" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>SN</th>
@@ -29,7 +29,7 @@
                     <th>Siguente Mantenimiento</th>
                     <th>Tecnico</th>
                     <th></th>
-                    <th>HVC</th>
+                    <th>Accion</th>
                 </tr>
             </thead>
             <tbody id="tbodymantenimiento">
@@ -55,7 +55,7 @@
                     <label for="serialInput" class="form-label">Serial (S/N)</label>
                     <div class="d-flex">
                         <input type="text" id="serialInput" class="form-control">
-                        <button id="btnBuscarSerial" class="btn btn-primary btn-sm ms-2" onclick="buscarPorSerial()">
+                        <button id="btnBuscarSerial" class="btn btn-fsvsaon ms-2" onclick="buscarPorSerial()">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -83,8 +83,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardarProgramacion">Programar</button>
+                <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal"><i class="fas fa-times mr-1"></i>Cancelar</button>
+                <button type="button" class="btn btn-fsvsaon" id="btnGuardarProgramacion"><i class="fas fa-plus mr-1"></i>Programar</button>
             </div>
         </div>
     </div>

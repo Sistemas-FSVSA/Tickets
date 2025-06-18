@@ -226,6 +226,13 @@ app.get("/configuraciones/horario", (req, res) => {
   res.render("configuraciones/horario");
 });
 
+app.get("/bodega/consultarbodega", (req, res) => {
+  if (req.xhr) {
+    return res.render("bodega/consultarbodega", { layout: false }); // Solo la vista
+  }
+  res.render("bodega/consultarbodega");
+});
+
 app.get("/config.js", (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
 

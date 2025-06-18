@@ -66,14 +66,14 @@ async function cargarHorarios() {
                         </div>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-warning btn-editar" data-id="${horario.id}">
-                            <i class="fas fa-edit"></i> Editar
+                        <button class="btn btn-sm btn-fsvsaoff btn-editar" data-id="${horario.id}">
+                            <i class="fas fa-pen mr-1"></i>Editar
                         </button>
-                        <button class="btn btn-sm btn-success btn-guardar d-none" data-id="${horario.id}">
-                            <i class="fas fa-save"></i> Guardar
+                        <button class="btn btn-sm btn-fsvsaon btn-guardar d-none" data-id="${horario.id}">
+                            <i class="fas fa-save mr-1"></i>Guardar
                         </button>
-                        <button class="btn btn-sm btn-danger btn-cancelar d-none" data-id="${horario.id}">
-                            <i class="fas fa-times"></i> Cancelar
+                        <button class="btn btn-sm btn-fsvsaoff btn-cancelar d-none" data-id="${horario.id}">
+                            <i class="fas fa-times mr-1"></i>Cancelar
                         </button>
                     </td>
                 `;
@@ -236,14 +236,19 @@ function cancelarEdicion(id) {
     const tr = document.querySelector(`tr[data-id="${id}"]`);
     if (!tr) return;
 
-    // Obtener valores originales
-    const horaInicioOriginal = tr.querySelector('.hora-inicio-col .hora-texto').textContent;
-    const horaFinOriginal = tr.querySelector('.hora-fin-col .hora-texto').textContent;
-    const estadoOriginal = tr.dataset.estadoOriginal === 'true'; // Convertir a boolean
+    // Obtener valores originales (en formato AM/PM)
+    const horaInicioAMPM = tr.querySelector('.hora-inicio-col .hora-texto').textContent;
+    const horaFinAMPM = tr.querySelector('.hora-fin-col .hora-texto').textContent;
+    
+    // Convertir de AM/PM a formato 24 horas para los inputs
+    const horaInicio24 = convertirAMPMa24Horas(horaInicioAMPM);
+    const horaFin24 = convertirAMPMa24Horas(horaFinAMPM);
+    
+    const estadoOriginal = tr.dataset.estadoOriginal === 'true';
 
-    // Restaurar valores en los inputs
-    tr.querySelector('.hora-inicio-col .hora-input').value = horaInicioOriginal;
-    tr.querySelector('.hora-fin-col .hora-input').value = horaFinOriginal;
+    // Restaurar valores en los inputs (en formato 24 horas)
+    tr.querySelector('.hora-inicio-col .hora-input').value = horaInicio24;
+    tr.querySelector('.hora-fin-col .hora-input').value = horaFin24;
 
     // Restaurar estado original del switch
     const checkbox = tr.querySelector('.toggle-estado');
@@ -259,6 +264,28 @@ function cancelarEdicion(id) {
     tr.querySelector('.btn-editar').classList.remove('d-none');
     tr.querySelector('.btn-guardar').classList.add('d-none');
     tr.querySelector('.btn-cancelar').classList.add('d-none');
+}
+
+// Función para convertir formato AM/PM a 24 horas
+function convertirAMPMa24Horas(horaAMPM) {
+    try {
+        const [horaMinuto, periodo] = horaAMPM.split(' ');
+        let [horas, minutos] = horaMinuto.split(':');
+        
+        horas = parseInt(horas, 10);
+        minutos = minutos || '00';
+        
+        if (periodo === 'PM' && horas < 12) {
+            horas += 12;
+        } else if (periodo === 'AM' && horas === 12) {
+            horas = 0;
+        }
+        
+        return `${String(horas).padStart(2, '0')}:${minutos}`;
+    } catch (error) {
+        console.error('Error al convertir hora:', error);
+        return horaAMPM; // Devuelve el original si hay error
+    }
 }
 
 // Función reutilizable para llamar al backend
