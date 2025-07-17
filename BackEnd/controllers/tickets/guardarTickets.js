@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const { DateTime } = require('luxon');
 
-const templateClientePath = path.join(__dirname, '../../templates/ticketEmail.html');
+const templateClientePath = path.join(__dirname, '../../templates/cliente.html');
 const templateSoportePath = path.join(__dirname, '../../templates/soporte.html');
 
 async function getEmailConfig() {
