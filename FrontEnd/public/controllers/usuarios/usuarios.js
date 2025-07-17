@@ -77,6 +77,7 @@ function renderizarUsuarios() {
             usuario.documento,
             switchEstado,
             usuario.correo || "No hay correo",
+            //usuario.contrasena ? "********" : "No hay contraseña",
             botonEditar
         ]);
     });
@@ -219,6 +220,7 @@ function editarUsuario(idusuario) {
                 $("#apellidos").val(usuario.apellidos);
                 $("#documento").val(usuario.documento);
                 $("#correo").val(usuario.correo || "");
+                $("#contrasena").val("");
                 $("#estado").val(usuario.estado);
 
                 // Mostrar el modal
@@ -237,6 +239,12 @@ async function guardarCambios() {
         documento: $("#documento").val(),
         correo: $("#correo").val(),
     };
+
+    // Solo incluir la contraseña si el usuario la cambia
+    const nuevaContrasena = $("#contrasena").val();
+    if (nuevaContrasena) {
+        data.contrasena = nuevaContrasena;
+    }
 
     try {
         const response = await fetch(`${url}/api/usuarios/actualizarUsuario`, {
@@ -271,13 +279,87 @@ async function guardarCambios() {
     }
 }
 
+function registrarUsuario() {
+    const nombres = document.getElementById("nombresRegistro").value;
+    const apellidos = document.getElementById("apellidosRegistro").value;
+    const documento = document.getElementById("documentoRegistro").value;
+    const contrasena = document.getElementById("contrasenaRegistro").value;
+    const correo = document.getElementById("correoRegistro").value;
+
+    if (!nombres || !apellidos || !documento || !contrasena) {
+        Swal.fire({
+            icon: "error",
+            title: "Campos incompletos",
+            text: "Por favor, completa todos los campos.",
+            timer: 1500,
+            showConfirmButton: false
+        });
+        return;
+    }
+
+    fetch(`${url}/api/usuarios/registrarUsuario`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ nombres, apellidos, documento, contrasena, correo }),
+    })
+        .then((response) => response.json())
+        .then((result) => {
+            if (result.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Usuario registrado",
+                    text: "El usuario se ha registrado correctamente.",
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    cargarUsuarios();
+                    $("#modalRegistrarUsuario").modal("hide");
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: result.message || "No se pudo registrar el usuario.",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        })
+        .catch(error => console.error("Error al registrar usuario:", error));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const formRegistro = document.getElementById("formRegistrarUsuario");
+    const btnGuardar = document.getElementById("guardarRegistro");
+
+    if (formRegistro && btnGuardar) {
+        btnGuardar.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            if (formRegistro.checkValidity() === false) {
+                formRegistro.classList.add("was-validated");
+                return;
+            }
+
+            registrarUsuario();
+        });
+
+        // Opcional: limpiar validación al cerrar el modal
+        $("#modalRegistrarUsuario").on("hidden.bs.modal", function () {
+            formRegistro.reset();
+            formRegistro.classList.remove("was-validated");
+        });
+    }
+});
+
 document.addEventListener("DOMContentLoaded", function () {
     const documentoRegistroInput = document.getElementById("documentoRegistro");
 
     if (documentoRegistroInput) {
         documentoRegistroInput.addEventListener("keydown", function (e) {
             if (
-                (e.key >= "0" && e.key <= "9") || 
+                (e.key >= "0" && e.key <= "9") ||
                 ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Enter"].includes(e.key)
             ) {
                 return;

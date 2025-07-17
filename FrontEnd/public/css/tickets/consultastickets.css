@@ -23,3 +23,11 @@ table td:nth-child(5) { /* Detalle */
     color: #050505;  
     margin-bottom: 20px; 
 }
+
+/* Truncar columna detalle con puntos suspensivos */
+.truncar-texto {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 1px;
+}

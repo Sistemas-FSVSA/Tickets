@@ -52,22 +52,6 @@
       width: 25%;
     }
 
-    ul ul ul ul {
-      list-style-type: disc !important;
-    }
-
-    ol ol {
-      list-style-type: lower-roman !important;
-    }
-
-    ol ol ol {
-      list-style-type: lower-latin !important;
-    }
-
-    ol ol ol ol {
-      list-style-type: decimal !important;
-    }
-
     @media screen and (max-width:480px) {
 
       .preheader .rightColumnContent,
@@ -149,7 +133,7 @@
                 </tr>
                 <tr>
                   <td colspan="3">
-                    <p><strong>Hola! </strong>Han generado un Ticket</p>
+                    <p><strong>Hola! {{username}}</strong></p>
                   </td>
                 </tr>
                 <tr>
@@ -157,53 +141,47 @@
                 </tr>
                 <tr align="center">
                   <td colspan="3">
-                    <p>Información del Ticket</p>
+                    <p>¡Nos alegra saludarte!</p>
                   </td>
                 </tr>
                 <tr>
                   <td colspan="3" height="25"></td>
                 </tr>
-                <!-- Usuario -->
-                <tr>
-                  <td colspan="3">
-                    <p><strong>Usuario:</strong> {{username}}</p>
+                <tr align="center">
+                  <td colspan="2">
+                    <p>
+                      Queremos comunicarte que tu ticket <strong>ID: {{idticket}}</strong> ha sido gestionado.
+                    </p>
                   </td>
                 </tr>
-                <!-- Fecha -->
+
+                <!-- NUEVA SECCIÓN CON TEMA, SUBTEMA, DETALLES, OBSERVACIONES -->
                 <tr>
                   <td colspan="3">
-                    <p><strong>Fecha:</strong> {{fecha}}</p>
+                    <table align="center" width="560px" style="margin-top: 20px; border-collapse: collapse;">
+                      <!-- Fila 1: Tema y Subtema en dos columnas -->
+                      <tr>
+                        <td style="width: 50%; padding: 8px;"><strong>Tema:</strong> {{tema}}</td>
+                        <td style="width: 50%; padding: 8px;"><strong>Subtema:</strong> {{subtema}}</td>
+                      </tr>
+                      <!-- Fila 2: Detalles ocupando las dos columnas -->
+                      <tr>
+                        <td colspan="2" style="padding: 8px;"><strong>Detalles:</strong> {{detalle}}</td>
+                      </tr>
+                      <!-- Fila 3: Observaciones también en ambas columnas -->
+                      <tr>
+                        <td colspan="2" style="padding: 8px;"><strong>Observaciones:</strong> {{observacion}}</td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
-                <!-- Dependencia -->
-                <tr>
-                  <td colspan="3">
-                    <p><strong>Dependencia:</strong> {{dependencia}}</p>
-                  </td>
-                </tr>
-                <!-- Tema -->
-                <tr>
-                  <td colspan="3">
-                    <p><strong>Tema:</strong> {{tema}}</p>
-                  </td>
-                </tr>
-                <!-- SubTema -->
-                <tr>
-                  <td colspan="3">
-                    <p><strong>Subtema:</strong> {{subtema}}</p>
-                  </td>
-                </tr>
-                <!-- Descripción -->
-                <tr>
-                  <td colspan="3">
-                    <p><strong>Descripción:</strong> {{descripcion}}</p>
-                  </td>
-                </tr>
+
+                <!-- FIN DE NUEVA SECCIÓN -->
+
                 <tr>
                   <td colspan="3" height="30"></td>
                 </tr>
               </table>
-
             </td>
           </tr>
           <tr>

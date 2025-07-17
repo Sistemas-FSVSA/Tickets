@@ -115,6 +115,46 @@ function contadorCaracteres() {
     });
 }
 
+// Cuando el usuario selecciona un tema
+document.getElementById('tema').addEventListener('change', async function () {
+    const temaId = this.value;
+    const subtemaContainer = document.getElementById('subtema-container');
+    const subtemaSelect = document.getElementById('subtema');
+
+    // Limpia el select de subtemas
+    subtemaSelect.innerHTML = '<option value="">Selecciona un subtema</option>';
+
+    if (temaId) {
+        try {
+            const response = await fetch(`${url}/api/tickets/obtenerSubtemas?idtema=${temaId}`, {
+                method: 'GET',
+            });
+            const data = await response.json();
+
+            if (data.subtemas && data.subtemas.length > 0) {
+                data.subtemas.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.idsubtema;
+                    option.textContent = sub.descripcion;
+                    subtemaSelect.appendChild(option);
+                });
+                subtemaContainer.style.display = '';
+                subtemaSelect.disabled = false;
+            } else {
+                subtemaContainer.style.display = 'none';
+                subtemaSelect.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error al cargar subtemas:', error);
+            //subtemaContainer.style.display = 'none';
+            subtemaSelect.disabled = false; // Deshabilitar el select si hay error
+        }
+    } else {
+        //subtemaContainer.style.display = 'none';
+        subtemaSelect.disabled = false;
+    }
+});
+
 // Función para manejar la carga de archivos
 function handleFileUpload(allowedTypes, callback) {
     const fileInput = document.createElement('input');
@@ -206,15 +246,21 @@ form.onsubmit = function (e) {
     const temaId = document.getElementById('tema').value;
     const dependenciaNombre = document.getElementById('dependencia').options[document.getElementById('dependencia').selectedIndex].text;
     const temaNombre = document.getElementById('tema').options[document.getElementById('tema').selectedIndex].text;
+    const subtemaId = document.getElementById('subtema').value;
+    const subtemaNombre = document.getElementById('subtema').options[document.getElementById('subtema').selectedIndex].text;
+    const temaCompleto = `${temaNombre} - ${subtemaNombre}`;
+
 
     const cleanedDescripcion = quill.getText().trim();
 
     const formData = new FormData(form);
     formData.set('dependencia', dependenciaId);
     formData.set('tema', temaId);
+    formData.set('idsubtema', subtemaId);
+    formData.set('subtema', subtemaNombre);
     formData.set('descripcion', cleanedDescripcion);
     formData.set('dependenciaNombre', dependenciaNombre);
-    formData.set('temaNombre', temaNombre);
+    formData.set('temaNombre', temaCompleto);
 
     imageFiles.forEach(file => formData.append('images[]', file));
     uploadedFiles.forEach(file => formData.append('files[]', file));

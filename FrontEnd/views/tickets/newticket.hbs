@@ -31,20 +31,26 @@
                 <input type="text" id="username" name="username" class="form-control" maxlength="50" required>
             </div>
             <!-- Dependencia -->
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <label for="dependencia" class="form-label">Dependencia</label>
                 <select id="dependencia" name="dependencia" class="form-select" required>
                 </select>
             </div>
+            <div class="col-md-6">
+                <label for="extension" class="form-label">EXT</label>
+                <input type="text" id="extension" name="extension" class="form-control" maxlength="10">
+            </div>
             <!-- Tema de Ayuda -->
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <label for="tema" class="form-label">Tema de Ayuda</label>
                 <select id="tema" name="tema" class="form-select" required>
                 </select>
             </div>
-            <div class="col-md-2">
-                <label for="extension" class="form-label">EXT</label>
-                <input type="text" id="extension" name="extension" class="form-control" maxlength="10">
+            <!-- Subtema de Ayuda (inicialmente oculto o deshabilitado) -->
+            <div class="col-md-6" id="subtema-container">
+                <label for="subtema" class="form-label">Subtema</label>
+                <select id="subtema" name="subtema" class="form-select" required>
+                </select>
             </div>
             <!-- Descripción del Problema -->
             <div class="col-md-12">
@@ -61,7 +67,7 @@
 
             <!-- Botón de Enviar -->
             <div class="col-12 text-center">
-                <button type="submit" class="btn btn-custom w-50">Enviar Ticket</button>
+                <button type="submit" class="btn btn-fsvsaoff w-50">Enviar Ticket</button>
             </div>
         </form>
     </div>

@@ -14,7 +14,8 @@ const { obtenerDependencias } = require('../controllers/tickets/obtenerDependenc
 const { obtenerTemas } = require('../controllers/tickets/obtenerTemas')
 const { obtenerDatos } = require('../controllers/tickets/obtenerDatos');
 const { guardarDatos } = require('../controllers/tickets/guardarDatos');
-const { actualizarDatos } = require('../controllers/tickets/actualizarDatos');
+const { actualizarDatos } = require('../controllers/tickets/actualizarDatos'); 
+const { obtenerSubtemas } = require('../controllers/tickets/obtenerSubtemas'); 
 
 const authenticateToken = require('../models/authMiddleware');
 const { uploadFields } = require('../models/multer');
@@ -33,5 +34,6 @@ router.get('/obtenerTemas', rateLimiterFast, obtenerTemas);
 router.get('/obtenerDatos', authenticateToken, rateLimiterFast, obtenerDatos);
 router.post('/guardarDatos', authenticateToken, rateLimiterFast, guardarDatos);
 router.post('/actualizarDatos', authenticateToken, rateLimiterFast, actualizarDatos);
+router.get('/obtenerSubtemas', rateLimiterFast, obtenerSubtemas);
 
 module.exports = router;
