@@ -1,61 +1,50 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // --- Autenticación y Permisos ---
   const url = window.env.API_URL;
 
   const form = document.getElementById("followform");
   const ticketInfoDiv = document.getElementById("ticket-info");
-  const anotherTicketContainer = document.getElementById(
-    "another-ticket-container"
-  );
+  const anotherTicketContainer = document.getElementById("another-ticket-container");
   const ticketInput = document.getElementById("ticket");
   const emailInput = document.getElementById("email");
 
-  // Función para dar formato a la fecha en formato 12 horas (AM/PM) sin conversión de zona horaria
   function formatearFecha(fecha) {
-    const dateObj = new Date(fecha); // Convertimos la fecha a un objeto Date
-
-    const year = dateObj.getUTCFullYear(); // Obtenemos el año en formato UTC
-    const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0"); // Mes en formato 2 dígitos (UTC)
-    const day = String(dateObj.getUTCDate()).padStart(2, "0"); // Día en formato 2 dígitos (UTC)
-
-    let hours = dateObj.getUTCHours(); // Usamos la hora en formato UTC
-    const minutes = String(dateObj.getUTCMinutes()).padStart(2, "0"); // Minutos en formato 2 dígitos (UTC)
-    const isPM = hours >= 12; // Verificar si es PM o AM
-
-    hours = hours % 12; // Convertir hora a formato 12 horas
-    hours = hours ? String(hours).padStart(2, "0") : "12"; // Si la hora es 0 (medianoche), mostramos 12
-    const period = isPM ? "PM" : "AM"; // Determinamos AM o PM
-
-    // Retornamos la fecha en el formato deseado
+    if (!fecha) return "";
+    const dateObj = new Date(fecha);
+    const year = dateObj.getUTCFullYear();
+    const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getUTCDate()).padStart(2, "0");
+    let hours = dateObj.getUTCHours();
+    const minutes = String(dateObj.getUTCMinutes()).padStart(2, "0");
+    const isPM = hours >= 12;
+    hours = hours % 12;
+    hours = hours ? String(hours).padStart(2, "0") : "12";
+    const period = isPM ? "PM" : "AM";
     return `${year}-${month}-${day} ${hours}:${minutes} ${period}`;
   }
 
-  // Validar que solo se permitan números en el input de ticket
   if (ticketInput) {
     ticketInput.addEventListener("keydown", function (e) {
       if (
-        (e.key >= "0" && e.key <= "9") || // Números
-        e.key === "Backspace" || // Retroceso
-        e.key === "Tab" || // Tabulación
-        e.key === "ArrowLeft" || // Flecha izquierda
-        e.key === "ArrowRight" || // Flecha derecha
-        e.key === "Delete" || // Suprimir
-        e.key === "Enter" // Enter
+        (e.key >= "0" && e.key <= "9") ||
+        e.key === "Backspace" ||
+        e.key === "Tab" ||
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight" ||
+        e.key === "Delete" ||
+        e.key === "Enter"
       ) {
-        return; // Permitir estas teclas
+        return;
       } else {
-        e.preventDefault(); // Bloquear cualquier otra tecla
+        e.preventDefault();
       }
     });
   }
 
-  // Evento submit del formulario
   form.onsubmit = function (e) {
     e.preventDefault();
     const idticket = ticketInput.value.trim();
     const email = emailInput.value.trim();
 
-    // Validar el correo
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       Swal.fire({
         title: "Error",
@@ -65,37 +54,60 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Realizar solicitud fetch
     fetch(`${url}/api/tickets/obtenerInfoTickets`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ idticket, email }),
     })
       .then((response) => response.json())
       .then((result) => {
         if (result.estado === "ok") {
-          form.querySelector('button[type="submit"]').style.display = "none"; // Ocultar el botón de enviar
+          const ticket = result.ticket;
+          form.querySelector('button[type="submit"]').style.display = "none";
           ticketInfoDiv.style.display = "flex";
-          const fechaFormateada = formatearFecha(result.ticket.fechainicio);
+
+          const fechaFormateada = formatearFecha(ticket.fechainicio);
+
+          // ✅ Validar observaciones
+          const observacionMostrada =
+            ticket.observacion && ticket.observacion.trim() !== ""
+              ? ticket.observacion
+              : "El ticket aún no ha sido gestionado";
+
+          const detalleMostrado =
+            ticket.detalle && ticket.detalle.trim() !== ""
+              ? ticket.detalle
+              : "No le fueron proporcionados detalles a este ticket.";
+
           ticketInfoDiv.innerHTML = `
-                        <div class="col">
-                            <p><strong>Correo:</strong> ${result.ticket.correo}</p>
-                            <p><strong>Usuario:</strong> ${result.ticket.usuario}</p>
-                            <p><strong>Dependencia:</strong> ${result.ticket.dependencia}</p>
-                            <p><strong>Extensión:</strong> ${result.ticket.ext}</p>
-                        </div>
-                        <div class="col">
-                            <p><strong>Estado:</strong> ${result.ticket.estado}</p>
-                            <p><strong>Fecha de Inicio:</strong> ${fechaFormateada}</p>
-                            <p><strong>Tema:</strong> ${result.ticket.tema}</p>
-                            <p><strong>Detalle:</strong> ${result.ticket.detalle}</p>
-                        </div>
-                    `;
-          anotherTicketContainer.style.display = "block"; // Mostrar botón de nuevo ticket
-          ticketInput.disabled = true; // Deshabilitar el input del ticket
-          emailInput.disabled = true; // Deshabilitar el input del correo
+            <div class="col">
+                <p><strong>Correo:</strong> ${ticket.correo}</p>
+                <p><strong>Dependencia:</strong> ${ticket.dependencia}</p>
+                <p><strong>Extensión:</strong> ${ticket.ext}</p>
+            </div> 
+            <div class="col">
+                <p><strong>Tema:</strong> ${ticket.tema}</p>
+                <p><strong>Subtema:</strong> ${ticket.subtema}</p>
+            </div>
+            <div>
+                <p><strong>Detalle:</strong> ${detalleMostrado}</p>
+            </div>
+            <div class="col-12 mt-4" id="timeline">
+                ${crearLineaProgreso(ticket)}
+                <div class="d-flex justify-content-between align-items-center px-4">
+                    ${crearPaso("enviado", "fa-envelope", "ENVIADO", formatearFecha(ticket.fechainicio))}
+                    ${crearPaso("visto", "fa-eye", "VISTO", formatearFecha(ticket.fechaleido))}
+                    ${crearPaso("gestionado-cerrado", "fa-check", "GESTIONADO/CERRADO", formatearFecha(ticket.fechacierre))}
+                </div>
+            </div>
+            <div class="col">
+              <p class="observacion-texto"><strong>Observaciones:</strong> ${observacionMostrada}</p>
+            </div>
+          `;
+
+          anotherTicketContainer.style.display = "block";
+          ticketInput.disabled = true;
+          emailInput.disabled = true;
         } else {
           Swal.fire({
             title: "Error",
@@ -113,28 +125,123 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
   };
-  // Función para resetear el formulario
-  function resetForm() {
-    form.reset(); // Reiniciar los valores del formulario
 
-    // Habilitar los campos
+  function crearPaso(id, iconClass, titulo, fecha) {
+    const isActivo = fecha !== null && fecha !== undefined && fecha !== "";
+    const dotClass = isActivo ? "dot active" : "dot";
+    const fechaHTML = isActivo ? `<div><small>${fecha}</small></div>` : "";
+    return `
+    <div class="step">
+      <div class="${dotClass}"><span class="icon"><i class="fas ${iconClass}"></i></span></div>
+      <small>${titulo}</small>
+      ${fechaHTML}
+    </div>
+  `;
+  }
+
+
+
+  function crearLineaProgreso(ticket) {
+    let porcentaje = 0;
+    if (ticket.fechainicio) porcentaje += 33.33;
+    if (ticket.fechaleido) porcentaje += 33.33;
+    if (ticket.fechacierre) porcentaje = 100;
+
+    return `
+    <div class="progress-track">
+      <div class="progress-bar-fill" style="width: ${porcentaje}%"></div>
+    </div>
+  `;
+  }
+
+
+  function resetForm() {
+    form.reset();
     ticketInput.disabled = false;
     emailInput.disabled = false;
-
-    // Ocultar la información del ticket y el botón de "otro ticket"
     ticketInfoDiv.style.display = "none";
-    ticketInfoDiv.innerHTML = ""; // Limpiar el contenido
+    ticketInfoDiv.innerHTML = "";
     anotherTicketContainer.style.display = "none";
-
-    // Mostrar nuevamente el botón de enviar
     form.querySelector('button[type="submit"]').style.display = "block";
   }
 
+  function refrescarTicket() {
+    const idticket = ticketInput.value.trim();
+    const email = emailInput.value.trim();
+
+    if (!idticket || !email) return;
+
+    fetch(`${url}/api/tickets/obtenerInfoTickets`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idticket, email }),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.estado === "ok") {
+          const ticket = result.ticket;
+          const fechaFormateada = formatearFecha(ticket.fechainicio);
+
+          // ✅ Validar observaciones
+          const observacionMostrada =
+            ticket.observacion && ticket.observacion.trim() !== ""
+              ? ticket.observacion
+              : "El ticket aún no ha sido gestionado";
+
+          ticketInfoDiv.innerHTML = `
+          <div class="col">
+              <p><strong>Correo:</strong> ${ticket.correo}</p>
+              <p><strong>Dependencia:</strong> ${ticket.dependencia}</p>
+              <p><strong>Extensión:</strong> ${ticket.ext}</p>
+          </div>
+          <div class="col">
+              <p><strong>Tema:</strong> ${ticket.tema}</p>
+              <p><strong>Subtema:</strong> ${ticket.subtema}</p>
+          </div>
+          <div>
+              <p><strong>Detalle:</strong> ${ticket.detalle}</p>
+          </div>
+          <div class="col-12 mt-4 position-relative" id="timeline">
+              ${crearLineaProgreso(ticket)}
+              <div class="d-flex justify-content-between align-items-center px-4 position-relative" style="z-index: 2;">
+                  ${crearPaso("enviado", "fa-envelope", "ENVIADO", formatearFecha(ticket.fechainicio))}
+                  ${crearPaso("visto", "fa-eye", "VISTO", formatearFecha(ticket.fechaleido))}
+                  ${crearPaso("gestionado-cerrado", "fa-check", "GESTIONADO/CERRADO", formatearFecha(ticket.fechacierre))}
+              </div>
+          </div>
+          <div class="col">
+            <p style="white-space: pre-wrap;"><strong>Observaciones:</strong> ${observacionMostrada}</p>
+          </div>
+
+        `;
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: result.mensaje || "No se encontró el ticket.",
+            icon: "error",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        Swal.fire({
+          title: "Error",
+          text: "Hubo un error al actualizar la información.",
+          icon: "error",
+        });
+      });
+  }
+
+
   window.resetForm = resetForm;
 
-  // Asignar la función resetForm al botón "Ingresar otro ticket"
   const resetButton = anotherTicketContainer.querySelector("button");
   if (resetButton) {
     resetButton.addEventListener("click", resetForm);
+  }
+
+  const refreshButton = document.getElementById("refreshTicketBtn");
+  if (refreshButton) {
+    refreshButton.addEventListener("click", refrescarTicket);
   }
 });

@@ -1,9 +1,8 @@
-const { ticketsPoolPromise, sistemasPoolPromise } = require('../../db/conexion');
+const { ticketsPoolPromise } = require('../../db/conexion');
 
 const obtenerSubtemas = async (req, res) => {
     try {
-        // Puedes filtrar por idtema si lo envías por query o body
-        const { idtema } = req.query; // o req.body si usas POST
+        const { idtema } = req.query; // Recibe el idtema (tema seleccionado)
 
         let query = `
             SELECT idsubtema, idtema, descripcion, estado
@@ -11,13 +10,16 @@ const obtenerSubtemas = async (req, res) => {
             WHERE estado = 1
         `;
 
-        if (idtema) {
-            query += ' AND idtema = @idtema';
-        }
-
         const pool = await ticketsPoolPromise;
         const request = pool.request();
-        if (idtema) request.input('idtema', idtema);
+
+        if (idtema) {
+            query += ' AND idtema = @idtema';
+            request.input('idtema', idtema);
+        }
+
+        // Ordenar los subtemas por descripcion (alfabéticamente)
+        query += ' ORDER BY descripcion ASC';
 
         const result = await request.query(query);
 

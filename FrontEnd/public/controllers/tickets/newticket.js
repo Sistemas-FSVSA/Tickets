@@ -116,7 +116,7 @@ function contadorCaracteres() {
 }
 
 // Cuando el usuario selecciona un tema
-document.getElementById('tema').addEventListener('change', async function() {
+document.getElementById('tema').addEventListener('change', async function () {
     const temaId = this.value;
     const subtemaContainer = document.getElementById('subtema-container');
     const subtemaSelect = document.getElementById('subtema');
@@ -247,16 +247,20 @@ form.onsubmit = function (e) {
     const dependenciaNombre = document.getElementById('dependencia').options[document.getElementById('dependencia').selectedIndex].text;
     const temaNombre = document.getElementById('tema').options[document.getElementById('tema').selectedIndex].text;
     const subtemaId = document.getElementById('subtema').value;
+    const subtemaNombre = document.getElementById('subtema').options[document.getElementById('subtema').selectedIndex].text;
+    const temaCompleto = `${temaNombre} - ${subtemaNombre}`;
+
 
     const cleanedDescripcion = quill.getText().trim();
 
     const formData = new FormData(form);
     formData.set('dependencia', dependenciaId);
     formData.set('tema', temaId);
-    formData.set('subtema', subtemaId);
+    formData.set('idsubtema', subtemaId);
+    formData.set('subtema', subtemaNombre);
     formData.set('descripcion', cleanedDescripcion);
     formData.set('dependenciaNombre', dependenciaNombre);
-    formData.set('temaNombre', temaNombre);
+    formData.set('temaNombre', temaCompleto);
 
     imageFiles.forEach(file => formData.append('images[]', file));
     uploadedFiles.forEach(file => formData.append('files[]', file));

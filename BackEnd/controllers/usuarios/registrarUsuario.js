@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt'); // Importa bcrypt
 async function registrarUsuario(req, res) {
     try {
         const { nombres, apellidos, documento, contrasena, correo } = req.body;
-        if (!nombres || !apellidos || !documento || !contrasena || !correo) {
+        if (!nombres || !apellidos || !documento || !contrasena ) {
             return res.status(400).json({ success: false, message: 'Faltan campos obligatorios.' });
         }
 
