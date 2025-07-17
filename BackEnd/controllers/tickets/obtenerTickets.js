@@ -49,6 +49,27 @@ const obtenerTickets = async (req, res) => {
 
             const ticket = ticketResult.recordset[0];
 
+            if (ticket.idusuario) {
+                const sistemasPool = await sistemasPoolPromise;
+                const responsableQuery = `
+        SELECT nombres, apellidos
+        FROM responsable
+        WHERE idresponsable = @idusuario
+    `;
+                const responsableResult = await sistemasPool.request()
+                    .input('idusuario', ticket.idusuario)
+                    .query(responsableQuery);
+
+                if (responsableResult.recordset.length > 0) {
+                    ticket.nombresUsuario = responsableResult.recordset[0].nombres;
+                    ticket.apellidosUsuario = responsableResult.recordset[0].apellidos;
+                } else {
+                    ticket.nombresUsuario = null;
+                    ticket.apellidosUsuario = null;
+                }
+            }
+
+
             if (estado) {
                 const updateQuery = `UPDATE ticket SET estado = @estado, fechaleido = GETDATE() WHERE idticket = @idticket`;
                 await ticketsPool.request()
