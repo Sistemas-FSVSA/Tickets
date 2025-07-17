@@ -4,17 +4,22 @@ body {
   font-family: Arial, sans-serif;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Asegura que el contenido se alinee hacia la parte superior */
+  align-items: flex-start;
+  /* Asegura que el contenido se alinee hacia la parte superior */
   height: 100vh;
   margin: 0;
   padding: 0;
-  min-height: 100vh; /* Asegura que el body ocupe toda la altura de la pantalla */
-  overflow: auto; /* Permite el desplazamiento si el contenido es muy largo */
+  min-height: 100vh;
+  /* Asegura que el body ocupe toda la altura de la pantalla */
+  overflow: auto;
+  /* Permite el desplazamiento si el contenido es muy largo */
 }
 
 .card {
-  width: 100%; /* Ocupa todo el ancho disponible */
-  max-width: 800px; /* Máximo 800px de ancho */
+  width: 100%;
+  /* Ocupa todo el ancho disponible */
+  max-width: 800px;
+  /* Máximo 800px de ancho */
   background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -24,17 +29,21 @@ body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Mantiene el contenido alineado desde la parte superior */
-  min-height: 60vh; /* Asegura que la tarjeta tenga suficiente altura para contenido completo */
+  justify-content: flex-start;
+  /* Mantiene el contenido alineado desde la parte superior */
+  min-height: 60vh;
+  /* Asegura que la tarjeta tenga suficiente altura para contenido completo */
 }
 
 h1 {
   font-size: 2rem;
-  margin-top: 0; /* Elimina el margen superior para el título */
+  margin-top: 0;
+  /* Elimina el margen superior para el título */
 }
 
 #editor {
-  height: 500px; /* Aumenta la altura del área de descripción */
+  height: 500px;
+  /* Aumenta la altura del área de descripción */
 }
 
 #editor img {
@@ -74,44 +83,119 @@ h1 {
 
 /* Aumentar el tamaño de los iconos en la toolbar */
 .ql-toolbar .ql-formats button {
-    padding: 1px;    /* Ajustar el espacio alrededor de los iconos */
+  padding: 1px;
+  /* Ajustar el espacio alrededor de los iconos */
 }
 
 /* Si también quieres ajustar el tamaño de los iconos dentro de la caja de texto */
 .ql-container .ql-editor {
-    font-size: 13px;  /* Ajusta el tamaño del texto dentro del editor */
+  font-size: 13px;
+  /* Ajusta el tamaño del texto dentro del editor */
 }
 
 /* Ajustes responsivos para pantallas pequeñas */
 @media (max-width: 576px) {
   body {
-      padding: 0 10px;
-      justify-content: flex-start; /* Mantiene la tarjeta hacia la parte superior */
-      align-items: flex-start; /* Centrado vertical no es necesario */
+    padding: 0 10px;
+    justify-content: flex-start;
+    /* Mantiene la tarjeta hacia la parte superior */
+    align-items: flex-start;
+    /* Centrado vertical no es necesario */
   }
 
   .card {
-      margin-top: 10px;
-      margin-bottom: 10px;
-      padding: 15px;
-      width: 100%; /* La tarjeta ocupa el 100% del ancho disponible */
-      min-height: auto; /* El contenido se ajusta al contenido de la tarjeta */
-      box-sizing: border-box;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 15px;
+    width: 100%;
+    /* La tarjeta ocupa el 100% del ancho disponible */
+    min-height: auto;
+    /* El contenido se ajusta al contenido de la tarjeta */
+    box-sizing: border-box;
   }
 
   h1 {
-      font-size: 1.5rem; /* Ajustar el tamaño del título */
+    font-size: 1.5rem;
+    /* Ajustar el tamaño del título */
   }
 
   .btn-custom {
-      width: 100%; /* Botón de envío a todo el ancho */
+    width: 100%;
+    /* Botón de envío a todo el ancho */
   }
 
-  .col-md-6, .col-md-5, .col-md-2 {
-      width: 100%; /* Asegurarse de que todos los campos ocupen el 100% del ancho */
+  .col-md-6,
+  .col-md-5,
+  .col-md-2 {
+    width: 100%;
+    /* Asegurarse de que todos los campos ocupen el 100% del ancho */
   }
 
   .d-flex {
-      flex-direction: column; /* Asegura que los elementos dentro del flexbox se apilen en pantallas pequeñas */
+    flex-direction: column;
+    /* Asegura que los elementos dentro del flexbox se apilen en pantallas pequeñas */
   }
+}
+
+.swal-cancel-button {
+  background-color: #96072d !important;
+  /* Rojo Oscuro*/
+  color: white !important;
+  border-radius: 5px !important;
+  padding: 8px 16px !important;
+  font-size: 16px !important;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out !important;
+}
+
+.swal-cancel-button:hover {
+  background-color: #c24d4d !important;
+  /* Rojo más claro */
+  transform: scale(1.05) !important;
+}
+
+.btn-fsvsaoff {
+  background-color: #96072d;
+  /* Rojo oscuro */
+  color: white;
+  border-radius: 5px;
+  font-size: 15px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.btn-fsvsaoff:hover {
+  background-color: #c24d4d !important;
+  /* Rojo más claro */
+  transform: scale(1.05);
+}
+
+
+.swal-confirm-button {
+  background-color: #163c64 !important;
+  /* Verde */
+  color: white !important;
+  border-radius: 5px !important;
+  padding: 8px 16px !important;
+  font-size: 16px !important;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out !important;
+}
+
+/* Efecto hover */
+.swal-confirm-button:hover {
+  background-color: #295c92 !important;
+  /* Verde más oscuro */
+  transform: scale(1.05) !important;
+}
+
+.btn-fsvsaon {
+  background-color: #163c64;
+  color: white;
+  border-radius: 5px;
+  font-size: 15px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.btn-fsvsaon:hover {
+  background-color: #2e5c8d !important;
+  /* Rojo más claro */
+  transform: scale(1.05);
 }

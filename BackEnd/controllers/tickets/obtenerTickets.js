@@ -2,7 +2,7 @@ const { ticketsPoolPromise, sistemasPoolPromise } = require('../../db/conexion')
 
 const obtenerTickets = async (req, res) => {
     try {
-        const { idticket, estado, filtro } = req.body; // Ahora recibimos "filtro"
+        const { idticket, estado, filtro } = req.body;
         const ticketsPool = await ticketsPoolPromise;
 
         const getNombreDependencia = async (iddependencia) => {
@@ -21,8 +21,24 @@ const obtenerTickets = async (req, res) => {
             return result.recordset[0]?.nombreTema || null;
         };
 
+        const getNombreSubtema = async (idsubtema) => {
+            const query = `SELECT descripcion AS nombreSubtema FROM subtema WHERE idsubtema = @idsubtema`;
+            const result = await ticketsPool.request()
+                .input('idsubtema', idsubtema)
+                .query(query);
+            return result.recordset[0]?.nombreSubtema || null;
+        };
+
         if (idticket) {
-            const ticketQuery = `SELECT * FROM ticket WHERE idticket = @idticket`;
+            const ticketQuery = `
+    SELECT idticket, usuario, idusuario, idtema, idsubtema, iddependencia,
+           correo, ext, detalle, fechainicio, fechacierre, fechaleido, fechaasignado,
+           estado, ipticket
+    FROM ticket
+    WHERE idticket = @idticket
+`;
+
+
             const ticketResult = await ticketsPool.request()
                 .input('idticket', idticket)
                 .query(ticketQuery);
@@ -42,20 +58,11 @@ const obtenerTickets = async (req, res) => {
                 ticket.estado = estado;
             }
 
-            const sistemasPool = await sistemasPoolPromise;
-            const usuarioQuery = `SELECT nombres, apellidos FROM responsable WHERE idresponsable = @idusuario`;
-            const usuarioResult = await sistemasPool.request()
-                .input('idusuario', ticket.idusuario)
-                .query(usuarioQuery);
-
-            if (usuarioResult.recordset.length > 0) {
-                const usuario = usuarioResult.recordset[0];
-                ticket.nombresUsuario = usuario.nombres;
-                ticket.apellidosUsuario = usuario.apellidos;
-            }
+            // No más búsqueda de responsable, ya tenemos el nombre del usuario desde la tabla ticket directamente
 
             ticket.nombreDependencia = await getNombreDependencia(ticket.iddependencia);
             ticket.nombreTema = await getNombreTema(ticket.idtema);
+            ticket.nombreSubtema = await getNombreSubtema(ticket.idsubtema);
 
             const attachmentsQuery = `SELECT idadjunto, idticket, url, fecha, tipo FROM adjuntos WHERE idticket = @idticket`;
             const attachmentsResult = await ticketsPool.request()
@@ -75,12 +82,15 @@ const obtenerTickets = async (req, res) => {
         } else {
             let filtroCondicion = '';
             if (estado && filtro) {
-                filtroCondicion = `WHERE estado ${filtro === '=' ? '=' : '!='} @estado`;
+                filtroCondicion = `WHERE t.estado ${filtro === '=' ? '=' : '!='} @estado`;
             }
 
             const ticketsQuery = `
-                SELECT idticket, usuario, idtema, iddependencia, detalle, fechainicio, estado
-                FROM ticket
+                SELECT t.idticket, t.usuario, t.idtema, t.iddependencia, t.idsubtema,
+                       t.detalle, t.fechainicio, t.estado,
+                       s.descripcion AS nombreSubtema
+                FROM ticket t
+                LEFT JOIN subtema s ON s.idsubtema = t.idsubtema
                 ${filtroCondicion}
             `;
 

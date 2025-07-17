@@ -77,7 +77,7 @@ function renderizarUsuarios() {
             usuario.documento,
             switchEstado,
             usuario.correo || "No hay correo",
-            usuario.contrasena ? "********" : "No hay contraseña",
+            //usuario.contrasena ? "********" : "No hay contraseña",
             botonEditar
         ]);
     });

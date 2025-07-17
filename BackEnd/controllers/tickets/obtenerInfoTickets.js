@@ -24,14 +24,25 @@ const obtenerInfoTickets = async (req, res) => {
                 tk.detalle,
                 tk.estado,
                 tk.fechainicio,
+                tk.fechacierre,
+                tk.fechaasignado,
+                tk.fechaleido,
                 tk.ipticket,
                 d.nombre AS dependencia,
-                t.nombre AS tema
+                t.nombre AS tema,
+                g.observacion,
+                g.idsubtema,
+                s.descripcion AS subtema
             FROM ticket tk
             INNER JOIN dependencias d ON tk.iddependencia = d.iddependencia
             INNER JOIN temas t ON tk.idtema = t.idtema
+            INNER JOIN subtema s ON tk.idsubtema = s.idsubtema
+            
+            LEFT JOIN gestion g ON tk.idticket = g.idticket
             WHERE tk.idticket = @idticket AND tk.correo = @correo
         `;
+
+        // g.gestion es para traer la gestion que se realizo y mostrarla debajo de la linea de tiempo!
 
         const result = await pool.request()
             .input('idticket', sql.Int, idticket)
