@@ -109,7 +109,6 @@ async function sendTicketEmail(idticket, observacion) {
         }
     }
 }
-
 const gestionarTickets = async (req, res) => {
     const pool = await ticketsPoolPromise;
     const transaction = pool.transaction();
@@ -135,14 +134,32 @@ const gestionarTickets = async (req, res) => {
         request.input('SN', SN || null);
         request.input('idsubtema', idsubtema);
 
+        // 🔎 Obtener el idtema correspondiente al subtema seleccionado
+        const resultTema = await request.query(`
+            SELECT idtema FROM subtema WHERE idsubtema = @idsubtema
+        `);
+
+        if (resultTema.recordset.length === 0) {
+            throw new Error('Subtema no válido. No se encontró su idtema relacionado.');
+        }
+
+        const idtema = resultTema.recordset[0].idtema;
+
+        request.input('idtema', idtema);
+
+        // 📝 Insertar en la tabla gestion
         await request.query(`
             INSERT INTO gestion (idticket, observacion, idsoporte, falsaalarma, SN, fechagestion, idsubtema)
             VALUES (@idticket, @observacion, @idsoporte, @falsaalarma, @SN, GETDATE(), @idsubtema)
         `);
 
+        // ✅ Actualizar estado, fecha de cierre, Y TAMBIÉN tema y subtema del ticket
         const updateResult = await request.query(`
             UPDATE ticket
-            SET estado = 'CERRADO', fechacierre = GETDATE()
+            SET estado = 'CERRADO',
+                fechacierre = GETDATE(),
+                idtema = @idtema,
+                idsubtema = @idsubtema
             WHERE idticket = @idticket
         `);
 
@@ -152,13 +169,13 @@ const gestionarTickets = async (req, res) => {
 
         await transaction.commit();
 
-        // 👇 Responder de inmediato
+        // ✅ Respuesta inmediata
         res.status(200).json({
-            message: 'Gestión creada y ticket cerrado correctamente',
+            message: 'Gestión creada, ticket cerrado y datos actualizados correctamente',
             idticket
         });
 
-        // 🚀 Envío del correo en segundo plano (sin bloquear respuesta)
+        // 🚀 Envío del correo en segundo plano
         sendTicketEmail(idticket, observacion);
 
     } catch (error) {
@@ -174,5 +191,6 @@ const gestionarTickets = async (req, res) => {
         return res.status(500).json({ error: 'Error del servidor al gestionar el ticket' });
     }
 };
+
 
 module.exports = { gestionarTickets };
