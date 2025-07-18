@@ -52,7 +52,10 @@ async function cargarTickets() {
         });
 
         const result = await response.json();
-        const ticketsAbiertos = result.tickets || [];
+        let ticketsAbiertos = result.tickets || [];
+
+        // Ordenar por idticket ascendente (menor idticket primero)
+        ticketsAbiertos.sort((a, b) => a.idticket - b.idticket);
 
         mostrarTickets(ticketsAbiertos);
     } catch (error) {
