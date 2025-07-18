@@ -130,7 +130,7 @@ const guardarTickets = async (req, res) => {
             tema: data.temaNombre,
             subtema: data.subtemaNombre,
             detalle: data.descripcion,
-            observacion: data.observacion || "Sin observaciones"
+            observacion: data.observacion || data.observaciones || "Sin observaciones"
         });
 
         const htmlContentSoporte = templateSoporte({
