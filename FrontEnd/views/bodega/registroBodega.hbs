@@ -1,0 +1,103 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Registro de Movimientos de Bodega</h2>
+
+  <!-- Campo para lector de código de barras -->
+  <div class="mb-3">
+    <label for="codigoBarras" class="form-label">Escanea el código de barras:</label>
+    <input type="text" id="codigoBarras" class="form-control" placeholder="Escanea el código aquí..." autofocus>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="mb-3">
+    <button id="btnEntrada" class="btn-fsvsaoff m-0 p-2">Registrar Entrada</button>
+    <button id="btnSalida" class="btn-fsvsaon m-0 p-2">Registrar Salida</button>
+  </div>
+    
+
+  <!-- Tabla de registros recientes -->
+  <h4 class="mt-4">Movimientos recientes</h4>
+  <table class="table table-striped" id="tablaMovimientos">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Tipo</th>
+        <th>Usuario</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Se llena dinámicamente -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const API_URL = window.env.API_URL;
+
+    const codigoBarrasInput = document.getElementById('codigoBarras');
+    const btnEntrada = document.getElementById('btnEntrada');
+    const btnSalida = document.getElementById('btnSalida');
+    const tablaMovimientos = document.querySelector('#tablaMovimientos tbody');
+
+    async function cargarMovimientos() {
+      try {
+        const res = await fetch(`${API_URL}/bodega/obtenerItems`);
+        const data = await res.json();
+
+        tablaMovimientos.innerHTML = '';
+        data.forEach(mov => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${new Date(mov.fecha).toLocaleString()}</td>
+            <td>${mov.codigo}</td>
+            <td>${mov.descripcion}</td>
+            <td>${mov.tipo}</td>
+            <td>${mov.usuario}</td>
+          `;
+          tablaMovimientos.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Error cargando movimientos:', err);
+      }
+    }
+
+    async function registrarMovimiento(tipo) {
+      const codigo = codigoBarrasInput.value.trim();
+      if (!codigo) return alert('Debe escanear un código');
+
+      try {
+        const res = await fetch(`${API_URL}/bodega/registrarMovimiento`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo, tipo })
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          alert('Movimiento registrado');
+          codigoBarrasInput.value = '';
+          cargarMovimientos();
+        } else {
+          alert(`Error: ${result.error}`);
+        }
+      } catch (err) {
+        console.error('Error registrando movimiento:', err);
+      }
+    }
+
+    btnEntrada.addEventListener('click', () => registrarMovimiento('ENTRADA'));
+    btnSalida.addEventListener('click', () => registrarMovimiento('SALIDA'));
+
+    // Cuando se escanee un código y presione ENTER, se registra por defecto como ENTRADA
+    codigoBarrasInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        registrarMovimiento('ENTRADA');
+      }
+    });
+
+    // Cargar datos al inicio
+    cargarMovimientos();
+  });
+</script>

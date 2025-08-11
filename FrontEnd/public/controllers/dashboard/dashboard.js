@@ -291,6 +291,70 @@ function inicializarGraficos() {
         plugins: [ChartDataLabels]
     });
 
+    // --- Inicializar gráfico Subtemas (placeholder) ---
+    try {
+        // Si ya existiera, lo destruimos
+        if (window.usersChartSubtemas instanceof Chart) {
+            window.usersChartSubtemas.destroy();
+        }
+        const canvasSub = document.getElementById('usersChartSubtemas');
+        if (canvasSub) {
+            // ajusta el contenedor si hace falta (consistente con los otros charts)
+            canvasSub.parentElement.style.height = `${customHeight}px`;
+            window.usersChartSubtemas = new Chart(canvasSub.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Cargando...'],
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: [0],
+                        backgroundColor: [
+                            '#00205C', '#8A2432', '#e0e0e0', '#4b8abe', '#b3b3b3',
+                            '#c14b3e', '#e27b6f', '#f7cca1', '#6495ed', '#00bfff'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Cantidad de Tickets', font: { weight: 'bold' } }
+                        },
+                        x: {
+                            title: { display: true, text: 'Subtemas de Tickets', font: { weight: 'bold' } },
+                            grid: {
+                                display: false // 🔹 Oculta las líneas verticales
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: (value) => value,
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+
+
+        } else {
+            console.warn("Canvas usersChartSubtemas no encontrado al inicializar.");
+        }
+    } catch (e) {
+        console.error('Error inicializando usersChartSubtemas:', e);
+    }
+
     window.maintenanceChart = new Chart(document.getElementById('maintenanceChart').getContext('2d'), {
         type: 'doughnut',
         data: {
@@ -441,6 +505,7 @@ function inicializarGraficos() {
                 }
             }
         },
+
         plugins: [ChartDataLabels]
     });
 }
@@ -495,7 +560,7 @@ function inicializarMonitorChart() {
                     align: 'top',       // La coloca arriba del punto
                     offset: 6,          // Ajusta la distancia hacia arriba (aumenta para más separación)
                     font: {
-                        size: 12,       // Tamaño de la fuente
+                        size: 10,       // Tamaño de la fuente
                     },
                     color: '#222',      // Color del texto
                     formatter: (value) => value ? value.toFixed(1) + '%' : ''
@@ -560,20 +625,36 @@ function actualizarGraficoSales(tickets) {
     });
 }
 
+
 async function cargarTodosLosDatos() {
     try {
-        const fechaInicio = document.getElementById('fechaInicio').value;
-        const fechaFin = document.getElementById('fechaFin').value;
-        const anio = document.getElementById('selectAnio').value; // Obtener el año seleccionado
+        // 📅 Fechas de ejemplo para obtener datos
+        const fechaInicio = document.getElementById('fechaInicio')?.value || '';
+        const fechaFin = document.getElementById('fechaFin')?.value || '';
+        const anio = document.getElementById('selectAnio')?.value || '';
 
-        // 1. Cargar datos para las tarjetas y gráficos
+        console.log('Valor de url:', url);
+        console.log('URLs usadas:', {
+            conteoTickets: `${url}/api/dashboard/obtenerEstadoTickets`,
+            dependencias: `${url}/api/dashboard/obtenerDependencias`,
+            soportes: `${url}/api/dashboard/obtenerSoportes`,
+            equipos: `${url}/api/dashboard/obtenerEquipos`,
+            mantenimientos: `${url}/api/dashboard/obtenerEstadoMantenimiento`,
+            modificaciones: `${url}/api/dashboard/obtenerModificaciones`,
+            temas: `${url}/api/dashboard/temas-solicitados`,
+            subtemas: `${url}/api/dashboard/subtemas-solicitados`
+        });
+
+        // 📡 Ejecutar todas las peticiones en paralelo
         const [
             responseConteoTickets,
             responseDependencias,
             responseSoportes,
             responseEquipos,
             responseMantenimientos,
-            responseModificaciones // Nueva petición para modificaciones
+            responseModificaciones,
+            responseTemas,
+            responseSubtemas
         ] = await Promise.all([
             fetch(`${url}/api/dashboard/obtenerEstadoTickets`, {
                 method: 'GET',
@@ -582,19 +663,13 @@ async function cargarTodosLosDatos() {
             fetch(`${url}/api/dashboard/obtenerDependencias`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fechainicio: fechaInicio,
-                    fechafin: fechaFin
-                }),
+                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
                 credentials: 'include'
             }),
             fetch(`${url}/api/dashboard/obtenerSoportes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fechainicio: fechaInicio,
-                    fechafin: fechaFin
-                }),
+                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
                 credentials: 'include'
             }),
             fetch(`${url}/api/dashboard/obtenerEquipos`, {
@@ -605,42 +680,68 @@ async function cargarTodosLosDatos() {
                 method: 'GET',
                 credentials: 'include'
             }),
-            fetch(`${url}/api/dashboard/obtenerModificaciones`, { // Nueva petición
+            fetch(`${url}/api/dashboard/obtenerModificaciones`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ anio }), // Enviar el año en el cuerpo de la solicitud
+                body: JSON.stringify({ anio }),
+                credentials: 'include'
+            }),
+            fetch(`${url}/api/dashboard/temas-solicitados`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
+                credentials: 'include'
+            }),
+            fetch(`${url}/api/dashboard/subtemas-solicitados`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
                 credentials: 'include'
             })
         ]);
 
-        // 2. Procesar todas las respuestas
+        console.log('Subtemas Response:', responseSubtemas.status, responseSubtemas.statusText);
+
+        // ❌ Verificar que todas las respuestas sean OK
         if (!responseConteoTickets.ok || !responseDependencias.ok ||
-            !responseSoportes.ok || !responseEquipos.ok || !responseMantenimientos.ok || !responseModificaciones.ok) {
-            throw new Error('Error en una o más peticiones');
+            !responseSoportes.ok || !responseEquipos.ok || !responseMantenimientos.ok ||
+            !responseModificaciones.ok || !responseTemas.ok || !responseSubtemas.ok) {
+            throw new Error('Error en una o más peticiones. Estados: ' +
+                `Conteo:${responseConteoTickets.status}, Dep:${responseDependencias.status}, Sop:${responseSoportes.status}, ` +
+                `Eq:${responseEquipos.status}, Mant:${responseMantenimientos.status}, Mod:${responseModificaciones.status}, ` +
+                `Tem:${responseTemas.status}, Sub:${responseSubtemas.status}`);
         }
 
+        // 📦 Procesar datos JSON
         const [
             conteoTickets,
             datosDependencias,
             datosSoportes,
             datosEquipos,
             datosMantenimientos,
-            datosModificaciones // Nueva respuesta
+            datosModificaciones,
+            datosTemas,
+            datosSubtemas
         ] = await Promise.all([
             responseConteoTickets.json(),
             responseDependencias.json(),
             responseSoportes.json(),
             responseEquipos.json(),
             responseMantenimientos.json(),
-            responseModificaciones.json() // Nueva respuesta
+            responseModificaciones.json(),
+            responseTemas.json(),
+            responseSubtemas.json()
         ]);
 
-        // 3. Actualizar componentes
+        console.log('Subtemas Data detallado:', JSON.stringify(datosSubtemas, null, 2));
+
+        // 📊 Actualizar dashboard
         actualizarTarjetas(conteoTickets.data, datosEquipos);
         actualizarGraficoSales(datosDependencias.data || []);
-        actualizarGraficoSoportes(datosSoportes.data || []);
+        actualizarGraficoTemas(datosTemas.data || []);
+        actualizarGraficoSubtemas(datosSubtemas.data || []); // ← Aquí ya se actualiza el gráfico de subtemas
         actualizarGraficoMantenimientos(datosMantenimientos.data);
-        actualizarGraficoModificaciones(datosModificaciones.data || []); // Actualizar gráfico de modificaciones
+        actualizarGraficoModificaciones(datosModificaciones.data || []);
 
     } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -648,30 +749,96 @@ async function cargarTodosLosDatos() {
     }
 }
 
-function actualizarGraficoSoportes(tickets) {
+
+function actualizarGraficoSubtemas(subtemas) {
     requestAnimationFrame(() => {
-        // Agrupar tickets por tipo de soporte
-        const soportesMap = new Map();
+        console.log('Ejecutando actualizarGraficoSubtemas con datos:', subtemas);
 
-        tickets.forEach(ticket => {
-            const nombreSoporte = ticket.nombreSoporte;
-            if (soportesMap.has(nombreSoporte)) {
-                soportesMap.set(nombreSoporte, soportesMap.get(nombreSoporte) + 1);
-            } else {
-                soportesMap.set(nombreSoporte, 1);
-            }
-        });
+        if (!Array.isArray(subtemas)) {
+            console.warn('Datos de subtemas no válidos:', subtemas);
+            subtemas = [];
+        }
 
-        // Convertir a arrays para el gráfico
-        const labels = Array.from(soportesMap.keys());
-        const data = Array.from(soportesMap.values());
+        const hasData = subtemas.length > 0;
+        const labels = hasData ? subtemas.map(s => s.nombreSubtema || 'Sin nombre') : ['Sin datos'];
+        const values = hasData ? subtemas.map(s => s.cantidad || 0) : [0];
+
+        console.log('Labels:', labels);
+        console.log('Data:', values);
+
+        const canvas = document.getElementById('usersChartSubtemas');
+        if (!canvas) {
+            console.error('Canvas con id="usersChartSubtemas" no encontrado');
+            return;
+        }
+
+        // Si por alguna razón no existió placeholder, lo creamos aquí (fallback)
+        if (!window.usersChartSubtemas) {
+            console.warn('usersChartSubtemas no existía — creando fallback.');
+            window.usersChartSubtemas = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: values,
+                        backgroundColor: 'rgba(66, 165, 245, 0.6)',
+                        borderColor: 'rgba(66, 165, 245, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Cantidad' } },
+                        x: { title: { display: true, text: 'Subtemas' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+            return; // ya quedó creado con labels/values correctos
+        }
+
+        // Asegurarnos que la estructura .data y datasets existen antes de asignar
+        if (!window.usersChartSubtemas.data) window.usersChartSubtemas.data = { labels: [], datasets: [{ data: [] }] };
+        if (!Array.isArray(window.usersChartSubtemas.data.datasets)) window.usersChartSubtemas.data.datasets = [{ data: [] }];
+        if (!window.usersChartSubtemas.data.datasets[0]) window.usersChartSubtemas.data.datasets[0] = { data: [] };
+
+        // Actualizar valores
+        window.usersChartSubtemas.data.labels = labels;
+        window.usersChartSubtemas.data.datasets[0].data = values;
+
+        // Opcional: cambia color cuando no hay datos
+        if (!hasData) {
+            window.usersChartSubtemas.data.datasets[0].backgroundColor = ['#e0e0e0'];
+            window.usersChartSubtemas.data.datasets[0].borderColor = ['#bdbdbd'];
+        }
+
+        window.usersChartSubtemas.update();
+    });
+}
+
+
+function actualizarGraficoTemas(temas) {
+    requestAnimationFrame(() => {
+        if (!temas || !Array.isArray(temas)) {
+            console.warn('Datos de temas no válidos:', temas);
+            return;
+        }
+
+        // Extraer nombres de temas y cantidades
+        const labels = temas.map(tema => tema.nombreTema);
+        const data = temas.map(tema => tema.cantidad);
 
         // Actualizar el gráfico de barras
         if (window.usersChart) {
             window.usersChart.data.labels = labels;
             window.usersChart.data.datasets[0].data = data;
-            window.usersChart.data.datasets[0].label;
+            window.usersChart.options.scales.x.title.text = 'Temas de Tickets'; // Actualizar título del eje X
             window.usersChart.update();
+        } else {
+            console.error('El gráfico usersChart no está inicializado');
         }
     });
 }

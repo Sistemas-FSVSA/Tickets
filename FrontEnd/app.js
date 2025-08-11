@@ -250,6 +250,14 @@ app.get("/config.js", (req, res) => {
   res.send(`window.env = { API_URL: "${apiUrl}" };`);
 });
 
+app.get("/bodega/registrobodega", (req, res) => {
+  if (req.xhr) {
+    return res.render("bodega/registrobodega", { layout: false }); // Vista sin layout (AJAX)
+  }
+  res.render("bodega/registrobodega"); // Vista con el layout principal
+});
+
+
 // Iniciar el servidor
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
