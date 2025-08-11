@@ -322,10 +322,10 @@ function inicializarGraficos() {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: 'Cantidad', font: { weight: 'bold' } }
+                            title: { display: true, text: 'Cantidad de Tickets', font: { weight: 'bold' } }
                         },
                         x: {
-                            title: { display: true, text: 'Subtemas', font: { weight: 'bold' } },
+                            title: { display: true, text: 'Subtemas de Tickets', font: { weight: 'bold' } },
                             grid: {
                                 display: false // 🔹 Oculta las líneas verticales
                             }
