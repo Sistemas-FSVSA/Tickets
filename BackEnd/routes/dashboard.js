@@ -6,7 +6,9 @@ const { obtenerConteoTicketsPorEstado } = require('../controllers/dashboard/obte
 const { obtenerEstadoMantenimientos } = require('../controllers/dashboard/obtenerEstadoMantenimiento');
 const { obtenerModificacionesPorMes } = require('../controllers/dashboard/obtenerModificaciones');
 const { obtenerUsuarioMasActivo } = require('../controllers/dashboard/usuarioMasTickets');
-const { setupMonitor } = require("../controllers/dashboard/monitorController");;
+const { setupMonitor } = require("../controllers/dashboard/monitorController");
+const { obtenerTemasSolicitados } = require('../controllers/dashboard/obtenerTemasSolicitados');
+const { obtenerSubtemasSolicitados } = require('../controllers/dashboard/obtenerSubtemasSolicitados');
 
 const router = Router();
 
@@ -18,5 +20,7 @@ router.get('/obtenerEstadoMantenimiento', obtenerEstadoMantenimientos);
 router.post('/obtenerModificaciones', obtenerModificacionesPorMes);
 router.get('/usuarioMasTickets', obtenerUsuarioMasActivo);
 router.get('/monitorController', setupMonitor);
+router.post('/temas-solicitados', obtenerTemasSolicitados);
+router.post('/subtemas-solicitados', obtenerSubtemasSolicitados);
 
 module.exports = router;

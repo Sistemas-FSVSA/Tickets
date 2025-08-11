@@ -17,5 +17,11 @@ router.get('/obtenerCategorias', authenticateToken, rateLimiterFast, obtenerCate
 router.post('/registrarItem', authenticateToken, rateLimiterFast, registrarItem);
 router.get('/obtenerItems', authenticateToken, rateLimiterFast, obtenerItems);
 router.post('/registrarMovimiento', authenticateToken, rateLimiterFast, registrarMovimiento);
+router.get('/vistaRegistros', authenticateToken, (req, res) => {
+    res.render('bodega/registroBodega', {
+        movimientos: [] // luego aquí puedes pasar datos reales
+    });
+});
+
 
 module.exports = router;
