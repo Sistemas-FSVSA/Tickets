@@ -6,15 +6,17 @@ const obtenerSubtemasSolicitados = async (req, res) => {
 
         // Consulta sin filtro de fechas
         const query = `
-            SELECT 
-                t.idsubtema,
-                st.descripcion AS nombreSubtema,
-                COUNT(*) AS cantidad
-            FROM [tickets].[dbo].[ticket] t
-            INNER JOIN [tickets].[dbo].[subtema] st ON t.idsubtema = st.idsubtema
-            WHERE st.estado = 1
-            GROUP BY t.idsubtema, st.descripcion
-            ORDER BY cantidad DESC
+              SELECT 
+    t.idsubtema,
+    st.descripcion AS nombreSubtema,
+    COUNT(*) AS cantidad
+FROM [tickets].[dbo].[ticket] t
+LEFT JOIN [tickets].[dbo].[subtema] st 
+    ON t.idsubtema = st.idsubtema
+WHERE t.idsubtema IS NOT NULL
+  AND t.fechainicio BETWEEN '2025-07-17T11:26:53.597' AND GETDATE()
+GROUP BY t.idsubtema, st.descripcion
+ORDER BY cantidad DESC;
         `;
 
         console.log('Consulta SQL generada:', query);
