@@ -13,7 +13,8 @@ const obtenerSubtemasSolicitados = async (req, res) => {
 FROM [tickets].[dbo].[ticket] t
 LEFT JOIN [tickets].[dbo].[subtema] st 
     ON t.idsubtema = st.idsubtema
-WHERE CAST(t.fechainicio AS date) BETWEEN '2025-07-17 11:26:53.597' AND CAST(GETDATE() AS date)
+WHERE t.idsubtema IS NOT NULL
+  AND t.fechainicio BETWEEN '2025-07-17T11:26:53.597' AND GETDATE()
 GROUP BY t.idsubtema, st.descripcion
 ORDER BY cantidad DESC;
         `;
