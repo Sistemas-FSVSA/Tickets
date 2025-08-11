@@ -1,0 +1,25 @@
+.contenedor-barras {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.izquierda {
+  flex: 1;
+}
+
+.input-codigo {
+  width: 100%;
+}
+
+.botones-izquierda {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px; /* separa los botones */
+}
+
+.derecha {
+  display: flex;
+  align-items: flex-end;
+}
