@@ -10,7 +10,7 @@ const obtenerTemasSolicitados = async (req, res) => {
                 COUNT(*) AS cantidad
             FROM [tickets].[dbo].[ticket] t
             INNER JOIN [tickets].[dbo].[temas] tm ON t.idtema = tm.idtema
-            WHERE t.fechainicio BETWEEN '2025-07-09' AND GETDATE()
+            WHERE t.fechainicio BETWEEN '2025-07-17 11:26:53.597' AND GETDATE()
             GROUP BY t.idtema, tm.nombre
             ORDER BY cantidad DESC
         `);
