@@ -11,24 +11,24 @@ async function InicializarModificaciones() {
     document.getElementById("archivos").addEventListener("change", function (event) {
         let listaArchivos = document.getElementById("listaArchivos");
         listaArchivos.innerHTML = ""; // Limpiar la lista antes de agregar nuevos archivos
-    
+
         const archivosValidos = Array.from(event.target.files).filter(archivo =>
             archivo.type.startsWith("image/") || archivo.type === "application/pdf"
         );
-    
+
         if (archivosValidos.length === 0) {
             Swal.fire("Error", "Solo se permiten imágenes y archivos PDF.", "error");
             event.target.value = ""; // Limpiar el input para evitar carga de archivos no permitidos
             return;
         }
-    
+
         archivosValidos.forEach(archivo => {
             let li = document.createElement("li");
             li.textContent = archivo.name;
             li.classList.add("list-group-item");
             listaArchivos.appendChild(li);
         });
-    });    
+    });
 
     // Evento para limpiar el modal cuando se cierre
     $('#guardarModificaciones').on('hidden.bs.modal', function () {
@@ -148,19 +148,37 @@ function renderizarResultados(resultados) {
     }
 
     resultados.forEach(mod => {
-        const imageUrl = `${url}/${mod.url.replace(/\\/g, '/')}`;
+        const fileUrl = `${url}/${mod.url.replace(/\\/g, '/')}`;
+        const extension = mod.url.split('.').pop().toLowerCase();
 
         const card = document.createElement("div");
         card.classList.add("col");
 
+        let previewContent = "";
+
+        if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
+            // Previsualización de imágenes
+            previewContent = `<img data-src="${fileUrl}" class="card-img-top lazy" alt="${mod.nombre}">`;
+        } else if (extension === "pdf") {
+            // Previsualización de PDFs
+            previewContent = `
+                <embed src="${fileUrl}#toolbar=0&navpanes=0&scrollbar=0" 
+                       type="application/pdf" 
+                       class="card-img-top" 
+                       style="height: 200px; object-fit: contain;">
+            `;
+        } else {
+            previewContent = `<p class="text-center p-3">Formato no soportado</p>`;
+        }
+
         card.innerHTML = `
             <div class="card">
-                <img data-src="${imageUrl}" class="card-img-top lazy" alt="${mod.nombre}">
+                ${previewContent}
                 <div class="card-body">
                     <p class="card-text">${mod.nombre} - ${mod.fecha}</p>
                     <div class="button-group">
-                        <button class="btn btn-fsvsaon abrir-btn" data-url="${imageUrl}"><i class="far fa-eye mr-1"></i>Abrir</button>
-                        <button class="btn btn-fsvsaoff imprimir-btn" data-url="${imageUrl}"><i class="fas fa-print mr-1"></i>Imprimir</button>
+                        <button class="btn btn-fsvsaon abrir-btn" data-url="${fileUrl}" data-ext="${extension}"><i class="far fa-eye mr-1"></i>Abrir</button>
+                        <button class="btn btn-fsvsaoff imprimir-btn" data-url="${fileUrl}" data-ext="${extension}"><i class="fas fa-print mr-1"></i>Imprimir</button>
                     </div>
                 </div>
             </div>
@@ -172,13 +190,13 @@ function renderizarResultados(resultados) {
     // Agregar eventos a los botones después de renderizar
     document.querySelectorAll('.abrir-btn').forEach(button => {
         button.addEventListener('click', () => {
-            abrirImagenGrande(button.getAttribute('data-url'));
+            abrirArchivo(button.getAttribute('data-url'), button.getAttribute('data-ext'));
         });
     });
 
     document.querySelectorAll('.imprimir-btn').forEach(button => {
         button.addEventListener('click', () => {
-            imprimirImagen(button.getAttribute('data-url'));
+            imprimirArchivo(button.getAttribute('data-url'), button.getAttribute('data-ext'));
         });
     });
 
@@ -186,31 +204,35 @@ function renderizarResultados(resultados) {
     aplicarLazyLoading();
 }
 
-// Función para abrir la imagen en grande con un fondo oscuro y una X para cerrar
-function abrirImagenGrande(imagenUrl) {
-    // Crear el contenedor de la imagen con el fondo oscuro
-    const imageViewer = document.createElement('div');
-    imageViewer.id = 'imageViewer';
-    imageViewer.style.position = 'fixed';
-    imageViewer.style.top = '0';
-    imageViewer.style.left = '0';
-    imageViewer.style.width = '100%';
-    imageViewer.style.height = '100%';
-    imageViewer.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    imageViewer.style.display = 'flex';
-    imageViewer.style.alignItems = 'center';
-    imageViewer.style.justifyContent = 'center';
-    imageViewer.style.zIndex = '9999';
-    imageViewer.style.cursor = 'pointer';
+function abrirArchivo(fileUrl, extension) {
+    const viewer = document.createElement('div');
+    viewer.id = 'fileViewer';
+    viewer.style.position = 'fixed';
+    viewer.style.top = '0';
+    viewer.style.left = '0';
+    viewer.style.width = '100%';
+    viewer.style.height = '100%';
+    viewer.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    viewer.style.display = 'flex';
+    viewer.style.alignItems = 'center';
+    viewer.style.justifyContent = 'center';
+    viewer.style.zIndex = '9999';
 
-    // Crear la imagen a tamaño grande
-    const imgElement = document.createElement('img');
-    imgElement.src = imagenUrl;
-    imgElement.style.maxWidth = '90%';
-    imgElement.style.maxHeight = '90%';
-    imgElement.style.objectFit = 'contain';
+    let content;
+    if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
+        content = document.createElement('img');
+        content.src = fileUrl;
+        content.style.maxWidth = '90%';
+        content.style.maxHeight = '90%';
+    } else if (extension === "pdf") {
+        content = document.createElement('embed');
+        content.src = fileUrl;
+        content.type = "application/pdf";
+        content.style.width = '80%';
+        content.style.height = '90%';
+    }
 
-    // Crear la X para cerrar
+    // Botón cerrar
     const closeButton = document.createElement('div');
     closeButton.textContent = '×';
     closeButton.style.position = 'absolute';
@@ -219,55 +241,25 @@ function abrirImagenGrande(imagenUrl) {
     closeButton.style.fontSize = '40px';
     closeButton.style.color = 'white';
     closeButton.style.cursor = 'pointer';
-    closeButton.style.fontWeight = 'bold';
 
-    // Agregar la imagen y la X al contenedor
-    imageViewer.appendChild(imgElement);
-    imageViewer.appendChild(closeButton);
+    viewer.appendChild(content);
+    viewer.appendChild(closeButton);
+    document.body.appendChild(viewer);
 
-    // Agregar el contenedor al cuerpo del documento
-    document.body.appendChild(imageViewer);
-
-    // Evento para cerrar la imagen cuando se hace clic en la X
     closeButton.addEventListener('click', () => {
-        if (document.body.contains(imageViewer)) {
-            document.body.removeChild(imageViewer);
-        }
+        viewer.remove();
     });
 
-    // También cerramos la imagen cuando se haga clic en cualquier parte del fondo oscuro
-    imageViewer.addEventListener('click', () => {
-        document.body.removeChild(imageViewer);
+    viewer.addEventListener('click', (e) => {
+        if (e.target === viewer) viewer.remove();
     });
 }
 
-function imprimirImagen(imagenUrl) {
-    const ventanaImpresion = window.open("", "_blank");
-
-    ventanaImpresion.document.write(`
-        <html>
-        <head>
-            <title>Imprimir Imagen</title>
-            <style>
-                @media print {
-                    body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-                    img { max-width: 100%; max-height: 100vh; }
-                }
-            </style>
-        </head>
-        <body>
-            <img src="${imagenUrl}">
-            <script>
-                window.onload = function() {
-                    window.print();
-                    setTimeout(() => window.close(), 500);
-                }
-            </script>
-        </body>
-        </html>
-    `);
-
-    ventanaImpresion.document.close();
+function imprimirArchivo(fileUrl, extension) {
+    const ventanaImpresion = window.open(fileUrl, "_blank");
+    ventanaImpresion.onload = () => {
+        ventanaImpresion.print();
+    };
 }
 
 function aplicarLazyLoading() {
