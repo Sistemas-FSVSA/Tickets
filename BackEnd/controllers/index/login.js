@@ -1,6 +1,6 @@
 const { ticketsPoolPromise, sistemasPoolPromise } = require('../../db/conexion');
 const jwt = require("jsonwebtoken");
-const bcrypt = require('bcrypt'); // Importa bcrypt
+const bcrypt = require('bcryptjs'); // Importa bcrypt
 
 const login = async (req, res) => {
     try {

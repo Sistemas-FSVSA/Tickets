@@ -358,10 +358,10 @@ function inicializarGraficos() {
     window.maintenanceChart = new Chart(document.getElementById('maintenanceChart').getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['Vigente', 'Próximos', 'Atrasados'],
+            labels: [],
             datasets: [{
                 data: [0, 0, 0],
-                backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+                backgroundColor: [],
                 borderColor: '#fff',
                 borderWidth: 2
             }]
@@ -848,13 +848,13 @@ function actualizarGraficoMantenimientos(mantenimientosData) {
         // Preparar datos para el gráfico
         const labels = ['Vigente', 'Próximos', 'Atrasados'];
         const data = [
-            mantenimientosData.conteos.alDia,
-            mantenimientosData.conteos.proximos,
-            mantenimientosData.conteos.atrasados
+            mantenimientosData.conteos?.alDia || 0,
+            mantenimientosData.conteos?.proximos || 0,
+            mantenimientosData.conteos?.atrasados || 0
         ];
 
-        // Colores para cada estado
-        const backgroundColors = ['#FFC107', '#4CAF50', '#F44336'];
+        // Colores para cada estado (fijos)
+        const backgroundColors = ['#4CAF50', '#FFC107', '#F44336'];
 
         // Actualizar el gráfico de doughnut
         if (window.maintenanceChart) {
@@ -869,26 +869,44 @@ function actualizarGraficoMantenimientos(mantenimientosData) {
         const progresoBar = document.getElementById('progresoBar');
         const progresoDetail = document.getElementById('progresoDetail');
 
-        // Extraer el valor de progreso (eliminando el % si existe)
-        const progreso = parseInt(mantenimientosData.progreso) || 0;
-        const equiposProximoAno = mantenimientosData.equiposProximoAno || 0;
-        const totalEquipos = mantenimientosData.conteos.total || 0;
+        // Extraer el valor de progreso (admite "46%" o 46)
+        const raw = mantenimientosData.progreso ?? '0';
+        let progreso = parseFloat(String(raw).replace('%', '').trim());
+        if (Number.isNaN(progreso)) progreso = 0;
+        // Clamp entre 0 y 100
+        progreso = Math.max(0, Math.min(100, Math.round(progreso)));
 
-        progresoText.textContent = `${progreso}%`;
-        progresoBar.style.width = `${progreso}%`;
-        progresoBar.setAttribute('aria-valuenow', progreso);
-        progresoDetail.textContent = `${equiposProximoAno} de ${totalEquipos} equipos realizados`;
+        const equiposProximoAno = mantenimientosData.equiposProximoAno ?? 0;
+        const totalEquipos = mantenimientosData.conteos?.total ?? 0;
 
-        // Cambiar color según el porcentaje
-        if (progreso < 30) {
-            progresoBar.className = 'progress-bar bg-danger';
-        } else if (progreso < 70) {
-            progresoBar.className = 'progress-bar bg-warning';
-        } else {
-            progresoBar.className = 'progress-bar bg-success';
+        // Texto y atributos ARIA
+        if (progresoText) progresoText.textContent = `${progreso}%`;
+        if (progresoBar) {
+            progresoBar.style.width = `${progreso}%`;
+            progresoBar.setAttribute('aria-valuenow', String(progreso));
+            progresoBar.setAttribute('aria-valuemin', '0');
+            progresoBar.setAttribute('aria-valuemax', '100');
+
+            // Remover clases de background previas y añadir la correcta
+            progresoBar.classList.remove('bg-danger', 'bg-warning', 'bg-success');
+            if (progreso < 20) {
+                // Menos del 20% -> rojo
+                progresoBar.classList.add('bg-danger');
+            } else if (progreso < 70) {
+                // Del 20% (incluido) hasta menos de 70% -> amarillo
+                progresoBar.classList.add('bg-warning');
+            } else {
+                // 70% o más -> verde
+                progresoBar.classList.add('bg-success');
+            }
+        }
+
+        if (progresoDetail) {
+            progresoDetail.textContent = `${equiposProximoAno} de ${totalEquipos} equipos realizados`;
         }
     });
 }
+
 
 // Llenar select con años
 function llenarSelectAnios() {
