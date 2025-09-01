@@ -1,0 +1,95 @@
+<link rel="stylesheet" href="/css/configuraciones/festivos.css">
+
+<body>
+    <header class="header mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Listado de Festivos</h5>
+            {{!-- <button id="nuevoFestivoBtn" class="btn btn-success" data-toggle="modal"
+                data-target="#modalRegistrarFestivo">
+                <i class="fas fa-plus"></i> Crear Festivo
+            </button> --}}
+        </div>
+    </header>
+
+    <div class="container-fluid mt-4">
+        <div class="table-responsive">
+            <table id="festivosTable" class="table table-striped table-bordered" style="width:99%;">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Motivo</th>
+                        <th class="acciones-col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los datos se llenan por JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Festivos de Colombia</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="selectAnioFestivos">Año:</label>
+                    <select id="selectAnioFestivos" class="form-control">
+                        <!-- Las opciones se generarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button id="btnCargarFestivosCO" class="btn btn-fsvsaon">
+                        <i class="fas fa-search mr-1"></i>Buscar Festivos
+                    </button>
+                </div>
+            </div>
+
+            <div id="festivosColombiaContainer" class="mb-3"></div>
+
+            <div class="text-end">
+                <button id="btnRegistrarFestivos" class="btn btn-fsvsaoff" disabled>
+                    <i class="fas fa-plus mr-1"></i> Registrar Seleccionados
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edición (opcional, puedes duplicar el de registro y cambiar ids) -->
+    <div class="modal fade" id="modalEditarFestivo" aria-labelledby="modalEditarFestivoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarFestivoLabel">Editar Festivo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarFestivo" novalidate>
+                        <input type="hidden" id="editFestivoId">
+                        <div class="form-group">
+                            <label for="editFecha">Fecha</label>
+                            <input type="date" id="editFecha" class="form-control" required>
+                            <div class="invalid-feedback">Seleccione una fecha válida.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMotivo">Motivo</label>
+                            <input type="text" id="editMotivo" class="form-control" required>
+                            <div class="invalid-feedback">Ingrese un motivo.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal"><i class="fas fa-times mr-1"></i>Cancelar</button>
+                    <button type="submit" class="btn btn-fsvsaon" id="guardarCambiosFestivo"><i class="fas fa-plus mr-1"></i>Registrar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/controllers/configuraciones/festivos.js"></script>
+</body>

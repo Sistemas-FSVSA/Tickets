@@ -12,7 +12,7 @@
         <!-- Tarjetas de estadísticas -->
         <div class="row text-center">
             <div class="col-md-3 mb-3">
-                <div class="card text-dark" style="background-color: #afeeee;">
+                <div class="card text-white" style="background-color: #00205C;">
                     <div class="card-body">
                         <h5 class="card-title">Tickets Activos</h5>
                         <p class="card-text fs-2" id="ticketsActivos">0</p>
@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="card text-dark" style="background-color: #b0e0e6;">
+                <div class="card text-white" style="background-color: #8A2432;">
                     <div class="card-body">
                         <h5 class="card-title">Tickets Leídos</h5>
                         <p class="card-text fs-2" id="ticketsPendientes">0</p>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="card text-dark" style="background-color: #e0ffff;">
+                <div class="card text-dark" style="background-color: #FFFFFF;">
                     <div class="card-body">
                         <h5 class="card-title">Tickets Cerrados</h5>
                         <p class="card-text fs-2" id="ticketsGestionados">0</p>
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="card text-dark" style="background-color: #87cefa;">
+                <div class="card text-white" style="background-color: #001E59;">
                     <div class="card-body">
                         <h5 class="card-title">Equipos Activos</h5>
                         <p class="card-text fs-2" id="equiposActivos">3</p>
@@ -61,7 +61,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header text-white" style="background-color: #007bff;">
+                    <div class="card-header text-white" style="background-color: #8a9db2;">
                         <h6>Tickets por Area</h6>
                     </div>
                     <div class="card-body">
@@ -69,29 +69,53 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header text-white" style="background-color: #007bff;">
-                        <h6>Tipos de Soporte</h6>
+                    <div class="card-header text-white" style="background-color: #8a9db2;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Modificaciones por Mes</h6>
+                            <select id="selectAnio" class="form-select form-select-sm" style="width: 100px;">
+                                <!-- Opciones de años se llenarán dinámicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="card-body" style="padding-bottom: 0;"> <!-- Reducir padding inferior -->
+                        <div class="chart-container" style="position: relative; height: 450px;">
+                            <!-- Aumentar altura -->
+                            <canvas id="modificationsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-white" style="background-color: #8a9db2;">
+                        <h6>Temas Más Solicitados</h6>
                     </div>
                     <div class="card-body">
                         <canvas id="usersChart"></canvas>
                     </div>
                 </div>
             </div>
-            {{!-- <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header text-white" style="background-color: #007bff;">
-                        <h6>Usuarios más Activos</h6>
-                    </div>
-                    <div class="card-body">
-                        <div id="usuariosMasActivosContainer" class="mt-2"></div>
-                    </div>
-                </div>
-            </div> --}}
+
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header text-white" style="background-color: #007bff;">
+                    <div class="card-header text-white" style="background-color: #8a9db2;">
+                        <h6>Subtemas Más Solicitados</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="usersChartSubtemas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-white" style="background-color: #8a9db2;">
                         <h6>Mantenimientos</h6>
                     </div>
                     <div class="card-body">
@@ -114,65 +138,42 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header text-white" style="background-color: #007bff;">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">Modificaciones por Mes</h6>
-                            <select id="selectAnio" class="form-select form-select-sm" style="width: 100px;">
-                                <!-- Opciones de años se llenarán dinámicamente -->
-                            </select>
-                        </div>
-                    </div>
-                    <br>
-                    <br>
-                    <div class="card-body" style="padding-bottom: 0;"> <!-- Reducir padding inferior -->
-                        <div class="chart-container" style="position: relative; height: 450px;">
-                            <!-- Aumentar altura -->
-                            <canvas id="modificationsChart"></canvas>
-                        </div>
-                    </div>
+            <!-- Nueva Sección: Estadísticas del Servidor -->
+            <div class="col-12 col-md-6">
+    <div class="card h-90">
+        <!-- Sección superior: Texto e información -->
+        <div class="card-body p-3">
+            <!-- Cabecera del monitor -->
+            <div class="server-status-container mb-4">
+                <h5 class="card-title mb-2" style="font-size: 1.2rem;">Monitor del Servidor:</h5>
+                <div class="d-flex align-items-center">
+                    <span id="server-status" class="server-status-text card-text fw-bold" style="font-size: 1rem; color: #28a745;">Óptimo</span>
+                    <span id="server-status-icon" class="ms-2">
+                        <i class="fas fa-circle" style="font-size: 1rem; color: #28a745;"></i>
+                    </span>
                 </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div id="monitorInfo" class="small text-muted mb-4">
+                <div class="mb-3"><strong style="font-size: 1rem;">CPU:</strong> <span id="cpu-usage" style="font-size: 1rem;">0%</span></div>
+                <div class="mb-3"><strong style="font-size: 1rem;">Memoria:</strong> <span id="memory-usage" style="font-size: 1rem;">0 MB/0 MB</span></div>
+                <div><strong style="font-size: 1rem;">Últ. actualización:</strong> <span id="last-update" style="font-size: 1rem;">00:00:00</span></div>
             </div>
         </div>
 
-        <!-- Nueva Sección: Estadísticas del Servidor -->
-        <div class="card mb-4">
-            <div class="row g-0"> <!-- row sin espacio entre columnas (g-0) -->
-                <!-- Columna izquierda (información de texto) -->
-                <div class="col-md-3 d-flex flex-column">
-                    <div class="card-body">
-                        <!-- Cabecera del monitor -->
-                        <div class="server-status-container mb-3">
-                            <h5 class="card-title mb-1">Monitor del Servidor:</h5>
-                            <div class="d-flex align-items-center">
-                                <span id="server-status"
-                                    class="server-status-text card-text fs-2 text-success">Óptimo</span>
-                                <span id="server-status-icon">
-                                    <i class="fas fa-circle text-success"></i>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Información adicional -->
-                        <div id="monitorInfo" class="small text-muted mt-auto">
-                            <!-- Contenido dinámico irá aquí -->
-                            <div class="mb-2"><strong>CPU:</strong> <span id="cpu-usage">0%</span></div>
-                            <div class="mb-2"><strong>Memoria:</strong> <span id="memory-usage">0 MB/0 MB</span></div>
-                            <div><strong>Últ. actualización:</strong> <span id="last-update">00:00:00</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Columna derecha (gráfico) -->
-                <div class="col-md-9">
-                    <div class="card-body" style="position: relative; height: 600px;">
-                        <canvas id="monitorChart" height="300"></canvas>
-                    </div>
-                </div>
+        <!-- Sección inferior: Gráfico -->
+        <div class="card-body">
+            <div style="position: relative;">
+                <canvas id="monitorChart" class="w-100" style="max-height: 400px;"></canvas>
             </div>
         </div>
     </div>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</div>
+        </div>
+
+
+    </div>
+
     <script src="/controllers/dashboard/dashboard.js" defer></script>
 </body>

@@ -8,6 +8,7 @@ const { actualizarEstadoUsr } = require('../controllers/usuarios/actualizarEstad
 const { actualizarContraseña } = require('../controllers/usuarios/actualizarContraseña');
 const { actualizarUsuario } = require('../controllers/usuarios/actualizarUsuario');
 const { obtenerUsuarios } = require('../controllers/usuarios/obtenerUsuarios');
+const { registrarUsuario } = require('../controllers/usuarios/registrarUsuario');
 
 const authenticateToken = require('../models/authMiddleware');
 
@@ -16,5 +17,6 @@ router.post('/obtenerUsuarios', authenticateToken, rateLimiterFast, obtenerUsuar
 router.post('/actualizarUsuario', authenticateToken, rateLimiterFast, actualizarUsuario);
 router.post('/actualizarContraseña', authenticateToken, rateLimiterFast, actualizarContraseña);
 router.post('/actualizarEstadoUsr', authenticateToken, rateLimiterFast, actualizarEstadoUsr);
+router.post('/registrarUsuario', authenticateToken, rateLimiterFast, registrarUsuario);
 
 module.exports = router;

@@ -212,6 +212,27 @@ app.get("/configuraciones/consultarcorreo", (req, res) => {
   res.render("configuraciones/consultarcorreo");
 });
 
+app.get("/configuraciones/festivos", (req, res) => {
+  if (req.xhr) {
+    return res.render("configuraciones/festivos", { layout: false }); // Solo la vista
+  }
+  res.render("configuraciones/festivos");
+});
+
+app.get("/configuraciones/horario", (req, res) => {
+  if (req.xhr) {
+    return res.render("configuraciones/horario", { layout: false }); // Solo la vista
+  }
+  res.render("configuraciones/horario");
+});
+
+app.get("/bodega/consultarbodega", (req, res) => {
+  if (req.xhr) {
+    return res.render("bodega/consultarbodega", { layout: false }); // Solo la vista
+  }
+  res.render("bodega/consultarbodega");
+});
+
 app.get("/config.js", (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
 
@@ -228,6 +249,14 @@ app.get("/config.js", (req, res) => {
 
   res.send(`window.env = { API_URL: "${apiUrl}" };`);
 });
+
+app.get("/bodega/registrobodega", (req, res) => {
+  if (req.xhr) {
+    return res.render("bodega/registrobodega", { layout: false }); // Vista sin layout (AJAX)
+  }
+  res.render("bodega/registrobodega"); // Vista con el layout principal
+});
+
 
 // Iniciar el servidor
 const PORT = process.env.PORT;

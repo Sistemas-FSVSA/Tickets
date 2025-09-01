@@ -2,6 +2,7 @@
 const url = window.env.API_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadSocketIO().then(() => {
     const nombres = localStorage.getItem('nombres');
     const apellidos = localStorage.getItem('apellidos');
 
@@ -82,7 +83,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setInterval(cargarTickets, 30000);
+    });
 });
+
+function loadSocketIO() {
+    return new Promise((resolve) => {
+        if (typeof io !== 'undefined') {
+            return resolve();
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdn.socket.io/4.5.4/socket.io.min.js';
+        script.onload = resolve;
+        script.onerror = () => {
+            console.error('Error cargando Socket.IO');
+            resolve(); // Continuar aunque falle
+        };
+        document.head.appendChild(script);
+    });
+}
 
 function reinitializeScripts() {
     const path = window.location.pathname;
@@ -157,8 +176,21 @@ function reinitializeScripts() {
     if (path.includes("/modificaciones/modificaciones")) {
         loadAndRunScript("/controllers/modificaciones/modificaciones.js", "InicializarModificaciones");
     }
+    
     if (path.includes("/configuraciones/consultarcorreo")) {
         loadAndRunScript("/controllers/configuraciones/consultarcorreo.js", "InicializarConsultarCorreo");
+    }
+
+    if (path.includes("/configuraciones/festivos")) {
+        loadAndRunScript("/controllers/configuraciones/festivos.js", "InicializarFestivos");
+    }
+
+    if (path.includes("/configuraciones/horario")) {
+        loadAndRunScript("/controllers/configuraciones/horario.js", "InicializarHorario");
+    }
+
+    if (path.includes("/bodega/consultarbodega")) {
+        loadAndRunScript("/controllers/bodega/bodega.js", "inicializarConsultarBodega");
     }
 }
 
@@ -337,6 +369,7 @@ function setupMenuToggle(menuId, toggleId, submenuId, iconId) {
 setupMenuToggle('menuTickets', 'toggleTickets', 'submenuTickets', 'iconTickets');
 setupMenuToggle('menuInventario', 'toggleInventario', 'submenuInventario', 'iconInventario');
 setupMenuToggle('menuConfiguraciones', 'toggleConfiguraciones', 'submenuConfiguraciones', 'iconConfiguraciones');
+setupMenuToggle('menuBodega', 'toggleBodega', 'submenuBodega', 'iconBodega');
 
 function formatoHora(fecha) {
     if (!fecha) return 'Fecha no disponible';

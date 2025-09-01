@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Centro de Soporte FSV</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
-    <link rel="icon" href="/image/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="icon" href="/image/favicon.ico" type="image/x-icon" />
+
     <style>
         body {
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; 
+            justify-content: flex-start;
             min-height: 100vh;
             margin: 0;
             background-color: #163c64;
@@ -18,11 +22,89 @@
             color: #fff;
         }
 
+
+        .swal-cancel-button {
+            background-color: #96072d !important;
+            /* Rojo Oscuro*/
+            color: white !important;
+            border-radius: 5px !important;
+            padding: 8px 16px !important;
+            font-size: 16px !important;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out !important;
+        }
+
+        .swal-cancel-button:hover {
+            background-color: #c24d4d !important;
+            /* Rojo más claro */
+            transform: scale(1.05) !important;
+        }
+
+        .btn-fsvsaoff {
+            background-color: #96072d;
+            /* Rojo oscuro */
+            color: white;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .btn-fsvsaoff:hover {
+            background-color: #c24d4d !important;
+            /* Rojo más claro */
+            transform: scale(1.05);
+        }
+
+
+        .swal-confirm-button {
+            background-color: #163c64 !important;
+            /* Verde */
+            color: white !important;
+            border-radius: 5px !important;
+            padding: 8px 16px !important;
+            font-size: 16px !important;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out !important;
+        }
+
+        /* Efecto hover */
+        .swal-confirm-button:hover {
+            background-color: #295c92 !important;
+            /* Verde más oscuro */
+            transform: scale(1.05) !important;
+        }
+
+        .btn-fsvsaon {
+            background-color: #163c64;
+            color: white;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .btn-fsvsaon:hover {
+            background-color: #2e5c8d !important;
+            /* Rojo más claro */
+            transform: scale(1.05);
+        }
+
+        /* Paso inactivo: bolita gris */
+        .step .dot {
+            background-color: #7b7b7b;
+            color: #666;
+            border: 6px solid #f8f9fa;
+        }
+
+        /* Paso activo: bolita vinotinto */
+        .step .dot.active {
+            background-color: #96072d;
+            color: #fff;
+        }
+
+
         .main-content {
             display: flex;
-            justify-content: center; 
+            justify-content: center;
             align-items: center;
-            flex-grow: 1; 
+            flex-grow: 1;
             width: 100%;
         }
 
@@ -98,23 +180,7 @@
             width: 100%;
         }
 
-        .btn-custom {
-            background-color: #96072d;
-            color: #fff;
-            width: 100%;
-            max-width: 200px;
-            margin-top: 15px;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
 
-        .btn-custom:hover {
-            background-color: #0056b3;
-        }
 
         .btn-back {
             color: #96072d;
@@ -161,8 +227,8 @@
         #another-ticket-container {
             margin-top: 20px;
             text-align: center;
-            display: flex; 
-            justify-content: center; 
+            display: flex;
+            justify-content: center;
             width: 100%;
         }
 
@@ -170,32 +236,196 @@
             width: 200px;
             height: 40px;
             font-size: 14px;
-            padding: 10px 20px;
+            padding: 0px 0px;
+            margin-top: 10px;
         }
 
         button[type="submit"] {
             margin-bottom: 20px;
         }
 
+        /* ---- NUEVO: Línea de tiempo ---- */
+        #timeline {
+            margin-top: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            /* Even spacing between steps */
+            align-items: center;
+            position: relative;
+            padding: 0 50px;
+            /* Increased padding for more space on sides */
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px 0;
+        }
+
+        #timeline::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            /* Adjusted to match increased padding */
+            height: 6px;
+            width: calc(100% - 100px);
+            /* Adjusted for increased padding (50px per side) */
+            background-color: #ccc;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 200px;
+            /* Increased to provide more space between steps */
+        }
+
+        .step .dot {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 5px;
+            border-radius: 50%;
+            /* Red background for active dots */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 6px solid #f8f9fa;
+            /* White border to match background */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 3;
+        }
+
+        .step .icon {
+            color: #fff;
+            font-size: 20px;
+            /* Larger icons to fit and be visible */
+            line-height: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step small {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .step div {
+            font-size: 10px;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        /* Contenedor de observaciones */
+        .observacion-container {
+            min-width: 100%;
+            margin-top: 25px;
+        }
+
+        .observacion-texto {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background-color: transparent;
+            padding: 0px;
+            border-radius: 5px;
+            color: #000;
+        }
+
+
+        /* Línea base gris */
+        .progress-container {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            width: calc(100% - 100px);
+            height: 6px;
+            background-color: #ccc;
+            border-radius: 3px;
+            z-index: 1;
+            transform: translateY(-50%);
+            overflow: hidden;
+        }
+
+        /* Línea roja que avanza */
+        .progress-fill {
+            height: 100%;
+            background-color: #96072d;
+            border-radius: 3px;
+            transition: width 0.6s ease;
+            z-index: 2;
+        }
+
+        /* Línea de progreso */
+        .progress-track {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            width: calc(100% - 100px);
+            height: 6px;
+            background-color: #ccc;
+            border-radius: 3px;
+            transform: translateY(-50%);
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #96072d;
+            width: 0%;
+            transition: width 0.6s ease;
+            border-radius: 3px;
+        }
+
         @media (max-width: 576px) {
-            .card {
-                margin: 10px;
+            #timeline {
+                flex-direction: column;
+                align-items: center;
             }
 
-            .form-control {
-                max-width: 100%;
+            #timeline::before {
+                display: none;
             }
 
-            .btn-custom {
-                max-width: 100%;
+            .step {
+                margin-bottom: 20px;
+                width: 100%;
             }
 
-            .footer-text {
-                font-size: 12px;
+            .step .dot {
+                margin-bottom: 10px;
+            }
+
+            #timeline .progress-line {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50px;
+                height: 6px;
+                background-color: #96072d;
+                transform: translateY(-50%);
+                z-index: 2;
+                border-radius: 5px;
+                transition: width 0.6s ease;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="main-content">
         <div class="card">
@@ -203,38 +433,47 @@
                 <a href="/" class="btn-back">⬅ Atrás</a>
             </div>
             <div class="card-header">
-                <img src="/image/logoblanco.png" alt="Funeraria San Vicente" class="img-fluid">
+                <img src="/image/logoblanco.png" alt="Funeraria San Vicente" class="img-fluid" />
             </div>
             <div class="card-body">
                 <form id="followform" method="post" class="w-100">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="ticket" class="form-label">Ticket</label>
-                            <input type="text" class="form-control" id="ticket" name="ticket" placeholder="Ingresa el ID de tu ticket" required>
+                            <input type="text" class="form-control" id="ticket" name="ticket"
+                                placeholder="Ingresa el ID de tu ticket" required />
                         </div>
                         <div class="col-md-6">
                             <label for="email" class="form-label">Correo Electrónico</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Ingresa tu correo electrónico" required>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="Ingresa tu correo electrónico" required />
                         </div>
                     </div>
                     <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-custom">Enviar</button>
+                        <button type="submit" class="btn btn-fsvsaoff">Enviar</button>
                     </div>
                 </form>
+
                 <div id="ticket-info" class="row">
-                    <!-- Aquí se añadirá la información del ticket dinámicamente -->
+                    <!-- Aquí se añade info + línea de tiempo desde JS -->
                 </div>
+
                 <div class="text-center mt-3" id="another-ticket-container" style="display: none;">
-                    <button class="btn btn-custom" onclick="resetForm()">Consultar otro ticket</button>
+                    <button class="btn btn-fsvsaoff me-2" onclick="resetForm()">Consultar otro ticket</button>
+                    <button class="btn btn-fsvsaon" id="refreshTicketBtn"><i class="fas fa-sync-alt"></i>
+                        Refrescar</button>
                 </div>
+
             </div>
         </div>
     </div>
     <div class="footer-text">
         Derechos de autor © 2025, Funeraria San Vicente S.A. By - Sistemas
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/config.js"></script>
     <script src="/controllers/tickets/infoticket.js"></script>
 </body>
+
 </html>

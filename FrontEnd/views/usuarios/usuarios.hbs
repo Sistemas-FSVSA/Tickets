@@ -3,7 +3,7 @@
 <body>
     <header class="header">
         <h5 class="titulo-usuarios">Usuarios</h5>
-        <button id="btnRegistrarUsuario" class="btn btn-success" data-toggle="modal" data-target="#modalRegistrarUsuario">Registrar Usuario</button>
+        <button id="btnRegistrarUsuario" class="btn btn-fsvsaoff mr-1" data-toggle="modal" data-target="#modalRegistrarUsuario"><i class="fas fa-plus mr-1"></i>Registrar Usuario</button>
     </header>
     <div class="container-fluid mt-4">
         <div class="table-responsive">
@@ -58,11 +58,17 @@
                             <input type="email" id="correo" class="form-control">
                             <div class="invalid-feedback">Por favor, ingrese un correo válido.</div>
                         </div>
+                        <div class="form-group">
+                            <label for="contrasena">Contraseña</label>
+                            <input type="password" id="contrasena" class="form-control">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            <small>Deja en blanco si no deseas cambiar la contraseña.</small>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="guardarCambios">Guardar</button>
+                    <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal"><i class="fas fa-times mr-1"></i>Cancelar</button>
+                    <button type="submit" class="btn btn-fsvsaon" id="guardarCambios"><i class="fas fa-plus mr-1"></i>Registrar</button>
                 </div>
             </div>
         </div>
@@ -99,6 +105,11 @@
                             <label for="correoRegistro">Correo</label>
                             <input type="email" id="correoRegistro" class="form-control">
                             <div class="invalid-feedback">Por favor, ingrese un correo válido.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contrasenaRegistro">Contraseña</label>
+                            <input type="password" id="contrasenaRegistro" class="form-control" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
                         </div>
                     </form>
                 </div>

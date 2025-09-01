@@ -6,7 +6,7 @@
             <!-- Bandeja de entrada -->
             <div class="col-md-4 col-lg-3">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white" style="background-color: #96072d;">
                         <h6 class="mb-0">Bandeja de entrada</h6>
                     </div>
                     <div class="list-group inbox-scroll">
@@ -18,7 +18,7 @@
             <!-- Contenido del ticket -->
             <div class="col-md-8 col-lg-9">
                 <div class="card">
-                    <div class="card-header bg-info text-white">
+                    <div class="card-header text-white" style="background-color: #163c64;">
                         <h6 class="mb-0">Tickets</h6>
                     </div>
                     <div class="card-body ticket-scroll">
@@ -33,14 +33,13 @@
     </div>
 
     <!-- Modal Gestionar -->
-    <div id="gestionarModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gestionarModalLabel"
-        aria-hidden="true">
+    <div id="gestionarModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gestionarModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="gestionarModalLabel">Gestionar Ticket</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -52,9 +51,16 @@
                                 <label for="idticket">ID del Ticket</label>
                                 <input type="text" class="form-control" id="idticket" readonly>
                             </div>
-                            <div class="form-group col-md-10">
-                                <label for="soporte">Seleccionar Opción</label>
-                                <select class="form-control" id="soporte" name="soporte">
+                            <div class="form-group col-md-5">
+                                <label for="tema">Seleccionar tema</label>
+                                <select class="form-control" id="tema" name="tema">
+                                    <!-- Opciones cargadas dinámicamente -->
+                                </select>
+                                <div class="invalid-feedback">Debe seleccionar una opción.</div>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="subtema">Seleccionar subtema</label>
+                                <select class="form-control" id="subtema" name="subtema">
                                     <!-- Opciones cargadas dinámicamente -->
                                 </select>
                                 <div class="invalid-feedback">Debe seleccionar una opción.</div>
@@ -64,8 +70,7 @@
                         <!-- Observación -->
                         <div class="form-group">
                             <label for="observacion">Observación</label>
-                            <textarea class="form-control" id="observacion" rows="4"
-                                placeholder="Escriba una observación" required></textarea>
+                            <textarea class="form-control" id="observacion" rows="4" placeholder="Escriba una observación" required></textarea>
                             <div class="invalid-feedback">Debe ingresar una observación.</div>
                         </div>
 
@@ -82,15 +87,14 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="snEquipo">SN del Equipo</label>
-                                <input type="text" class="form-control" id="snEquipo"
-                                    placeholder="Ingrese el SN del equipo">
+                                <input type="text" class="form-control" id="snEquipo" placeholder="Ingrese el SN del equipo">
                             </div>
                         </div>
 
                         <!-- Botones -->
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                            <button type="submit" class="btn btn-primary" id="guardarGestion">Guardar</button>
+                            <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal"><i class="fas fa-times mr-1"></i>Cancelar</button>
+                            <button type="submit" class="btn btn-fsvsaon" id="guardarGestion"><i class="fas fa-plus mr-1"></i>Registrar</button>
                         </div>
                     </form>
                 </div>
@@ -99,3 +103,4 @@
     </div>
 
     <script type="module" src="/controllers/tickets/tickets.js"></script>
+</body>
