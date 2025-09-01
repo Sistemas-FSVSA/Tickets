@@ -73,8 +73,11 @@ class Server {
     this.app.use(cookieParser());
     this.app.use(express.json());
 
-    // Servir la carpeta "uploads" como estática
-    this.app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+    // Servir la carpeta "uploads" como estática desde la ruta de red
+    this.app.use(
+      '/uploads',
+      express.static('\\\\' + process.env.UPLOAD_PATH)
+    );
   }
 
   routes() {
