@@ -511,7 +511,7 @@ function inicializarGraficos() {
 }
 
 function inicializarMonitorChart() {
-    const maxPoints = 20;
+    const maxPoints = 10;
     const cpuData = Array(maxPoints).fill(0);
     const memData = Array(maxPoints).fill(0);
 
@@ -560,7 +560,7 @@ function inicializarMonitorChart() {
                     align: 'top',       // La coloca arriba del punto
                     offset: 6,          // Ajusta la distancia hacia arriba (aumenta para más separación)
                     font: {
-                        size: 10,       // Tamaño de la fuente
+                        size: 12,       // Tamaño de la fuente
                     },
                     color: '#222',      // Color del texto
                     formatter: (value) => value ? value.toFixed(1) + '%' : ''

@@ -98,7 +98,10 @@ const guardarTickets = async (req, res) => {
 
         const insertFiles = async (files) => {
             for (let file of files) {
-                const fileUrl = file.path;
+                // 🔧 FIX: Extraer solo el nombre del archivo y crear la ruta relativa
+                const fileName = path.basename(file.path); // Solo el nombre: "1756760888777.png"
+                const relativePath = `uploads\\${fileName}`; // Ruta relativa: "uploads\1756760888777.png"
+                
                 const fileType = path.extname(file.path).substring(1).toLowerCase();
 
                 let tipo = 'otro';
@@ -109,7 +112,7 @@ const guardarTickets = async (req, res) => {
 
                 await pool.request()
                     .input('idticket', idTicket)
-                    .input('url', fileUrl)
+                    .input('url', relativePath) // 🔧 Guardar solo "uploads\archivo.png"
                     .input('tipo', tipo)
                     .query(insertFileQuery);
             }
