@@ -1,13 +1,18 @@
 const multer = require('multer');
 const path = require('path');
 
-// Configuración para guardar archivos en una carpeta llamada 'uploads'
+// Ruta absoluta al NAS montado (unidad de red)
+// 🔧 reconstruimos la ruta UNC con doble barra inicial
+const uploadDir = '\\\\' + process.env.UPLOAD_PATH;
+
+// Configuración para guardar archivos en la ruta de red
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './uploads');  // La carpeta debe existir
+        cb(null, uploadDir);  // La carpeta debe existir en la ruta de red
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));  // Nombre del archivo con timestamp
+        const fileName = Date.now() + path.extname(file.originalname);
+        cb(null, fileName);  // Nombre del archivo con timestamp
     }
 });
 
