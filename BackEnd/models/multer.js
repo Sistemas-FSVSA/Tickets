@@ -1,24 +1,33 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+require('dotenv').config();
 
-// Ruta absoluta al NAS montado (unidad de red)
-// 🔧 reconstruimos la ruta UNC con doble barra inicial
-const uploadDir = '\\\\' + process.env.UPLOAD_PATH;
+// Obtener la ruta desde la variable de entorno
+const UPLOAD_PATH = process.env.UPLOAD_PATH || './uploads';
 
-// Configuración para guardar archivos en la ruta de red
+// Verificar y crear el directorio si no existe
+if (!fs.existsSync(UPLOAD_PATH)) {
+    fs.mkdirSync(UPLOAD_PATH, { recursive: true });
+}
+
+// Configuración para guardar archivos
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, uploadDir);  // La carpeta debe existir en la ruta de red
+        cb(null, UPLOAD_PATH);
     },
     filename: function (req, file, cb) {
-        const fileName = Date.now() + path.extname(file.originalname);
-        cb(null, fileName);  // Nombre del archivo con timestamp
+        cb(null, Date.now() + path.extname(file.originalname));
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: {
+        fileSize: 50 * 1024 * 1024
+    }
+});
 
-// Middleware para procesar la subida de archivos
 const uploadFields = upload.fields([
     { name: 'images[]', maxCount: 2 },
     { name: 'files[]', maxCount: 2 },
