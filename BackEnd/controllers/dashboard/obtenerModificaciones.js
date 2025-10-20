@@ -1,5 +1,4 @@
 const { sistemasPoolPromise } = require('../../db/conexion');
-
 const obtenerModificacionesPorMes = async (req, res) => {
     try {
         const { anio } = req.body; // Recibimos el año desde el cuerpo de la solicitud
@@ -13,19 +12,19 @@ const obtenerModificacionesPorMes = async (req, res) => {
 
         const sistemasPool = await sistemasPoolPromise;
 
-        // Consulta SQL ajustada para manejar el formato 'YYYY-MM'
+        // Consulta SQL ajustada para sumar la columna 'total' en lugar de contar registros
         const query = `
             SELECT 
-                MONTH(CAST(fecha + '-01' AS DATE)) as mes, -- Convertir 'YYYY-MM' a una fecha válida
-                COUNT(idmodificacion) as cantidad
+                MONTH(CAST(fecha + '-01' AS DATE)) as mes,
+                SUM(ISNULL(total, 1)) as cantidad  -- Suma la columna 'total', si es NULL cuenta como 1
             FROM [sistemas].[dbo].[modificaciones]
-            WHERE YEAR(CAST(fecha + '-01' AS DATE)) = @anio -- Filtrar por el año proporcionado
+            WHERE YEAR(CAST(fecha + '-01' AS DATE)) = @anio
             GROUP BY MONTH(CAST(fecha + '-01' AS DATE))
             ORDER BY mes;
         `;
 
         const result = await sistemasPool.request()
-            .input('anio', anio) // Enviar el año como parámetro
+            .input('anio', anio)
             .query(query);
 
         // Formatear respuesta para incluir todos los meses (incluso los que no tienen datos)
