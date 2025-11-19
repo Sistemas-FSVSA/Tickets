@@ -27,6 +27,58 @@ if (extension) {
     });
 }
 
+
+// Validar que solo se permitan letras en el campo "Nombre"
+const username = document.getElementById('username');
+if (username) {
+    // Bloquear números y caracteres no permitidos
+    username.addEventListener('keydown', function (e) {
+        // Permitir teclas de control
+        if (
+            e.key === 'Backspace' ||
+            e.key === 'Tab' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowRight' ||
+            e.key === 'Delete' ||
+            e.key === 'Enter' ||
+            e.key === ' ' // Permitir espacio para nombres compuestos
+        ) {
+            return;
+        }
+
+        // Bloquear números
+        if (e.key >= '0' && e.key <= '9') {
+            e.preventDefault();
+            return;
+        }
+
+        // Solo permitir letras (a-z, A-Z) y letras con tildes/ñ
+        const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]$/;
+        if (!regex.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    // Bloquear copiar y pegar
+    username.addEventListener('paste', function (e) {
+        e.preventDefault();
+        Swal.fire({
+            title: '¡Acción no permitida!',
+            html: 'Digite su nombre completo.<br>Omita el uso de números.',
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+        });
+    });
+
+    username.addEventListener('copy', function (e) {
+        e.preventDefault();
+    });
+
+    username.addEventListener('cut', function (e) {
+        e.preventDefault();
+    });
+}
+
 // Inicializar Quill con las opciones personalizadas
 var quill = new Quill('#editor', {
     theme: 'snow',
