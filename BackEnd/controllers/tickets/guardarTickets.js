@@ -101,7 +101,7 @@ const guardarTickets = async (req, res) => {
                 // 🔧 FIX: Extraer solo el nombre del archivo y crear la ruta relativa
                 const fileName = path.basename(file.path); // Solo el nombre: "1756760888777.png"
                 const relativePath = `uploads\\${fileName}`; // Ruta relativa: "uploads\1756760888777.png"
-                
+
                 const fileType = path.extname(file.path).substring(1).toLowerCase();
 
                 let tipo = 'otro';
@@ -190,10 +190,11 @@ const guardarTickets = async (req, res) => {
 
         sendEmails();
 
+        // Backend - guardarTickets
         res.status(200).json({
-            message: `Ticket generado exitosamente con el ID: ${idTicket}`
+            message: 'Ticket enviado exitosamente',  // Para logs
+            idticket: idTicket                       // Para el frontend
         });
-
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Ocurrió un error en el servidor' });
