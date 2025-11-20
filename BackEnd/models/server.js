@@ -2,36 +2,36 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
-const { createServer } = require("http");
-const socketIo = require("socket.io");
+const { createServer } = require("http"); // Añadir
+const socketIo = require("socket.io"); // Añadir
 
 class Server {
   constructor() {
     this.app = express();
-    this.server = createServer(this.app);
-
+    this.server = createServer(this.app); 
+    // Obtener los orígenes permitidos desde la variable de entorno y convertirlos en array
     const allowedOrigins = process.env.ALLOWED_ORIGINS
-      ? process.env.ALLOWED_ORIGINS.split(",").map(origin => origin.trim())
+      ? process.env.ALLOWED_ORIGINS.split(",")
       : [];
 
     this.io = socketIo(this.server, {
       cors: {
-        origin: function (origin, callback) {
-          if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-          } else {
-            callback(new Error('Origen no permitido por CORS'));
-          }
-        },
-        methods: ["GET", "POST"],
-        credentials: true
+      origin: function (origin, callback) {
+        // Permitir solicitudes sin origen (como Postman o herramientas locales)
+        if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        } else {
+        callback(new Error('Origen no permitido por CORS'));
+        }
+      },
+      methods: ["GET", "POST"],
+      credentials: true
       },
       transports: ['websocket', 'polling'],
       allowUpgrades: true,
       pingInterval: 25000,
       pingTimeout: 20000
     });
-    
     this.port = process.env.PORT;
     this.indexPath = "/api/index";
     this.ticketsPath = "/api/tickets";
@@ -46,37 +46,34 @@ class Server {
 
     this.middlewares();
     this.routes();
-    this.monitorSetup();
+    this.monitorSetup(); //funcion para el monitor
   }
 
   middlewares() {
+
     const allowedOrigins = process.env.ALLOWED_ORIGINS
-      ? process.env.ALLOWED_ORIGINS.split(",").map(origin => origin.trim())
+      ? process.env.ALLOWED_ORIGINS.split(",")
       : [];
 
     this.app.use(
       cors({
         origin: function (origin, callback) {
-          if (!origin) {
-            return callback(null, true);
-          }
-
-          if (allowedOrigins.includes(origin)) {
+          // Permitir solicitudes sin origen (como Postman o herramientas locales)
+          if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
           } else {
             callback(new Error('Origen no permitido por CORS'));
           }
         },
-        methods: ["POST", "GET", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        credentials: true,
-        allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+        methods: ["POST", "GET", "PUT", "DELETE", "PATCH"],
+        credentials: true, // Habilita el envío de cookies y credenciales
       })
     );
 
     this.app.use(cookieParser());
     this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: true }));
 
+    // Servir la carpeta "uploads" como estática desde la ruta de red
     this.app.use(
       '/uploads',
       express.static('\\\\' + process.env.UPLOAD_PATH)
@@ -97,13 +94,15 @@ class Server {
   }
 
   monitorSetup() {
+    // Pasamos io al controlador del dashboard
     const { setupMonitor } = require("../controllers/dashboard/monitorController");
     setupMonitor(this.io);
   }
 
   listen() {
-    this.server.listen(this.port, '0.0.0.0', () => {
-      console.log(`Servidor escuchando en puerto ${this.port}`);
+    this.server.listen(this.port, () => {
+      console.log(`Escuchando desde http://localhost:${this.port}`);
+      console.log(`Archivos estáticos disponibles en http://localhost:${this.port}/uploads`);
     });
   }
 }
