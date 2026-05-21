@@ -98,9 +98,9 @@ const guardarTickets = async (req, res) => {
 
         const insertFiles = async (files) => {
             for (let file of files) {
-                // 🔧 FIX: Extraer solo el nombre del archivo y crear la ruta relativa
-                const fileName = path.basename(file.path); // Solo el nombre: "1756760888777.png"
-                const relativePath = `uploads\\${fileName}`; // Ruta relativa: "uploads\1756760888777.png"
+
+                const fileName = path.basename(file.path);
+                const relativePath = `uploads\\${fileName}`; 
 
                 const fileType = path.extname(file.path).substring(1).toLowerCase();
 
