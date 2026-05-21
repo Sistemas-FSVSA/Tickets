@@ -9,7 +9,7 @@ const actualizarEquipo = async (req, res) => {
         idinventario, sn, ip, mac, datos, procesador, tiporam, cantidadram,
         tipoalmacenamiento, cantidadalmacenamiento, formatoequipo, marca, so, nombreequipo,
         sistemas, mantenimiento, dependencia, responsable, usuario, cargousuario, observaciones,
-        idusuario
+        idusuario, LicOffice, LicSO
     } = equipoData;
 
     try {
@@ -27,7 +27,8 @@ const actualizarEquipo = async (req, res) => {
                     i.ipequipo, i.mantenimiento,
                     d.responsable, d.cargousuario, d.ipequipo AS ip_detalle, d.mac, 
                     d.puertodatos, d.procesador, d.idram, d.cantidadram, d.idalmacenamiento, 
-                    d.cantidadalmacenamiento, d.so, d.nombreusuario, d.usuariosistemas, d.observacion
+                    d.cantidadalmacenamiento, d.so, d.nombreusuario, d.usuariosistemas, d.observacion,
+                    d.LicOffice, d.LicSO
                 FROM inventario i
                 INNER JOIN detalleequipo d ON i.idinventario = d.idinventario
                 WHERE i.idinventario = @idinventario;`;
@@ -47,7 +48,8 @@ const actualizarEquipo = async (req, res) => {
             const fieldsToCheck = {
                 ip, mac, datos, procesador, tiporam, cantidadram, tipoalmacenamiento,
                 cantidadalmacenamiento, formatoequipo, marca, so, nombreequipo, sistemas,
-                mantenimiento, dependencia, responsable, usuario, cargousuario, observaciones
+                mantenimiento, dependencia, responsable, usuario, cargousuario, observaciones,
+                LicOffice, LicSO
             };
 
             const fieldMapping = {
@@ -69,7 +71,9 @@ const actualizarEquipo = async (req, res) => {
                 responsable: "responsable",
                 usuario: "nombreusuario",
                 cargousuario: "cargousuario",
-                observaciones: "observacion"
+                observaciones: "observacion",
+                LicOffice: "LicOffice",
+                LicSO: "LicSO"
             };
 
             for (const [key, newValue] of Object.entries(fieldsToCheck)) {
@@ -126,7 +130,8 @@ const actualizarEquipo = async (req, res) => {
                 puertodatos = @datos, procesador = @procesador, idram = @tiporam, 
                 cantidadram = @cantidadram, idalmacenamiento = @tipoalmacenamiento, 
                 cantidadalmacenamiento = @cantidadalmacenamiento, so = @so, nombreusuario = @usuario, 
-                nombreequipo = @nombreequipo, usuariosistemas = @sistemas, observacion = @observaciones
+                nombreequipo = @nombreequipo, usuariosistemas = @sistemas, observacion = @observaciones,
+                LicOffice = @LicOffice, LicSO = @LicSO
             WHERE idinventario = @idinventario;`;
 
             await transaction
@@ -150,6 +155,8 @@ const actualizarEquipo = async (req, res) => {
                 .input("nombreequipo", sql.VarChar, nombreequipo)
                 .input("sistemas", sql.VarChar, sistemas)
                 .input("observaciones", sql.VarChar, observaciones)
+                .input("LicOffice", sql.Int, (LicOffice === "" || LicOffice === null || LicOffice === undefined) ? null : parseInt(LicOffice, 10))
+                .input("LicSO", sql.Int, (LicSO === "" || LicSO === null || LicSO === undefined) ? null : parseInt(LicSO, 10))
                 .query(queryUpdateDetalleEquipo);
 
             // Actualización de la tabla mantenimiento

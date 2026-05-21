@@ -249,6 +249,8 @@ function editarInventario(idinventario) {
                 $("#cargousuario").val(inventario.cargousuario);
                 $("#responsable").val(inventario.responsable);
                 $("#so").val(inventario.so);
+                $("#LicSO").val(inventario.LicSO);
+                $("#LicOffice").val(inventario.LicOffice);
                 $("#cantidadalmacenamiento").val(inventario.cantidadalmacenamiento);
                 $("#mantenimiento").val(inventario.mantenimiento ? '1' : '0');
                 $("#sistemas").val(inventario.usuariosistemas === 1 ? '1' : inventario.usuariosistemas === 0 ? '0' : '2');
@@ -451,7 +453,7 @@ async function actualizarEquipo() {
     const equipoData = [
         "sn", "ip", "mac", "datos", "procesador", "tiporam", "cantidadram",
         "tipoalmacenamiento", "cantidadalmacenamiento", "formatoequipo", "marca",
-        "so", "nombreequipo", "sistemas", "dependencia", "responsable", "usuario",
+        "so", "LicOffice", "LicSO", "nombreequipo", "sistemas", "dependencia", "responsable", "usuario",
         "cargousuario", "mantenimiento", "observaciones"
     ];
 

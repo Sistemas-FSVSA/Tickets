@@ -1,28 +1,44 @@
 const sql = require('mssql');
 
-// Configuración para la base de datos 'tickets'
-const configTickets = {
-  user: process.env.DB1_USER,
-  password: process.env.DB1_PASSWORD,
-  server: process.env.DB1_SERVER,
-  database: process.env.DB1_DATABASE,
-  options: {
-    encrypt: false,
-    enableArithAbort: true
+// Función para construir la configuración extrayendo el host y puerto
+const buildConfig = (user, password, serverEnv, database) => {
+  const config = {
+    user,
+    password,
+    database,
+    options: {
+      encrypt: false,
+      enableArithAbort: true
+    }
+  };
+
+  if (serverEnv) {
+    // Si viene en formato "host,puerto" o "host:puerto"
+    const parts = serverEnv.split(/[,:]/);
+    config.server = parts[0].trim();
+    if (parts.length > 1) {
+      config.port = parseInt(parts[1].trim(), 10);
+    }
   }
+
+  return config;
 };
 
+// Configuración para la base de datos 'tickets'
+const configTickets = buildConfig(
+  process.env.DB1_USER,
+  process.env.DB1_PASSWORD,
+  process.env.DB1_SERVER,
+  process.env.DB1_DATABASE
+);
+
 // Configuración para la base de datos 'sistemas'
-const configSistemas = {
-  user: process.env.DB2_USER,
-  password: process.env.DB2_PASSWORD,
-  server: process.env.DB2_SERVER,
-  database: process.env.DB2_DATABASE,
-  options: {
-    encrypt: false,
-    enableArithAbort: true
-  }
-};
+const configSistemas = buildConfig(
+  process.env.DB2_USER,
+  process.env.DB2_PASSWORD,
+  process.env.DB2_SERVER,
+  process.env.DB2_DATABASE
+);
 
 // Función para conectar a una base de datos con reintentos
 const connectWithRetry = async (config, retryInterval = 5000) => {

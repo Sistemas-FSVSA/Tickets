@@ -32,7 +32,7 @@ class Server {
       pingInterval: 25000,
       pingTimeout: 20000
     });
-    this.port = process.env.PORT;
+    this.port = process.env.PORT || '8080';
     this.indexPath = "/api/index";
     this.ticketsPath = "/api/tickets";
     this.usuariosPath = "/api/usuarios";
