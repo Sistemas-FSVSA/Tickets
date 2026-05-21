@@ -122,10 +122,18 @@
                         <div class="col-md-3 mb-3">
                             <label for="mantenimiento">Mantenimiento</label>
                             <select class="form-control" id="mantenimiento" required>
-                                <option value="">Seleccionar</option> <!-- Opción predeterminada -->
+                                <option value="">Seleccionar</option>
                                 <option value="1">Aplica</option>
                                 <option value="0">No Aplica</option>
                             </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="LicOffice">Licencia Office</label>
+                            <input type="text" class="form-control" id="LicOffice" placeholder="Licencia Office">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="LicSO">Licencia S.O</label>
+                            <input type="text" class="form-control" id="LicSO" placeholder="Licencia S.O">
                         </div>
                         <div class="col-md-12 mb-3 d-flex align-items-center">
                             <div class="flex-grow-1">
@@ -146,7 +154,8 @@
             <!-- FINAL CUERPO DEL MODAL -->
             <!-- INICIO PIES DEL MODAL -->
             <div class="modal-footer d-flex justify-content-end">
-                <button class="btn btn-fsvsaoff" type="button" id="cerrarBtn" data-dismiss="modal"><i class="fas fa-times mr-1"></i>Cancelar</button>
+                <button class="btn btn-fsvsaoff" type="button" id="cerrarBtn" data-dismiss="modal"><i
+                        class="fas fa-times mr-1"></i>Cancelar</button>
                 <button class="btn btn-fsvsaon" id="guardarEquipoBtn"><i class="fas fa-plus mr-1"></i>Registrar</button>
             </div>
             <!-- FINAL PIES DEL MODAL -->
@@ -191,8 +200,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal"><i class="fas fa-times mr-1"></i>Cancelar</button>
-                <button type="button" class="btn btn-fsvsaon" id="guardarImagenesBtn"><i class="fas fa-plus mr-1"></i>Registrar Imágenes</button>
+                <button type="button" class="btn btn-fsvsaoff" data-dismiss="modal"><i
+                        class="fas fa-times mr-1"></i>Cancelar</button>
+                <button type="button" class="btn btn-fsvsaon" id="guardarImagenesBtn"><i
+                        class="fas fa-plus mr-1"></i>Registrar Imágenes</button>
             </div>
         </div>
     </div>

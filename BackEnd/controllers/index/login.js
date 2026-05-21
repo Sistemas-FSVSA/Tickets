@@ -47,10 +47,10 @@ const login = async (req, res) => {
 
         // Configuración de la cookie
         res.cookie('authToken', token, {
-            httpOnly: true, // Solo accesible desde el backend
-            secure: false, // Cambiar a `true` si usas HTTPS
-            sameSite: 'strict',
-            maxAge: 12 * 60 * 60 * 1000, // 12 horas en milisegundos
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 12 * 60 * 60 * 1000,
             path: '/'
         });
 

@@ -273,7 +273,7 @@ async function enviarEquipo() {
         "sn", "ip", "mac", "datos", "procesador", "tiporam", "cantidadram",
         "tipoalmacenamiento", "cantidadalmacenamiento", "formatoequipo", "marcaequipo",
         "so", "nombreequipo", "sistemas", "dependenciaequipo", "responsable", "usuario",
-        "cargousuario", "mantenimiento", "observaciones"
+        "cargousuario", "mantenimiento", "observaciones", "LicOffice", "LicSO"
     ];
 
     equipoData.forEach(id => {
