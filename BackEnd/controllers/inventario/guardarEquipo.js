@@ -7,7 +7,7 @@ const guardarEquipo = async (req, res) => {
         const {
             sn, ip, mac, datos, procesador, tiporam, cantidadram, tipoalmacenamiento, cantidadalmacenamiento,
             formatoequipo, marcaequipo, so, nombreequipo, sistemas, dependenciaequipo, responsable, usuario, cargousuario,
-            mantenimiento, observaciones, idusuario
+            mantenimiento, observaciones, idusuario, LicOffice, LicSO
         } = equipoData;
 
         const pool = await sistemasPoolPromise;
@@ -48,10 +48,10 @@ const guardarEquipo = async (req, res) => {
             const queryDetalle = `
             INSERT INTO detalleequipo (idinventario, idformato, idmarca, iddependencia, responsable, cargousuario, ipequipo, mac, 
             puertodatos, procesador, idram, cantidadram, idalmacenamiento, cantidadalmacenamiento, so, nombreusuario, nombreequipo, 
-            usuariosistemas, observacion)
+            usuariosistemas, observacion, LicOffice, LicSO)
             VALUES (@idinventario, @formatoequipo, @marca, @dependencia, @responsable, @cargousuario, @ip, @mac, @datos, 
             @procesador, @tiporam, @cantidadram, @tipoalmacenamiento, @cantidadalmacenamiento, @so, @usuario, 
-            @nombreequipo, @sistemas, @observaciones);`;
+            @nombreequipo, @sistemas, @observaciones, @LicOffice, @LicSO);`;
 
             await transaction.request()
                 .input("idinventario", sql.Int, idinventario)
@@ -73,6 +73,8 @@ const guardarEquipo = async (req, res) => {
                 .input("nombreequipo", sql.VarChar, nombreequipo)
                 .input("sistemas", sql.Int, sistemas)
                 .input("observaciones", sql.VarChar, observaciones)
+                .input("LicOffice", sql.VarChar, LicOffice)
+                .input("LicSO", sql.VarChar, LicSO)
                 .query(queryDetalle);
 
             // Programar mantenimiento

@@ -155,8 +155,8 @@ const actualizarEquipo = async (req, res) => {
                 .input("nombreequipo", sql.VarChar, nombreequipo)
                 .input("sistemas", sql.VarChar, sistemas)
                 .input("observaciones", sql.VarChar, observaciones)
-                .input("LicOffice", sql.Int, (LicOffice === "" || LicOffice === null || LicOffice === undefined) ? null : parseInt(LicOffice, 10))
-                .input("LicSO", sql.Int, (LicSO === "" || LicSO === null || LicSO === undefined) ? null : parseInt(LicSO, 10))
+                .input("LicOffice", sql.VarChar, (LicOffice === "" || LicOffice === null || LicOffice === undefined) ? null : LicOffice)
+                .input("LicSO", sql.VarChar, (LicSO === "" || LicSO === null || LicSO === undefined) ? null : LicSO)
                 .query(queryUpdateDetalleEquipo);
 
             // Actualización de la tabla mantenimiento
