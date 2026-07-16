@@ -1,5 +1,13 @@
 // --- Autenticación y Permisos ---
-const url = window.env.API_URL;
+// NOTA: este formulario es público (no requiere sesión), por eso ninguna
+// de las peticiones de abajo manda header Authorization. Si en algún
+// momento el backend empieza a exigir un token incluso para este flujo
+// público, avisar para agregarlo.
+const url = window.env.API_URL; // Backend viejo (se mantiene por si algo más de esta página lo usa)
+
+// Backend NUEVO: solo para los endpoints de tickets que ya migraron
+// (topics, subtopics, dependencias vía /auth, y creación de ticket).
+const ticketsUrl = window.env.TICKETS_API_URL;
 
 const MAX_IMAGES = 2;
 const MAX_FILES = 2;
@@ -91,46 +99,83 @@ var quill = new Quill('#editor', {
 
 // Iniciar la validación periódica al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
-    validarHorarioPeriodicamente();
-    contadorCaracteres()
+    // NOTA: se quitó la llamada a validarHorarioPeriodicamente() — llamaba a
+    // `${url}/api/index/horario`, endpoint que ya no existe en el backend
+    // nuevo. Si en algún momento se necesita restringir el horario de
+    // creación de tickets, habría que reimplementarlo contra un endpoint
+    // real del backend actual.
+    contadorCaracteres();
 
-    fetchOptions(`${url}/api/tickets/obtenerDependencias`, 'dependencia', 'dependencias');
-    fetchOptions(`${url}/api/tickets/obtenerTemas`, 'tema', 'temas');
+    // Endpoints nuevos: temas y dependencias viven en rutas y con formas
+    // de respuesta distintas a las de antes, por eso ahora son dos
+    // funciones dedicadas en vez de una sola genérica (ver más abajo).
+    cargarTemas();
+    cargarDependencias();
 });
 
+// ==========================
+// Carga de Temas
+// ==========================
+// GET /system/tickets/topics?status=true -> { status, message, data: [{ topicId, name, priorityId, status }] }
+function cargarTemas() {
+    fetch(`${ticketsUrl}/system/tickets/topics?status=true`)
+        .then(response => response.json())
+        .then(result => {
+            const temas = (result.data || [])
+                .filter(item => item.status === true)
+                .sort((a, b) => a.name.localeCompare(b.name));
 
+            const select = document.getElementById('tema');
+            select.innerHTML = '';
 
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Seleccione un tema';
+            select.appendChild(defaultOption);
 
-// Validar horario periódicamente
-function validarHorarioPeriodicamente() {
-    setInterval(async () => {
-        const ahora = new Date(); // Declarar correctamente la fecha actual
-        const fechaLocalISO = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000).toISOString();
-
-        try {
-            const response = await fetch(`${url}/api/index/horario`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fechaHora: fechaLocalISO }),
-                credentials: "include",
+            temas.forEach(tema => {
+                const opt = document.createElement('option');
+                opt.value = tema.topicId;
+                opt.textContent = tema.name;
+                select.appendChild(opt);
             });
+        })
+        .catch(error => console.error('Error al obtener temas:', error));
+}
 
-            const data = await response.json();
+// ==========================
+// Carga de Dependencias
+// ==========================
+// GET /auth/dependency?code=TICKETS -> { status, message, data: [{ dependency, name, ... }] }
+// NOTA: este endpoint vive en /auth (no en /system/tickets), y el
+// identificador real es "dependency" (viene como texto, ej. "102"),
+// no un ID numérico como en el formulario viejo. Tampoco trae un campo
+// de estado explícito: todo lo que devuelve para code=TICKETS ya se
+// asume habilitado para este formulario.
+function cargarDependencias() {
+    fetch(`${ticketsUrl}/auth/dependency?code=TICKETS`)
+        .then(response => response.json())
+        .then(result => {
+            const dependencias = (result.data || [])
+                .slice()
+                .sort((a, b) => a.name.localeCompare(b.name));
 
-            if (data.estado !== "true") {
-                Swal.fire({
-                    title: "Horario no disponible",
-                    text: "El horario permitido ha finalizado. Serás redirigido al inicio.",
-                    icon: "warning",
-                    confirmButtonText: "Aceptar",
-                }).then(() => {
-                    window.location.href = "/";
-                });
-            }
-        } catch (error) {
-            console.error("Error al validar horario:", error);
-        }
-    }, 60000); // Validar cada 60 segundos
+            const select = document.getElementById('dependencia');
+            select.innerHTML = '';
+
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Seleccione una dependencia';
+            select.appendChild(defaultOption);
+
+            dependencias.forEach(dep => {
+                const opt = document.createElement('option');
+                opt.value = dep.dependency;
+                opt.textContent = dep.name;
+                select.appendChild(opt);
+            });
+        })
+        .catch(error => console.error('Error al obtener dependencias:', error));
 }
 
 
@@ -168,26 +213,28 @@ function contadorCaracteres() {
 }
 
 // Cuando el usuario selecciona un tema
+// GET /system/tickets/subtopics?status=true&topicId={topicId} -> { status, message, data: [{ subtopicId, topicId, description, status }] }
 document.getElementById('tema').addEventListener('change', async function () {
-    const temaId = this.value;
+    const topicId = this.value;
     const subtemaContainer = document.getElementById('subtema-container');
     const subtemaSelect = document.getElementById('subtema');
 
     // Limpia el select de subtemas
     subtemaSelect.innerHTML = '<option value="">Selecciona un subtema</option>';
 
-    if (temaId) {
+    if (topicId) {
         try {
-            const response = await fetch(`${url}/api/tickets/obtenerSubtemas?idtema=${temaId}`, {
+            const response = await fetch(`${ticketsUrl}/system/tickets/subtopics?status=true&topicId=${topicId}`, {
                 method: 'GET',
             });
-            const data = await response.json();
+            const result = await response.json();
+            const subtemas = result.data || [];
 
-            if (data.subtemas && data.subtemas.length > 0) {
-                data.subtemas.forEach(sub => {
+            if (subtemas.length > 0) {
+                subtemas.forEach(sub => {
                     const option = document.createElement('option');
-                    option.value = sub.idsubtema;
-                    option.textContent = sub.descripcion;
+                    option.value = sub.subtopicId;
+                    option.textContent = sub.description;
                     subtemaSelect.appendChild(option);
                 });
                 subtemaContainer.style.display = '';
@@ -277,6 +324,9 @@ function removePreviewItem(type, name) {
 let lastRequestTime = 0; // Guarda la marca de tiempo del último envío
 
 // Enviar el formulario
+// POST /system/tickets -> body: email, userName, extension, dependencyId,
+// topicId, subTopicId, description, desktop, images, files
+// Respuesta: { status, message, data: { ticketId, user, details, status, createdDate } }
 const form = document.getElementById('ticketForm');
 form.onsubmit = function (e) {
     e.preventDefault();
@@ -294,38 +344,44 @@ form.onsubmit = function (e) {
 
     lastRequestTime = currentTime; // Actualizar tiempo del último envío
 
-    const dependenciaId = document.getElementById('dependencia').value;
-    const temaId = document.getElementById('tema').value;
-    const dependenciaNombre = document.getElementById('dependencia').options[document.getElementById('dependencia').selectedIndex].text;
-    const temaNombre = document.getElementById('tema').options[document.getElementById('tema').selectedIndex].text;
-    const subtemaId = document.getElementById('subtema').value;
-    const subtemaNombre = document.getElementById('subtema').options[document.getElementById('subtema').selectedIndex].text;
-    const temaCompleto = `${temaNombre} - ${subtemaNombre}`;
-
-
+    const email = document.getElementById('email').value;
+    const userName = document.getElementById('username').value;
+    const extensionValue = document.getElementById('extension').value;
+    const dependencyId = document.getElementById('dependencia').value;
+    const topicId = document.getElementById('tema').value;
+    const subTopicId = document.getElementById('subtema').value;
     const cleanedDescripcion = quill.getText().trim();
 
-    const formData = new FormData(form);
-    formData.set('dependencia', dependenciaId);
-    formData.set('tema', temaId);
-    formData.set('idsubtema', subtemaId);
-    formData.set('subtema', subtemaNombre);
-    formData.set('descripcion', cleanedDescripcion);
-    formData.set('dependenciaNombre', dependenciaNombre);
-    formData.set('temaNombre', temaCompleto);
+    // TODO: no hay una fuente confiable para este dato desde el navegador
+    // (el backend espera un identificador del equipo, ej. "108AIOHP").
+    // Se envía vacío por ahora; si el backend lo completa solo o hay otra
+    // forma de obtenerlo, ajustar aquí.
+    const desktop = '';
 
-    imageFiles.forEach(file => formData.append('images[]', file));
-    uploadedFiles.forEach(file => formData.append('files[]', file));
+    const formData = new FormData();
+    formData.set('email', email);
+    formData.set('userName', userName);
+    formData.set('extension', extensionValue);
+    formData.set('dependencyId', dependencyId);
+    formData.set('topicId', topicId);
+    if (subTopicId) {
+        formData.set('subTopicId', subTopicId);
+    }
+    formData.set('description', cleanedDescripcion);
+    formData.set('desktop', desktop);
 
-    fetch(`${url}/api/tickets/guardarTickets`, { method: 'POST', body: formData })
+    imageFiles.forEach(file => formData.append('images', file));
+    uploadedFiles.forEach(file => formData.append('files', file));
+
+    fetch(`${ticketsUrl}/system/tickets`, { method: 'POST', body: formData })
         .then(response => {
             if (response.status === 429) {
                 throw new Error("Demasiadas solicitudes. Intenta nuevamente en un minuto.");
             }
-            return response.json();
+            return response.json().then(result => ({ ok: response.ok, result }));
         })
-        .then(result => {
-            if (result.message) {
+        .then(({ ok, result }) => {
+            if (ok && result.message) {
                 Swal.fire({
                     title: "¡Éxito!",
                     text: result.message,
@@ -337,7 +393,7 @@ form.onsubmit = function (e) {
             } else {
                 Swal.fire({
                     title: "Error",
-                    text: result.mensaje || "Hubo un problema al crear el ticket",
+                    text: result.message || "Hubo un problema al crear el ticket",
                     icon: "error",
                     confirmButtonText: "Intentar nuevamente"
                 });
@@ -356,36 +412,6 @@ form.onsubmit = function (e) {
             }
         });
 };
-
-
-// Utilidades de fetch y validación
-function fetchOptions(url, selectId, keyName) {
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            // Filtrar los elementos con estado true
-            const options = data[keyName]
-                .filter(item => item.estado === true)
-                .sort((a, b) => a.nombre.localeCompare(b.nombre)); // Ordenar alfabéticamente por nombre
-
-            const select = document.getElementById(selectId);
-
-            select.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = `Seleccione una ${selectId === 'dependencia' ? 'dependencia' : 'tema'}`;
-            select.appendChild(defaultOption);
-
-            // Añadir las opciones ordenadas al <select>
-            options.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option.iddependencia || option.idtema;
-                opt.textContent = option.nombre;
-                select.appendChild(opt);
-            });
-        })
-        .catch(error => console.error(`Error al obtener ${keyName}:`, error));
-}
 
 // Escuchar el evento de pegar
 quill.root.addEventListener('paste', function (e) {
@@ -445,4 +471,3 @@ quill.getModule('toolbar').addHandler('link', function () {
         displayPreviewFile(file);
     });
 });
-
