@@ -116,9 +116,12 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================
 // Carga de Temas
 // ==========================
-// GET /system/tickets/topics?status=true -> { status, message, data: [{ topicId, name, priorityId, status }] }
+// GET /system/tickets/topics -> { status, message, data: [{ topicId, name, priorityId, status }] }
+// NOTA: la respuesta trae temas con status true Y false mezclados (no se
+// filtra del lado del backend), por eso el filtro por "status === true"
+// se hace acá, en el cliente.
 function cargarTemas() {
-    fetch(`${ticketsUrl}/system/tickets/topics?status=true`)
+    fetch(`${ticketsUrl}/system/tickets/topics`)
         .then(response => response.json())
         .then(result => {
             const temas = (result.data || [])
@@ -146,14 +149,15 @@ function cargarTemas() {
 // ==========================
 // Carga de Dependencias
 // ==========================
-// GET /auth/dependency?code=TICKETS -> { status, message, data: [{ dependency, name, ... }] }
+// GET /auth/dependency?code=AREAS -> { status, message, data: [{ dependency, name, ... }] }
 // NOTA: este endpoint vive en /auth (no en /system/tickets), y el
 // identificador real es "dependency" (viene como texto, ej. "102"),
 // no un ID numérico como en el formulario viejo. Tampoco trae un campo
-// de estado explícito: todo lo que devuelve para code=TICKETS ya se
-// asume habilitado para este formulario.
+// de estado explícito: todo lo que devuelve para code=AREAS ya se
+// asume habilitado para este formulario. El único filtro que importa
+// es "code=TICKETS" (no depende de status/page/limit).
 function cargarDependencias() {
-    fetch(`${ticketsUrl}/auth/dependency?code=TICKETS`)
+    fetch(`${ticketsUrl}/auth/dependency?code=AREAS`)
         .then(response => response.json())
         .then(result => {
             const dependencias = (result.data || [])
@@ -213,7 +217,7 @@ function contadorCaracteres() {
 }
 
 // Cuando el usuario selecciona un tema
-// GET /system/tickets/subtopics?status=true&topicId={topicId} -> { status, message, data: [{ subtopicId, topicId, description, status }] }
+// GET /system/tickets/subtopics?topicId={topicId} -> { status, message, data: [{ subtopicId, topicId, description, status }] }
 document.getElementById('tema').addEventListener('change', async function () {
     const topicId = this.value;
     const subtemaContainer = document.getElementById('subtema-container');
@@ -224,11 +228,11 @@ document.getElementById('tema').addEventListener('change', async function () {
 
     if (topicId) {
         try {
-            const response = await fetch(`${ticketsUrl}/system/tickets/subtopics?status=true&topicId=${topicId}`, {
+            const response = await fetch(`${ticketsUrl}/system/tickets/subtopics?topicId=${topicId}`, {
                 method: 'GET',
             });
             const result = await response.json();
-            const subtemas = result.data || [];
+            const subtemas = (result.data || []).filter(item => item.status === true);
 
             if (subtemas.length > 0) {
                 subtemas.forEach(sub => {
@@ -325,7 +329,8 @@ let lastRequestTime = 0; // Guarda la marca de tiempo del último envío
 
 // Enviar el formulario
 // POST /system/tickets -> body: email, userName, extension, dependencyId,
-// topicId, subTopicId, description, desktop, images, files
+// dependencyName, topicId, topicName, subTopicId, subTopicName,
+// description, desktop, images, files
 // Respuesta: { status, message, data: { ticketId, user, details, status, createdDate } }
 const form = document.getElementById('ticketForm');
 form.onsubmit = function (e) {
@@ -347,9 +352,21 @@ form.onsubmit = function (e) {
     const email = document.getElementById('email').value;
     const userName = document.getElementById('username').value;
     const extensionValue = document.getElementById('extension').value;
-    const dependencyId = document.getElementById('dependencia').value;
-    const topicId = document.getElementById('tema').value;
-    const subTopicId = document.getElementById('subtema').value;
+
+    const dependenciaSelect = document.getElementById('dependencia');
+    const temaSelect = document.getElementById('tema');
+    const subtemaSelect = document.getElementById('subtema');
+
+    const dependencyId = dependenciaSelect.value;
+    const topicId = temaSelect.value;
+    const subTopicId = subtemaSelect.value;
+
+    // Nombre visible de cada select (no solo el ID) — el backend ahora
+    // también exige dependencyName/topicName/subTopicName en el payload.
+    const dependencyName = dependenciaSelect.options[dependenciaSelect.selectedIndex]?.text || '';
+    const topicName = temaSelect.options[temaSelect.selectedIndex]?.text || '';
+    const subTopicName = subtemaSelect.options[subtemaSelect.selectedIndex]?.text || '';
+
     const cleanedDescripcion = quill.getText().trim();
 
     // TODO: no hay una fuente confiable para este dato desde el navegador
@@ -362,11 +379,18 @@ form.onsubmit = function (e) {
     formData.set('email', email);
     formData.set('userName', userName);
     formData.set('extension', extensionValue);
+
     formData.set('dependencyId', dependencyId);
+    formData.set('dependencyName', dependencyName);
+
     formData.set('topicId', topicId);
+    formData.set('topicName', topicName);
+
     if (subTopicId) {
         formData.set('subTopicId', subTopicId);
+        formData.set('subTopicName', subTopicName);
     }
+
     formData.set('description', cleanedDescripcion);
     formData.set('desktop', desktop);
 
