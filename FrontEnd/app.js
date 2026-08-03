@@ -84,43 +84,13 @@ app.get("/login", (req, res) => {
   res.render("login", { layout: false });
 });
 
-app.get("/tickets/nuevoticket", async (req, res) => {
-  try {
-    const ahora = new Date();
-    const fechaLocal = new Date(
-      ahora.getTime() - ahora.getTimezoneOffset() * 60000
-    ); // Ajuste de zona horaria
-
-    // Determinar la URL de la API según el host de la petición
-    const host = req.headers.host;
-    let apiUrl;
-
-    if (host.includes(process.env.FRONTEND_HOST)) {
-      apiUrl = process.env.API_URL_HOST;
-    } else if (host.includes(process.env.FRONTEND_IP)) {
-      apiUrl = process.env.API_URL_IP;
-    } else {
-      apiUrl = process.env.API_URL_IP; // Fallback si no hay coincidencias
-    }
-
-    const response = await fetch(`${apiUrl}/api/index/horario`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fechaHora: fechaLocal.toISOString() }), // Enviar en ISO
-      credentials: "include",
-    });
-
-    const data = await response.json();
-
-    if (data.estado === "true") {
-      res.render("tickets/newticket", { layout: false });
-    } else {
-      res.redirect("/"); // Redirigir si el horario no está disponible
-    }
-  } catch (error) {
-    console.error("Error al validar horario:", error);
-    res.redirect("/"); // Redirigir en caso de error
-  }
+// NOTA: se quitó la validación de horario (llamaba a `${apiUrl}/api/index/horario`,
+// endpoint que ya no existe en el backend nuevo). Ahora la vista se renderiza
+// directo. Si en algún momento se necesita restringir el horario de creación
+// de tickets, habría que reimplementarlo contra un endpoint real del backend
+// actual (no hay ninguno documentado para esto todavía).
+app.get("/tickets/nuevoticket", (req, res) => {
+  res.render("tickets/newticket", { layout: false });
 });
 
 app.get("/tickets/infoticket", (req, res) => {
@@ -247,7 +217,14 @@ app.get("/config.js", (req, res) => {
     apiUrl = process.env.API_URL_IP; // Fallback si no hay coincidencias
   }
 
-  res.send(`window.env = { API_URL: "${apiUrl}" };`);
+  // Backend NUEVO (solo para los endpoints de tickets que ya migraron:
+  // /system/tickets, /system/tickets/topics, /system/tickets/subtopics,
+  // /auth/dependency). El resto del sitio sigue usando API_URL de arriba,
+  // que apunta al backend viejo — por eso es una variable aparte y no un
+  // reemplazo de "apiUrl".
+  const ticketsApiUrl = process.env.TICKETS_API_URL_IP;
+
+  res.send(`window.env = { API_URL: "${apiUrl}", TICKETS_API_URL: "${ticketsApiUrl}" };`);
 });
 
 app.get("/bodega/registrobodega", (req, res) => {
