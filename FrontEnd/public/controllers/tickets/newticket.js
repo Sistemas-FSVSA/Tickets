@@ -7,7 +7,7 @@ const url = window.env.API_URL; // Backend viejo (se mantiene por si algo más d
 
 // Backend NUEVO: solo para los endpoints de tickets que ya migraron
 // (topics, subtopics, dependencias vía /auth, y creación de ticket).
-const ticketsUrl = window.env.TICKETS_API_URL;
+const ticketsUrl = 'https://auroraservice.funerariasanvicente.co/api';
 
 const MAX_IMAGES = 2;
 const MAX_FILES = 2;
