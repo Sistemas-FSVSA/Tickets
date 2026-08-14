@@ -17,8 +17,10 @@ async function inicializarDashboard() {
     const fechaInicio = new Date(fechaActual);
     fechaInicio.setDate(fechaActual.getDate() - 6); // Una semana atrás
 
-    document.getElementById('fechaInicio').value = fechaInicio.toISOString().split('T')[0];
-    document.getElementById('fechaFin').value = fechaActual.toISOString().split('T')[0];
+    const fechaInicioInput = document.getElementById('fechaInicio');
+    const fechaFinInput = document.getElementById('fechaFin');
+    if (fechaInicioInput) fechaInicioInput.value = fechaInicio.toISOString().split('T')[0];
+    if (fechaFinInput) fechaFinInput.value = fechaActual.toISOString().split('T')[0];
 
     await cargarTodosLosDatos();
     // await cargarUsuariosMasActivos();
@@ -121,10 +123,15 @@ function inicializarUI() {
 function inicializarGraficos() {
     Chart.register(ChartDataLabels);
     const customHeight = 500;
-    document.getElementById('salesChart').parentElement.style.height = `${customHeight}px`;
-    document.getElementById('usersChart').parentElement.style.height = `${customHeight}px`;
-    document.getElementById('maintenanceChart').parentElement.style.height = `${customHeight}px`;
-    document.getElementById('modificationsChart').parentElement.style.height = `${customHeight}px`;
+    const salesCanvas = document.getElementById('salesChart');
+    const usersCanvas = document.getElementById('usersChart');
+    const maintenanceCanvas = document.getElementById('maintenanceChart');
+    const modificationsCanvas = document.getElementById('modificationsChart');
+
+    if (salesCanvas?.parentElement) salesCanvas.parentElement.style.height = `${customHeight}px`;
+    if (usersCanvas?.parentElement) usersCanvas.parentElement.style.height = `${customHeight}px`;
+    if (maintenanceCanvas?.parentElement) maintenanceCanvas.parentElement.style.height = `${customHeight}px`;
+    if (modificationsCanvas?.parentElement) modificationsCanvas.parentElement.style.height = `${customHeight}px`;
 
     // Verifica si los gráficos existen antes de destruirlos
     if (window.salesChart instanceof Chart) {
@@ -140,7 +147,8 @@ function inicializarGraficos() {
         window.modificationsChart.destroy();
     }
 
-    window.salesChart = new Chart(document.getElementById('salesChart').getContext('2d'), {
+    if (salesCanvas) {
+        window.salesChart = new Chart(salesCanvas.getContext('2d'), {
         type: 'pie',
         data: {
             labels: [],
@@ -208,9 +216,11 @@ function inicializarGraficos() {
             layout: { padding: { left: 20, right: 20 } }
         },
         plugins: [ChartDataLabels]
-    });
+        });
+    }
 
-    window.usersChart = new Chart(document.getElementById('usersChart').getContext('2d'), {
+    if (usersCanvas) {
+        window.usersChart = new Chart(usersCanvas.getContext('2d'), {
         type: 'bar',
         data: {
             labels: [], // Se llenará con los nombres de soporte
@@ -289,7 +299,8 @@ function inicializarGraficos() {
             }
         },
         plugins: [ChartDataLabels]
-    });
+        });
+    }
 
     // --- Inicializar gráfico Subtemas (placeholder) ---
     try {
@@ -355,7 +366,8 @@ function inicializarGraficos() {
         console.error('Error inicializando usersChartSubtemas:', e);
     }
 
-    window.maintenanceChart = new Chart(document.getElementById('maintenanceChart').getContext('2d'), {
+    if (maintenanceCanvas) {
+        window.maintenanceChart = new Chart(maintenanceCanvas.getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: [],
@@ -428,9 +440,11 @@ function inicializarGraficos() {
             }
         },
         plugins: [ChartDataLabels]
-    });
+        });
+    }
 
-    window.modificationsChart = new Chart(document.getElementById('modificationsChart').getContext('2d'), {
+    if (modificationsCanvas) {
+        window.modificationsChart = new Chart(modificationsCanvas.getContext('2d'), {
         type: 'line',
         data: {
             labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -507,7 +521,8 @@ function inicializarGraficos() {
         },
 
         plugins: [ChartDataLabels]
-    });
+        });
+    }
 }
 
 function inicializarMonitorChart() {
@@ -1040,7 +1055,7 @@ function formatDate(date) {
     });
 }
 
-document.getElementById('selectAnio').addEventListener('change', cargarTodosLosDatos);
-document.getElementById('fechaInicio').addEventListener('change', cargarTodosLosDatos);
-document.getElementById('fechaFin').addEventListener('change', cargarTodosLosDatos);
+document.getElementById('selectAnio')?.addEventListener('change', cargarTodosLosDatos);
+document.getElementById('fechaInicio')?.addEventListener('change', cargarTodosLosDatos);
+document.getElementById('fechaFin')?.addEventListener('change', cargarTodosLosDatos);
 
