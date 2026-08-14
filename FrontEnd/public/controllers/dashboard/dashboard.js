@@ -114,10 +114,6 @@ function updateServerStatus(cpuUsage, memUsage, offline = false) {
 }
 
 function inicializarUI() {
-    document.getElementById('ticketsActivos').textContent = '...';
-    document.getElementById('ticketsGestionados').textContent = '...';
-    document.getElementById('ticketsPendientes').textContent = '...';
-    document.getElementById('equiposActivos').textContent = '...';
 }
 
 function inicializarGraficos() {
@@ -643,119 +639,19 @@ function actualizarGraficoSales(tickets) {
 
 async function cargarTodosLosDatos() {
     try {
-        // 📅 Fechas de ejemplo para obtener datos
-        const fechaInicio = document.getElementById('fechaInicio')?.value || '';
-        const fechaFin = document.getElementById('fechaFin')?.value || '';
         const anio = document.getElementById('selectAnio')?.value || '';
-
-        console.log('Valor de url:', url);
-        console.log('URLs usadas:', {
-            conteoTickets: `${url}/api/dashboard/obtenerEstadoTickets`,
-            dependencias: `${url}/api/dashboard/obtenerDependencias`,
-            soportes: `${url}/api/dashboard/obtenerSoportes`,
-            equipos: `${url}/api/dashboard/obtenerEquipos`,
-            mantenimientos: `${url}/api/dashboard/obtenerEstadoMantenimiento`,
-            modificaciones: `${url}/api/dashboard/obtenerModificaciones`,
-            temas: `${url}/api/dashboard/temas-solicitados`,
-            subtemas: `${url}/api/dashboard/subtemas-solicitados`
+        const responseModificaciones = await fetch(`${url}/api/dashboard/obtenerModificaciones`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ anio }),
+            credentials: 'include'
         });
 
-        // 📡 Ejecutar todas las peticiones en paralelo
-        const [
-            responseConteoTickets,
-            responseDependencias,
-            responseSoportes,
-            responseEquipos,
-            responseMantenimientos,
-            responseModificaciones,
-            responseTemas,
-            responseSubtemas
-        ] = await Promise.all([
-            fetch(`${url}/api/dashboard/obtenerEstadoTickets`, {
-                method: 'GET',
-                credentials: 'include'
-            }),
-            fetch(`${url}/api/dashboard/obtenerDependencias`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
-                credentials: 'include'
-            }),
-            fetch(`${url}/api/dashboard/obtenerSoportes`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
-                credentials: 'include'
-            }),
-            fetch(`${url}/api/dashboard/obtenerEquipos`, {
-                method: 'GET',
-                credentials: 'include'
-            }),
-            fetch(`${url}/api/dashboard/obtenerEstadoMantenimiento`, {
-                method: 'GET',
-                credentials: 'include'
-            }),
-            fetch(`${url}/api/dashboard/obtenerModificaciones`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ anio }),
-                credentials: 'include'
-            }),
-            fetch(`${url}/api/dashboard/temas-solicitados`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
-                credentials: 'include'
-            }),
-            fetch(`${url}/api/dashboard/subtemas-solicitados`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fechainicio: fechaInicio, fechafin: fechaFin }),
-                credentials: 'include'
-            })
-        ]);
-
-        console.log('Subtemas Response:', responseSubtemas.status, responseSubtemas.statusText);
-
-        // ❌ Verificar que todas las respuestas sean OK
-        if (!responseConteoTickets.ok || !responseDependencias.ok ||
-            !responseSoportes.ok || !responseEquipos.ok || !responseMantenimientos.ok ||
-            !responseModificaciones.ok || !responseTemas.ok || !responseSubtemas.ok) {
-            throw new Error('Error en una o más peticiones. Estados: ' +
-                `Conteo:${responseConteoTickets.status}, Dep:${responseDependencias.status}, Sop:${responseSoportes.status}, ` +
-                `Eq:${responseEquipos.status}, Mant:${responseMantenimientos.status}, Mod:${responseModificaciones.status}, ` +
-                `Tem:${responseTemas.status}, Sub:${responseSubtemas.status}`);
+        if (!responseModificaciones.ok) {
+            throw new Error(`Error al cargar modificaciones. Estado: ${responseModificaciones.status}`);
         }
 
-        // 📦 Procesar datos JSON
-        const [
-            conteoTickets,
-            datosDependencias,
-            datosSoportes,
-            datosEquipos,
-            datosMantenimientos,
-            datosModificaciones,
-            datosTemas,
-            datosSubtemas
-        ] = await Promise.all([
-            responseConteoTickets.json(),
-            responseDependencias.json(),
-            responseSoportes.json(),
-            responseEquipos.json(),
-            responseMantenimientos.json(),
-            responseModificaciones.json(),
-            responseTemas.json(),
-            responseSubtemas.json()
-        ]);
-
-        console.log('Subtemas Data detallado:', JSON.stringify(datosSubtemas, null, 2));
-
-        // 📊 Actualizar dashboard
-        actualizarTarjetas(conteoTickets.data, datosEquipos);
-        actualizarGraficoSales(datosDependencias.data || []);
-        actualizarGraficoTemas(datosTemas.data || []);
-        actualizarGraficoSubtemas(datosSubtemas.data || []); // ← Aquí ya se actualiza el gráfico de subtemas
-        actualizarGraficoMantenimientos(datosMantenimientos.data);
+        const datosModificaciones = await responseModificaciones.json();
         actualizarGraficoModificaciones(datosModificaciones.data || []);
 
     } catch (error) {
